@@ -4,28 +4,39 @@ import {
   UPLOAD_SYLLABUS_REQUEST,
   uploadSyllabusSuccess,
   uploadSyllabusFailure,
+  SyllabusActionTypes
 } from './syllabusActions';
 
 // API call function
 const uploadSyllabusAPI = async (formData: FormData) => {
   try {
-    // Add userId to formData - you should get this from your auth context or redux store
-    formData.append('userId', '1'); // Replace with actual user ID from your auth system
-    
-    const response = await api.post('/upload-syllabus', formData, {
+    // First, extract text from the syllabus
+    const textExtractionResponse = await api.post('/ocr/extract-text', formData);
+    const { extractedText } = textExtractionResponse.data;
+
+    // Then, generate learning path with the extracted text
+    const learningPathResponse = await api.post('/api/learning-path', {
+      extractedText,
+      startDate: formData.get('startDate'),
+      endDate: formData.get('endDate')
+    }, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        'Content-Type': 'application/json'
       }
     });
-    return response.data;
+
+    if (!learningPathResponse.data.learningPath) {
+      throw new Error('No learning path generated');
+    }
+
+    return learningPathResponse.data.learningPath;
   } catch (error: any) {
-    console.error('Upload error:', error.response?.data || error.message);
     throw new Error(error.response?.data?.error || 'Upload failed');
   }
 };
 
 // Worker Saga
-function* handleSyllabusUpload(action: { type: string; payload: FormData }) {
+function* handleSyllabusUpload(action: { type: string; payload: FormData }): Generator<any, void, any> {
   try {
     const response = yield call(uploadSyllabusAPI, action.payload);
     yield put(uploadSyllabusSuccess(response));

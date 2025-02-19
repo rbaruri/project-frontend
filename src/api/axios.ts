@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 export const api = axios.create({
-    baseURL: 'http://localhost:3000/api',
+    baseURL: 'http://localhost:5000',
     headers: {
         'Content-Type': 'multipart/form-data'
     },
-    withCredentials: true // Enable if you're using cookies
+    withCredentials: false  // Change this to false since we don't need credentials
 });

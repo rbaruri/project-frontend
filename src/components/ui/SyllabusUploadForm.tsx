@@ -8,7 +8,7 @@ interface SyllabusUploadFormProps {
   message: string | null;
   isUploading: boolean;
   isDisabled: boolean;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
   handleFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleDateChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleUpload: () => void;

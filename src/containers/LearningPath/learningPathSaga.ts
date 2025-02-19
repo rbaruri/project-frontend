@@ -1,23 +1,18 @@
 import { call, put, takeLatest } from "redux-saga/effects";
-import { FETCH_LEARNING_PATH_REQUEST, FETCH_LEARNING_PATH_SUCCESS, FETCH_LEARNING_PATH_FAILURE } from "./learningPathConstants";
-import { GET_USER_LEARNING_PATHS } from "../../graphql/queries";
+import { FETCH_LEARNING_PATH_REQUEST } from "./learningPathConstants";
 import { fetchLearningPathSuccess, fetchLearningPathFailure } from "./learningPathActions";
-import { client } from "../../api/apolloClient";
+import { api } from "../../api/axios";
 
-function* fetchLearningPathSaga(action: any) {
+function* fetchLearningPathSaga(action: any): Generator<any, void, any> {
   try {
     const { userId } = action.payload;
-    const { data } = yield call(client.query, {
-      query: GET_USER_LEARNING_PATHS,
-      variables: { userId },
-      fetchPolicy: "network-only",
-    });
+    const { data } = yield call(api.get, `/api/learning-path/${userId}`);
 
-    if (!data?.learning_paths?.length) {
-      throw new Error("No learning paths found");
+    if (!data) {
+      throw new Error("No learning path found");
     }
 
-    yield put(fetchLearningPathSuccess(data.learning_paths[0]));
+    yield put(fetchLearningPathSuccess(data));
   } catch (error: any) {
     yield put(fetchLearningPathFailure(error.message || "Failed to fetch learning path"));
   }

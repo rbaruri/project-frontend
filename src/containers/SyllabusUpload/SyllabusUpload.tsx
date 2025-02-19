@@ -1,22 +1,13 @@
 import React, { useState, useRef, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { uploadSyllabusRequest, uploadSyllabusFailure, SyllabusActionTypes } from "./syllabusActions";
-import { RootState } from "../../redux/store";
+import { uploadSyllabusRequest, uploadSyllabusFailure } from "./syllabusActions";
+import { RootState, AppDispatch } from "../../redux/store";
 import { useNavigate } from "react-router-dom";
 import SyllabusUploadForm from "../../components/ui/SyllabusUploadForm";
-import { Dispatch } from "redux";
 
-const isValidFile = (file: File, dispatch: Dispatch<SyllabusActionTypes>): boolean => {
+const isValidFile = (file: File): boolean => {
   const validTypes = ["application/pdf", "image/png", "image/jpeg", "image/jpg"];
-  if (!validTypes.includes(file.type)) {
-    dispatch(uploadSyllabusFailure("Please upload a PDF or image file"));
-    return false;
-  }
-  if (file.size > 10 * 1024 * 1024) {
-    dispatch(uploadSyllabusFailure("File size should be less than 10MB"));
-    return false;
-  }
-  return true;
+  return validTypes.includes(file.type) && file.size <= 10 * 1024 * 1024;
 };
 
 const SyllabusUpload = () => {
@@ -26,8 +17,8 @@ const SyllabusUpload = () => {
     endDate: "",
   });
 
-  const fileInputRef = useRef<HTMLInputElement>(null) as React.RefObject<HTMLInputElement>;
-  const dispatch = useDispatch<Dispatch<SyllabusActionTypes>>();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const dispatch = useDispatch<AppDispatch>();
   const { status, message } = useSelector((state: RootState) => state.syllabus);
   const navigate = useNavigate();
 
@@ -36,8 +27,10 @@ const SyllabusUpload = () => {
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-    if (selectedFile && isValidFile(selectedFile, dispatch)) {
+    if (selectedFile && isValidFile(selectedFile)) {
       setFormData((prev) => ({ ...prev, file: selectedFile }));
+    } else {
+      dispatch(uploadSyllabusFailure("Please upload a valid PDF or image file (max 10MB)"));
     }
   }, [dispatch]);
 

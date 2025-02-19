@@ -1,8 +1,10 @@
-import { createStore, applyMiddleware, combineReducers } from "redux";
+import { createStore, applyMiddleware, combineReducers, compose } from "redux";
 import createSagaMiddleware from "redux-saga";
 import { learningPathReducer } from "../containers/LearningPath/learningPathReducer";
-import { syllabusReducer } from "../containers/SyllabusUpload/syllabusReducer"; // Import syllabus reducer
-import { rootSaga } from "./rootSaga"; // Import rootSaga
+import { syllabusReducer } from "../containers/SyllabusUpload/syllabusReducer";
+import moduleReducer from "../containers/Modules/moduleReducer";
+import quizReducer from "../containers/Quiz/quizReducer";
+import rootSaga from "./rootSaga";
 
 // Create Saga Middleware
 const sagaMiddleware = createSagaMiddleware();
@@ -10,14 +12,23 @@ const sagaMiddleware = createSagaMiddleware();
 // Combine Reducers
 const rootReducer = combineReducers({
   learningPath: learningPathReducer,
-  syllabus: syllabusReducer, // Add syllabus reducer
+  syllabus: syllabusReducer,
+  modules: moduleReducer,
+  quiz: quizReducer, // ✅ Include quizReducer
 });
 
+// Enable Redux DevTools if available
+const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
 // Create Store with Middleware
-export const store = createStore(rootReducer, applyMiddleware(sagaMiddleware));
+export const store = createStore(
+  rootReducer,
+  composeEnhancers(applyMiddleware(sagaMiddleware))
+);
 
 // Run Root Saga
 sagaMiddleware.run(rootSaga);
 
 // Define RootState Type
 export type RootState = ReturnType<typeof rootReducer>;
+export type AppDispatch = typeof store.dispatch;
