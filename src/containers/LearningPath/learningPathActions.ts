@@ -1,4 +1,4 @@
-import { FETCH_LEARNING_PATH_REQUEST, FETCH_LEARNING_PATH_SUCCESS, FETCH_LEARNING_PATH_FAILURE } from "./constants";
+import { FETCH_LEARNING_PATH_REQUEST, FETCH_LEARNING_PATH_SUCCESS, FETCH_LEARNING_PATH_FAILURE } from "../LearningPath/learningPathConstants";
 
 export const fetchLearningPathRequest = (userId: string) => ({
   type: FETCH_LEARNING_PATH_REQUEST,
