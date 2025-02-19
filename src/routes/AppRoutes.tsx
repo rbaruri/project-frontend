@@ -3,6 +3,7 @@ import { useAuth } from '../hooks/UseAuth';
 import Login from '../pages/Login';
 import SignUp from '../pages/SignUp';
 import Dashboard from '../pages/Dashboard';
+import SyllabusUpload from '../pages/SyllabusUpload';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -28,6 +29,7 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <Dashboard />
+            <SyllabusUpload />
           </ProtectedRoute>
         }
       />
