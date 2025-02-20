@@ -29,7 +29,10 @@ const uploadSyllabusAPI = async (formData: FormData) => {
       throw new Error('No learning path generated');
     }
 
-    return learningPathResponse.data.learningPath;
+    return {
+      syllabusId: learningPathResponse.data.learningPath.courseId,
+      message: 'Syllabus processed and learning path created successfully'
+    };
   } catch (error: any) {
     throw new Error(error.response?.data?.error || 'Upload failed');
   }

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useMemo } from "react";
+import React, { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { uploadSyllabusRequest, uploadSyllabusFailure } from "./syllabusActions";
 import { RootState, AppDispatch } from "../../redux/store";
@@ -18,6 +18,7 @@ const SyllabusUpload = () => {
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigationAttempted = useRef(false);
   const dispatch = useDispatch<AppDispatch>();
   const { status, message } = useSelector((state: RootState) => state.syllabus);
   const navigate = useNavigate();
@@ -49,14 +50,34 @@ const SyllabusUpload = () => {
     data.append("startDate", formData.startDate);
     data.append("endDate", formData.endDate);
 
+    navigationAttempted.current = false;
     dispatch(uploadSyllabusRequest(data));
   }, [dispatch, formData]);
 
-  // Navigate when upload is successful
-  React.useEffect(() => {
-    if (status === "success") {
-      navigate("/learning-path");
-    }
+  // Single effect for handling navigation
+  useEffect(() => {
+    let mounted = true;
+    let timeoutId: NodeJS.Timeout;
+
+    const handleNavigation = () => {
+      if (status === "success" && !navigationAttempted.current && mounted) {
+        navigationAttempted.current = true;
+        timeoutId = setTimeout(() => {
+          if (mounted) {
+            navigate("/learning-path");
+          }
+        }, 100); // Small delay to prevent rapid navigation
+      }
+    };
+
+    handleNavigation();
+
+    return () => {
+      mounted = false;
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [status, navigate]);
 
   return (
