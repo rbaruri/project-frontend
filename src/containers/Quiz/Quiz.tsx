@@ -1,51 +1,73 @@
-import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import Quiz from "./Quiz";
-import { fetchQuizRequest } from "./quizActions";
+import React, { useState } from 'react';
+import QuizComponent from '../../components/ui/Quiz';
 
-const QuizContainer: React.FC = () => {
-  const dispatch = useDispatch();
-  const { quiz, loading, error } = useSelector((state: any) => state.quiz);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
+interface QuizQuestion {
+    question: string;
+    options: string[];
+    correctAnswer: string;
+}
 
-  useEffect(() => {
-    dispatch(fetchQuizRequest());
-  }, [dispatch]);
+interface QuizProps {
+    quiz: QuizQuestion[];
+}
 
-  const handleAnswerSelect = (answer: string) => {
-    const newAnswers = [...selectedAnswers];
-    newAnswers[currentQuestion] = answer;
-    setSelectedAnswers(newAnswers);
-  };
+const Quiz: React.FC<QuizProps> = ({ quiz }) => {
+    const [currentQuestion, setCurrentQuestion] = useState(0);
+    const [selectedAnswers, setSelectedAnswers] = useState<string[]>(new Array(quiz.length).fill(''));
+    const [showResults, setShowResults] = useState(false);
 
-  const handleNext = () => {
-    setCurrentQuestion((prev) => prev + 1);
-  };
+    const handleAnswerSelect = (answer: string) => {
+        const newAnswers = [...selectedAnswers];
+        newAnswers[currentQuestion] = answer;
+        setSelectedAnswers(newAnswers);
+    };
 
-  const handlePrevious = () => {
-    setCurrentQuestion((prev) => prev - 1);
-  };
+    const handleNext = () => {
+        if (currentQuestion < quiz.length - 1) {
+            setCurrentQuestion(prev => prev + 1);
+        }
+    };
 
-  const handleFinish = () => {
-    console.log("Quiz Finished!");
-    console.log("Selected Answers:", selectedAnswers);
-  };
+    const handlePrevious = () => {
+        if (currentQuestion > 0) {
+            setCurrentQuestion(prev => prev - 1);
+        }
+    };
 
-  if (loading) return <p>Loading quiz...</p>;
-  if (error) return <p>{error}</p>;
+    const handleFinish = () => {
+        setShowResults(true);
+    };
 
-  return (
-    <Quiz
-      quiz={quiz}
-      currentQuestion={currentQuestion}
-      selectedAnswers={selectedAnswers}
-      onAnswerSelect={handleAnswerSelect}
-      onNext={handleNext}
-      onPrevious={handlePrevious}
-      onFinish={handleFinish}
-    />
-  );
+    if (showResults) {
+        const score = selectedAnswers.reduce((acc, answer, index) => 
+            answer === quiz[index].correctAnswer ? acc + 1 : acc, 0);
+        
+        return (
+            <div className="quiz-results">
+                <h2>Quiz Results</h2>
+                <p>Your score: {score} out of {quiz.length}</p>
+                <button onClick={() => {
+                    setShowResults(false);
+                    setCurrentQuestion(0);
+                    setSelectedAnswers(new Array(quiz.length).fill(''));
+                }}>
+                    Retry Quiz
+                </button>
+            </div>
+        );
+    }
+
+    return (
+        <QuizComponent
+            quiz={quiz}
+            currentQuestion={currentQuestion}
+            selectedAnswers={selectedAnswers}
+            onAnswerSelect={handleAnswerSelect}
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+            onFinish={handleFinish}
+        />
+    );
 };
 
-export default QuizContainer;
+export default Quiz;
