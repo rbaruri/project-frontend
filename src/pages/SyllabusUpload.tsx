@@ -1,4 +1,3 @@
-import React from "react";
 import SyllabusUpload from "../containers/SyllabusUpload/SyllabusUpload";
 
 const SyllabusUploadPage = () => {

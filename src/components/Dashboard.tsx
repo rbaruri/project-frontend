@@ -1,18 +1,15 @@
 import React from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 
-const Dashboard: React.FC = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+interface DashboardProps {
+  firstName: string;
+  email: string;
+  onLogout: () => void;
+}
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
+const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout }) => {
   return (
     <div className="min-h-screen bg-gray-100">
+      {/* Navbar */}
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
@@ -20,9 +17,9 @@ const Dashboard: React.FC = () => {
               <h1 className="text-xl font-semibold">Dashboard</h1>
             </div>
             <div className="flex items-center">
-              <span className="mr-4">Welcome, {user?.firstName}!</span>
+              <span className="mr-4">Welcome, {firstName}!</span>
               <button
-                onClick={handleLogout}
+                onClick={onLogout}
                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium"
               >
                 Logout
@@ -32,10 +29,12 @@ const Dashboard: React.FC = () => {
         </div>
       </nav>
 
+      {/* Dashboard Content */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 p-4">
             <h2 className="text-2xl font-bold mb-4">Your Dashboard Content</h2>
+            <p>Email: {email}</p>
             <p>Welcome to your dashboard! This is a protected route.</p>
           </div>
         </div>
@@ -44,4 +43,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

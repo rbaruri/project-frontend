@@ -1,14 +1,15 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import Login from "../pages/Login";
-import SignUp from "../pages/SignUp";
-import Dashboard from "../pages/Dashboard";
-import CoursesDetails from "../pages/CoursesDetails";
-import LearningPath from "../pages/LearningPath";
-import ModuleDetails from "../pages/ModuleDetails";
-import SyllabusUpload from "../pages/SyllabusUpload";
+import LoginPage from "../pages/Login";
+import SignUpPage from "../pages/SignUp";
+import DashboardPage from "../pages/Dashboard";
+import CourseDetailsPage from "../pages/CoursesDetails";
+import LearningPathPage from "../pages/LearningPath";
+import ModuleDetailsPage from "../pages/ModuleDetails";
+import SyllabusUploadPage from "../pages/SyllabusUpload";
 import ProtectedRoute from "./ProtectedRoute";
+import CoursesPage from '../pages/Courses';
 
 const AppRoutes: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -16,75 +17,37 @@ const AppRoutes: React.FC = () => {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route
-        path="/login"
-        element={
-          isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignUp />
-        }
-      />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignUpPage />} />
 
       {/* Protected Routes */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/courses/:courseId"
-        element={
-          <ProtectedRoute>
-            <CoursesDetails />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/learning-path"
-        element={
-          <ProtectedRoute>
-            <LearningPath />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/courses/:courseId/modules/:moduleId"
-        element={
-          <ProtectedRoute>
-            <ModuleDetails />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/syllabus-upload"
-        element={
-          <ProtectedRoute>
-            <SyllabusUpload />
-          </ProtectedRoute>
-        }
-      />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/courses" element={<CoursesPage />} />
+        <Route path="/courses/:courseId" element={<CourseDetailsPage />} />
+        <Route path="/modules/:moduleId" element={<ModuleDetailsPage />} />
+        <Route path="/learning-path" element={<LearningPathPage />} />
+        <Route path="/syllabus-upload" element={<SyllabusUploadPage />} />
+      </Route>
 
       {/* Default Route */}
       <Route
         path="/"
         element={
           isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
           ) : (
-            <Navigate to="/login" replace />
+            <ProtectedRoute>
+              <LoginPage />
+            </ProtectedRoute>
           )
         }
       />
 
       {/* Catch-all Route */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<DashboardPage />} />
     </Routes>
   );
 };

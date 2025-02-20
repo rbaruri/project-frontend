@@ -1,44 +1,100 @@
-import { useQuery, gql } from "@apollo/client";
-import { useParams } from "react-router-dom";
+import React from 'react';
+import { useQuery } from "@apollo/client";
+import { useParams, Navigate } from "react-router-dom";
+import { GET_COURSE_WITH_LEARNING_PATH } from '../graphql/queries/courses';
 
-const GET_COURSE_DETAILS = gql`
-  query GetCourseDetails($id: uuid!) {
-    learning_paths_by_pk(id: $id) {
-      course_name
-      modules {
-        id
-        title
-        description
-        duration
-      }
+interface Module {
+  id: string;
+  title: string;
+  description: string;
+  duration: number;
+}
+
+interface CourseWithLearningPath {
+  courses_by_pk: {
+    id: string;
+    name: string;
+    start_date: string;
+    end_date: string;
+    learning_paths: Array<{
+      id: string;
+      syllabus_text: string;
+      generated_path: {
+        modules: Module[];
+      };
+      created_at: string;
+    }>;
+  };
+}
+
+const CourseDetails: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const { loading, error, data } = useQuery<CourseWithLearningPath>(
+    GET_COURSE_WITH_LEARNING_PATH,
+    {
+      variables: { id },
     }
+  );
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
-`;
 
-const CourseDetails = () => {
-  const { id } = useParams<{ id: string }>(); // Get course ID from URL
-  const { loading, error, data } = useQuery(GET_COURSE_DETAILS, {
-    variables: { id },
-  });
+  if (error) {
+    return (
+      <div className="text-center p-8 text-red-600">
+        <h3 className="text-xl font-semibold mb-2">Error Loading Course</h3>
+        <p>{error.message}</p>
+      </div>
+    );
+  }
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  if (!data?.courses_by_pk || !data.courses_by_pk.learning_paths?.[0]) {
+    return <Navigate to="/not-found" replace />;
+  }
+
+  const course = data.courses_by_pk;
+  const learningPath = course.learning_paths[0];
+  const modules = learningPath.generated_path.modules || [];
 
   return (
-    <>
-      <div className="p-4">
-        <h2 className="text-xl font-bold mb-4">{data.learning_paths_by_pk.course_name}</h2>
-        <ul className="space-y-4">
-          {data.learning_paths_by_pk.modules.map((module: any) => (
-            <li key={module.id} className="p-4 border rounded-lg shadow">
-              <h3 className="text-lg font-semibold">{module.title}</h3>
-              <p>{module.description}</p>
-              <p>Duration: {module.duration} hours</p>
-            </li>
-          ))}
-        </ul>
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">{course.name}</h1>
+        <div className="flex gap-4 text-gray-600">
+          <span>Start Date: {new Date(course.start_date).toLocaleDateString()}</span>
+          <span>End Date: {new Date(course.end_date).toLocaleDateString()}</span>
+        </div>
       </div>
-    </>
+
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4">Course Syllabus</h2>
+        <p className="whitespace-pre-wrap text-gray-600">{learningPath.syllabus_text}</p>
+      </div>
+
+      <div>
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">Learning Modules</h2>
+        <div className="space-y-4">
+          {modules.map((module, index) => (
+            <div key={module.id} className="bg-white rounded-lg shadow-md p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold text-gray-800">
+                  Module {index + 1}: {module.title}
+                </h3>
+                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                  {module.duration} hours
+                </span>
+              </div>
+              <p className="text-gray-600">{module.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -1,25 +1,22 @@
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import { ApolloProvider } from '@apollo/client';
 import { AuthProvider } from './context/AuthContext';
-import { store } from './redux/store';
-import { client } from './apollo/client';
 import AppRoutes from './routes/AppRoutes';
-import './App.css';
+import Navbar from './components/Navbar';
 
-const App: React.FC = () => {
+function App() {
   return (
-    <ApolloProvider client={client}>
-      <Provider store={store}>
-        <AuthProvider>
-          <Router>
+    <AuthProvider>
+      <Router>
+        <div className="min-h-screen bg-gray-50">
+          <Navbar />
+          <main>
             <AppRoutes />
-          </Router>
-        </AuthProvider>
-      </Provider>
-    </ApolloProvider>
+          </main>
+        </div>
+      </Router>
+    </AuthProvider>
   );
-};
+}
 
 export default App;
