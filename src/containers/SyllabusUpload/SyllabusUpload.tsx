@@ -64,7 +64,7 @@ const SyllabusUpload = () => {
         navigationAttempted.current = true;
         timeoutId = setTimeout(() => {
           if (mounted) {
-            navigate("/learning-path");
+            navigate("/courses");
           }
         }, 100); // Small delay to prevent rapid navigation
       }

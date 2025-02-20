@@ -14,7 +14,7 @@ interface LearningPathProps {
   onModuleClick: (module: Module) => void;
 }
 
-const LearningPathComponent: React.FC<LearningPathProps> = ({ 
+const LearningPath: React.FC<LearningPathProps> = ({ 
   modules, 
   overallProgress, 
   onModuleClick 
@@ -42,4 +42,4 @@ const LearningPathComponent: React.FC<LearningPathProps> = ({
   );
 };
 
-export default LearningPathComponent;
+export default LearningPath;

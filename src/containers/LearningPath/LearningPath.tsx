@@ -4,7 +4,7 @@ import { selectLearningPath, selectLearningPathLoading, selectLearningPathError 
 import LearningPathComponent from "../../components/ui/LearningPath";
 import { useNavigate } from "react-router-dom";
 
-const LearningPathContainer = () => {
+const LearningPath = () => {
   const learningPath = useSelector(selectLearningPath);
   const loading = useSelector(selectLearningPathLoading);
   const error = useSelector(selectLearningPathError);
@@ -27,4 +27,4 @@ const LearningPathContainer = () => {
   );
 };
 
-export default LearningPathContainer;
+export default LearningPath;

@@ -1,11 +1,15 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import Login from '../components/auth/Login';
-import Signup from '../components/auth/Signup';
-import Dashboard from '../components/Dashboard';
-import ProtectedRoute from '../components/auth/ProtectedRoute';
-import SyllabusUpload from '../containers/SyllabusUpload/SyllabusUpload';
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Login from "../pages/Login";
+import SignUp from "../pages/SignUp";
+import Dashboard from "../pages/Dashboard";
+import CoursesDetails from "../pages/CoursesDetails";
+import LearningPath from "../pages/LearningPath";
+import ModuleDetails from "../pages/ModuleDetails";
+import SyllabusUpload from "../pages/SyllabusUpload";
+import ProtectedRoute from "./ProtectedRoute";
+
 const AppRoutes: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
@@ -21,7 +25,7 @@ const AppRoutes: React.FC = () => {
       <Route
         path="/signup"
         element={
-          isAuthenticated ? <Navigate to="/dashboard" replace /> : <Signup />
+          isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignUp />
         }
       />
 
@@ -31,8 +35,38 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/courses/:courseId"
+        element={
+          <ProtectedRoute>
+            <CoursesDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/learning-path"
+        element={
+          <ProtectedRoute>
+            <LearningPath />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/courses/:courseId/modules/:moduleId"
+        element={
+          <ProtectedRoute>
+            <ModuleDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/syllabus-upload"
+        element={
+          <ProtectedRoute>
             <SyllabusUpload />
-
           </ProtectedRoute>
         }
       />
@@ -49,11 +83,10 @@ const AppRoutes: React.FC = () => {
         }
       />
 
-      {/* Catch all route */}
+      {/* Catch-all Route */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };
 
 export default AppRoutes;
-
