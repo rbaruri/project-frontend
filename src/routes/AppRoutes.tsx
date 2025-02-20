@@ -1,33 +1,59 @@
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from '../hooks/UseAuth';
-import Login from '../pages/Login';
-import SignUp from '../pages/SignUp';
-import Dashboard from '../pages/Dashboard';
+import { useAuth } from '../context/AuthContext';
+import Login from '../components/auth/Login';
+import Signup from '../components/auth/Signup';
+import Dashboard from '../components/Dashboard';
+import ProtectedRoute from '../components/auth/ProtectedRoute';
 import SyllabusUpload from '../containers/SyllabusUpload/SyllabusUpload';
-import LearningPathContainer from '../containers/LearningPath/LearningPath';
+const AppRoutes: React.FC = () => {
+  const { isAuthenticated } = useAuth();
 
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-}
-
-const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { user } = useAuth();
-  
-  if (!user) {
-    return <Navigate to="/login" />;
-  }
-  
-  return <>{children}</>;
-};
-
-export const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/upload" replace />} />
-      <Route path="/upload" element={<SyllabusUpload />} />
-      <Route path="/learning-path" element={<LearningPathContainer />} />
-      <Route path="*" element={<Navigate to="/upload" replace />} />
+      {/* Public Routes */}
+      <Route
+        path="/login"
+        element={
+          isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          isAuthenticated ? <Navigate to="/dashboard" replace /> : <Signup />
+        }
+      />
+
+      {/* Protected Routes */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+            <SyllabusUpload />
+
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Default Route */}
+      <Route
+        path="/"
+        element={
+          isAuthenticated ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+
+      {/* Catch all route */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };
+
+export default AppRoutes;
 
