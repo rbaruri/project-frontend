@@ -5,20 +5,20 @@ interface CalendarProps {
   name: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  min?: string;
+  className?: string;
 }
 
-const Calendar: React.FC<CalendarProps> = ({ label, name, value, onChange, min }) => {
+const Calendar: React.FC<CalendarProps> = ({ label, name, value, onChange, className }) => {
   return (
     <div>
       <label className="text-sm text-gray-600 block mb-1">{label}</label>
       <input
         type="date"
         name={name}
-        className="w-full px-3 py-2 border rounded-md focus:ring focus:ring-indigo-200"
+        className={className}
         value={value}
         onChange={onChange}
-        min={min}
+        aria-label={label}
       />
     </div>
   );

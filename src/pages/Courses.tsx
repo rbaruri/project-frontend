@@ -3,9 +3,17 @@ import CoursesContainer from '../containers/Courses/Courses';
 
 const CoursesPage: React.FC = () => {
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-l font-bold text-gray-800 mb-8 px-6">My Courses</h1>
-      <CoursesContainer />
+    <div className="space-y-6">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-purple-600 to-purple-800 rounded-lg shadow-lg p-6 text-white">
+        <h1 className="text-3xl font-bold mb-2">My Courses</h1>
+        <p className="text-purple-100">Explore your enrolled courses and track your progress</p>
+      </div>
+
+      {/* Courses Content */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <CoursesContainer />
+      </div>
     </div>
   );
 };

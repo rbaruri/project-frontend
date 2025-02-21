@@ -1,6 +1,7 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import LandingPage from "../pages/Landing";
 import LoginPage from "../pages/Login";
 import SignUpPage from "../pages/SignUp";
 import DashboardPage from "../pages/Dashboard";
@@ -16,13 +17,23 @@ const AppRoutes: React.FC = () => {
 
   return (
     <Routes>
-      {/* Public Routes */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignUpPage />} />
+      {/* Public Routes - Only accessible when not authenticated */}
+      <Route
+        path="/"
+        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />}
+      />
+      <Route
+        path="/login"
+        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />}
+      />
+      <Route
+        path="/signup"
+        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignUpPage />}
+      />
 
-      {/* Protected Routes */}
+      {/* Protected Routes - Only accessible when authenticated */}
       <Route element={<ProtectedRoute />}>
-        <Route path="/" element={<DashboardPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/courses" element={<CoursesPage />} />
         <Route path="/courses/:courseId" element={<CourseDetailsPage />} />
         <Route path="/modules/:moduleId" element={<ModuleDetailsPage />} />
@@ -30,24 +41,11 @@ const AppRoutes: React.FC = () => {
         <Route path="/syllabus-upload" element={<SyllabusUploadPage />} />
       </Route>
 
-      {/* Default Route */}
-      <Route
-        path="/"
-        element={
-          isAuthenticated ? (
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          ) : (
-            <ProtectedRoute>
-              <LoginPage />
-            </ProtectedRoute>
-          )
-        }
+      {/* Catch-all Route - Redirect to appropriate page based on auth status */}
+      <Route 
+        path="*" 
+        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/" replace />} 
       />
-
-      {/* Catch-all Route */}
-      <Route path="*" element={<DashboardPage />} />
     </Routes>
   );
 };
