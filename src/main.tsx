@@ -2,16 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { store } from './redux/store'; // Make sure this path is correct
+import { store } from './redux/store'; 
 import AppRoutes from './routes/AppRoutes';
 import { AuthProvider } from './context/AuthContext';
 import { ApolloProvider } from '@apollo/client';
 import { client } from './api/apolloClient';
+import './index.css'; // Import Tailwind CSS
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <Provider store={store}>  {/* 🔹 Wrap in Redux Provider */}
+      <Provider store={store}> 
         <AuthProvider>
           <BrowserRouter>
             <AppRoutes />
