@@ -17,12 +17,9 @@ const uploadSyllabusAPI = async (formData: FormData) => {
     // Then, generate learning path with the extracted text
     const learningPathResponse = await api.post('/api/learning-path', {
       extractedText,
+      courseName: formData.get('courseName'),
       startDate: formData.get('startDate'),
       endDate: formData.get('endDate')
-    }, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
     });
 
     if (!learningPathResponse.data.learningPath) {
@@ -30,11 +27,11 @@ const uploadSyllabusAPI = async (formData: FormData) => {
     }
 
     return {
-      syllabusId: learningPathResponse.data.learningPath.courseId,
+      syllabusId: learningPathResponse.data.courseId,
       message: 'Syllabus processed and learning path created successfully'
     };
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || 'Upload failed');
+    throw new Error(error.response?.data?.error || error.response?.data?.details || 'Upload failed');
   }
 };
 

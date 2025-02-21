@@ -11,8 +11,14 @@ const isValidFile = (file: File): boolean => {
 };
 
 const SyllabusUpload = () => {
-  const [formData, setFormData] = useState<{ file: File | null; startDate: string; endDate: string }>({
+  const [formData, setFormData] = useState<{ 
+    file: File | null; 
+    courseName: string;
+    startDate: string; 
+    endDate: string;
+  }>({
     file: null,
+    courseName: "",
     startDate: "",
     endDate: "",
   });
@@ -24,7 +30,10 @@ const SyllabusUpload = () => {
   const navigate = useNavigate();
 
   const isUploading = useMemo(() => status === "uploading", [status]);
-  const isDisabled = useMemo(() => !formData.file || !formData.startDate || !formData.endDate || isUploading, [formData, isUploading]);
+  const isDisabled = useMemo(
+    () => !formData.file || !formData.courseName || !formData.startDate || !formData.endDate || isUploading,
+    [formData, isUploading]
+  );
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -35,18 +44,19 @@ const SyllabusUpload = () => {
     }
   }, [dispatch]);
 
-  const handleDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }, []);
 
   const handleUpload = useCallback(() => {
-    if (!formData.file || !formData.startDate || !formData.endDate) {
-      dispatch(uploadSyllabusFailure("Please select a file and specify the date range"));
+    if (!formData.file || !formData.courseName || !formData.startDate || !formData.endDate) {
+      dispatch(uploadSyllabusFailure("Please fill in all required fields"));
       return;
     }
 
     const data = new FormData();
     data.append("file", formData.file);
+    data.append("courseName", formData.courseName);
     data.append("startDate", formData.startDate);
     data.append("endDate", formData.endDate);
 
@@ -88,7 +98,7 @@ const SyllabusUpload = () => {
       isDisabled={isDisabled}
       fileInputRef={fileInputRef}
       handleFileSelect={handleFileSelect}
-      handleDateChange={handleDateChange}
+      handleInputChange={handleInputChange}
       handleUpload={handleUpload}
     />
   );
