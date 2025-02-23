@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { UPDATE_COURSE_NAME, DELETE_COURSE, GET_COURSES_WITH_LEARNING_PATHS } from "../../graphql/queries/courses";
 
 interface Course {
   id: string;
@@ -8,17 +10,69 @@ interface Course {
   hours_per_week: number;
   start_date: string;
   end_date: string;
+  progress: number;
   onClick: () => void;
 }
 
 interface CourseCardProps {
   course: Course;
+  userId: number;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ course, userId }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [newName, setNewName] = useState(course.course_name);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
   const startDate = new Date(course.start_date);
   const endDate = new Date(course.end_date);
-  const progress = calculateProgress(startDate, endDate);
+
+  const [updateCourseName] = useMutation(UPDATE_COURSE_NAME, {
+    refetchQueries: [
+      {
+        query: GET_COURSES_WITH_LEARNING_PATHS,
+        variables: { userId }
+      }
+    ]
+  });
+
+  const [deleteCourse] = useMutation(DELETE_COURSE, {
+    refetchQueries: [
+      {
+        query: GET_COURSES_WITH_LEARNING_PATHS,
+        variables: { userId }
+      }
+    ]
+  });
+
+  const handleUpdateName = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newName.trim() === "") return;
+    
+    try {
+      await updateCourseName({
+        variables: {
+          id: course.id,
+          name: newName.trim()
+        }
+      });
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating course name:", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteCourse({
+        variables: {
+          id: course.id
+        }
+      });
+    } catch (error) {
+      console.error("Error deleting course:", error);
+    }
+  };
 
   return (
     <div
@@ -26,18 +80,122 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
       onClick={course.onClick}
     >
       <div className="p-6">
-        <h3 className="text-xl font-semibold text-gray-800 mb-3">{course.course_name}</h3>
-        
+        {/* Course Name - Editable */}
+        <div className="flex justify-between items-start mb-3">
+          {isEditing ? (
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleUpdateName(e);
+            }} className="flex-1 mr-2" onClick={e => e.stopPropagation()}>
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                className="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                autoFocus
+                onClick={e => e.stopPropagation()}
+              />
+              <div className="flex gap-2 mt-2">
+                <button
+                  type="submit"
+                  className="text-sm px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                  onClick={e => e.stopPropagation()}
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setNewName(course.course_name);
+                    setIsEditing(false);
+                  }}
+                  className="text-sm px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          ) : (
+            <>
+              <h3 className="text-xl font-semibold text-gray-800">{course.course_name}</h3>
+              <div className="flex gap-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsEditing(true);
+                  }}
+                  className="text-gray-600 hover:text-blue-600"
+                  title="Edit course name"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowDeleteConfirm(true);
+                  }}
+                  className="text-gray-600 hover:text-red-600"
+                  title="Delete course"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full mx-4">
+              <h4 className="text-lg font-semibold mb-4">Delete Course</h4>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to delete "{course.course_name}"? This action cannot be undone.
+              </p>
+              <div className="flex justify-end gap-4">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowDeleteConfirm(false);
+                  }}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete();
+                    setShowDeleteConfirm(false);
+                  }}
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Progress Bar */}
         <div className="mb-4">
           <div className="flex justify-between text-sm text-gray-600 mb-1">
             <span>Course Progress</span>
-            <span>{Math.round(progress)}%</span>
+            <span>{Math.round(course.progress)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
               className="bg-blue-600 h-2 rounded-full transition-all"
-              style={{ width: `${progress}%` }}
+              style={{ width: `${course.progress}%` }}
             ></div>
           </div>
         </div>
@@ -77,18 +235,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
       </div>
     </div>
   );
-};
-
-// Helper function to calculate progress based on dates
-const calculateProgress = (startDate: Date, endDate: Date): number => {
-  const today = new Date();
-  const total = endDate.getTime() - startDate.getTime();
-  const elapsed = today.getTime() - startDate.getTime();
-  
-  if (today < startDate) return 0;
-  if (today > endDate) return 100;
-  
-  return Math.min(100, Math.max(0, (elapsed / total) * 100));
 };
 
 export default CourseCard;

@@ -3,6 +3,7 @@ import { api } from '../api/axios';
 
 interface User {
   id: string;
+  userId: string;
   email: string;
   firstName: string;
   lastName: string;

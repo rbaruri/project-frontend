@@ -3,6 +3,7 @@ import { useQuery } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import CourseCard from "../../components/ui/CourseCard";
 import { GET_COURSES_WITH_LEARNING_PATHS } from '../../graphql/queries/courses';
+import { useAuth } from '../../context/AuthContext';
 
 interface Course {
   id: string;
@@ -14,6 +15,11 @@ interface Course {
     generated_path: any;
     created_at: string;
   }>;
+  modules: Array<{
+    id: string;
+    title: string;
+    status: string;
+  }>;
 }
 
 interface GetCoursesData {
@@ -21,8 +27,19 @@ interface GetCoursesData {
 }
 
 const CoursesContainer: React.FC = () => {
-  const { loading, error, data } = useQuery<GetCoursesData>(GET_COURSES_WITH_LEARNING_PATHS);
+  const { user } = useAuth();
+  const { loading, error, data } = useQuery<GetCoursesData>(GET_COURSES_WITH_LEARNING_PATHS, {
+    variables: { userId: parseInt(user?.userId || '0', 10) },
+    skip: !user?.userId
+  });
   const navigate = useNavigate();
+
+  // Calculate actual course progress based on completed modules
+  const calculateCourseProgress = (modules: Course['modules']): number => {
+    if (!modules || modules.length === 0) return 0;
+    const completedModules = modules.filter(module => module.status === 'completed').length;
+    return Math.round((completedModules / modules.length) * 100);
+  };
 
   if (loading) {
     return (
@@ -90,8 +107,10 @@ const CoursesContainer: React.FC = () => {
               calculateTotalHours(course.learning_paths[0]?.generated_path),
               calculateWeeksBetweenDates(new Date(course.start_date), new Date(course.end_date))
             ),
+            progress: calculateCourseProgress(course.modules),
             onClick: () => navigate(`/courses/${course.id}`),
           }}
+          userId={parseInt(user?.userId || '0', 10)}
         />
       ))}
     </div>

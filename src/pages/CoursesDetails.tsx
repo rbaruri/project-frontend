@@ -3,6 +3,7 @@ import { useQuery } from "@apollo/client";
 import { useParams, Navigate } from "react-router-dom";
 import { GET_COURSE_WITH_LEARNING_PATH } from '../graphql/queries/courses';
 import ModuleList from '../components/modules/ModuleList';
+import { useAuth } from '../context/AuthContext';
 
 interface Resource {
   id: string;
@@ -32,6 +33,7 @@ interface CourseData {
     name: string;
     start_date: string;
     end_date: string;
+    user_id: string;
   };
   modules: Module[];
   resources: Resource[];
@@ -40,15 +42,21 @@ interface CourseData {
 
 const CourseDetails: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
+  const { user } = useAuth();
 
   if (!courseId) {
     return <Navigate to="/courses" />;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" />;
   }
 
   const { loading, error, data } = useQuery<CourseData>(
     GET_COURSE_WITH_LEARNING_PATH,
     {
       variables: { id: courseId },
+      skip: !courseId
     }
   );
 
@@ -71,6 +79,11 @@ const CourseDetails: React.FC = () => {
 
   if (!data?.courses_by_pk) {
     return <Navigate to="/not-found" replace />;
+  }
+
+  // Check if the course belongs to the current user
+  if (parseInt(data.courses_by_pk.user_id, 10) !== parseInt(user.userId, 10)) {
+    return <Navigate to="/courses" replace />;
   }
 
   const course = data.courses_by_pk;
