@@ -14,6 +14,7 @@ const ModuleDetailsPage = lazy(() => import("../pages/ModuleDetails"));
 const SyllabusUploadPage = lazy(() => import("../pages/SyllabusUpload"));
 const CoursesPage = lazy(() => import('../pages/Courses'));
 const QuizPage = lazy(() => import('../pages/Quiz'));
+const ProfilePage = lazy(() => import('../pages/Profile'));
 
 const AppRoutes: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -44,6 +45,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/learning-path" element={<LearningPathPage />} />
           <Route path="/syllabus-upload" element={<SyllabusUploadPage />} />
           <Route path="/quiz/:quizId" element={<QuizPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
 
         {/* Catch-all Route - Redirect to appropriate page based on auth status */}
