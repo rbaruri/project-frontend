@@ -6,5 +6,17 @@ export default defineConfig({
   plugins: [react()],
   css: {
     postcss: './postcss.config.js'
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['react', 'react-dom', 'react-router-dom'],
+          'auth': ['./src/context/AuthContext.tsx'],
+          'dashboard': ['./src/pages/Dashboard.tsx'],
+          'courses': ['./src/pages/Courses.tsx'],
+        }
+      }
+    }
   }
 })

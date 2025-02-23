@@ -2,6 +2,7 @@ import React, { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/UseAuth';
 import LoginForm from '../../components/LoginForm';
+import { api } from '../../api/axios';
 
 const LoginContainer: React.FC = () => {
   const navigate = useNavigate();
@@ -12,28 +13,32 @@ const LoginContainer: React.FC = () => {
     password: '',
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     try {
-      // In a real application, you would make an API call here
-      // For demo purposes, we're creating a mock response
-      const mockApiResponse = {
-        user: {
-          id: '1', // Mock ID
-          email: formData.email,
-          firstName: formData.email.split('@')[0],
-          lastName: 'User',
-        },
-        token: 'mock-jwt-token', // In real app, this would come from your backend
-      };
+      const response = await api.post('/api/auth/login', {
+        email: formData.email,
+        password: formData.password,
+      });
+
+      const { user, token } = response.data;
       
-      login(mockApiResponse);
+      if (!token) {
+        throw new Error('No token received from server');
+      }
+
+      login({ user, token });
       navigate('/dashboard');
-    } catch (err) {
-      setError('Invalid credentials');
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.response?.data?.message || 'Invalid credentials');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -45,6 +50,7 @@ const LoginContainer: React.FC = () => {
     <LoginForm
       formData={formData}
       error={error}
+      loading={loading}
       onSubmit={handleSubmit}
       onChange={handleChange}
     />
