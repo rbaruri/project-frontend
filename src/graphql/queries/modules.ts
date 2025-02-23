@@ -8,6 +8,12 @@ export const GET_MODULES_BY_COURSE = gql`
       title
       status
       created_at
+      resources {
+        id
+        title
+        url
+        created_at
+      }
     }
   }
 `;
@@ -20,6 +26,12 @@ export const GET_ALL_MODULES = gql`
       title
       status
       created_at
+      resources {
+        id
+        title
+        url
+        created_at
+      }
     }
   }
 `; 
