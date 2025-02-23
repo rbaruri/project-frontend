@@ -32,6 +32,11 @@ export const GET_MODULES_BY_COURSE = gql`
         score
         created_at
       }
+      similar_questions {
+        id
+        question
+        created_at
+      }
     }
   }
 `;
@@ -54,6 +59,11 @@ export const GET_ALL_MODULES = gql`
         id
         cutoff_score
         status
+        created_at
+      }
+      similar_questions {
+        id
+        question
         created_at
       }
     }
@@ -87,6 +97,12 @@ export interface Quiz {
   score: number;
 }
 
+export interface SimilarQuestion {
+  id: string;
+  question: string;
+  created_at: string;
+}
+
 export interface Module {
   id: string;
   title: string;
@@ -94,4 +110,5 @@ export interface Module {
   created_at: string;
   resources: Resource[];
   quizzes: Quiz[];
+  similar_questions: SimilarQuestion[];
 } 
