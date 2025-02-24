@@ -144,6 +144,59 @@ const Quiz: React.FC = () => {
 
   const [updateModuleStatus] = useMutation(UPDATE_MODULE_STATUS);
 
+  // Function to save answers to local storage
+  const saveAnswersToLocalStorage = useCallback((answers: UserAnswers) => {
+    if (quizId) {
+      localStorage.setItem(`quiz_${quizId}_answers`, JSON.stringify(answers));
+      localStorage.setItem(`quiz_${quizId}_timestamp`, Date.now().toString());
+    }
+  }, [quizId]);
+
+  // Function to load answers from local storage
+  const loadAnswersFromLocalStorage = useCallback((): UserAnswers | null => {
+    if (!quizId) return null;
+
+    const savedAnswers = localStorage.getItem(`quiz_${quizId}_answers`);
+    const savedTimestamp = localStorage.getItem(`quiz_${quizId}_timestamp`);
+
+    if (savedAnswers && savedTimestamp) {
+      const timestamp = parseInt(savedTimestamp);
+      const now = Date.now();
+      // Only restore answers if they were saved within the quiz time limit
+      if (now - timestamp <= QUIZ_TIME_LIMIT * 1000) {
+        try {
+          return JSON.parse(savedAnswers);
+        } catch (e) {
+          console.error('Error parsing saved answers:', e);
+        }
+      }
+    }
+    return null;
+  }, [quizId]);
+
+  // Load saved answers when component mounts
+  useEffect(() => {
+    if (!isSubmitted && !showResults) {
+      const savedAnswers = loadAnswersFromLocalStorage();
+      if (savedAnswers) {
+        setUserAnswers(savedAnswers);
+        // Update current question index based on the last answered question
+        const answeredQuestions = Object.keys(savedAnswers).length;
+        if (answeredQuestions > 0) {
+          setCurrentQuestionIndex(Math.min(answeredQuestions - 1, currentQuestionIndex));
+        }
+      }
+    }
+  }, [loadAnswersFromLocalStorage, isSubmitted, showResults]);
+
+  // Clear saved answers when quiz is submitted or retaken
+  useEffect(() => {
+    if (isSubmitted || showResults) {
+      localStorage.removeItem(`quiz_${quizId}_answers`);
+      localStorage.removeItem(`quiz_${quizId}_timestamp`);
+    }
+  }, [isSubmitted, showResults, quizId]);
+
   // Timer functionality
   useEffect(() => {
     if (!isSubmitted && !showResults) {
@@ -168,10 +221,13 @@ const Quiz: React.FC = () => {
   };
 
   const handleAnswerSelect = (questionId: string, selectedOption: string) => {
-    setUserAnswers(prev => ({
-      ...prev,
+    const newAnswers = {
+      ...userAnswers,
       [questionId]: selectedOption
-    }));
+    };
+    setUserAnswers(newAnswers);
+    // Save to local storage whenever an answer is selected
+    saveAnswersToLocalStorage(newAnswers);
   };
 
   const calculateScore = (questions: QuizQuestion[], answers: UserAnswers): number => {
