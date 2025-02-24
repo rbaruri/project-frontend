@@ -9,15 +9,19 @@ interface CalendarProps {
 }
 
 const Calendar: React.FC<CalendarProps> = ({ label, name, value, onChange, className }) => {
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
+
   return (
     <div>
       <label className="text-sm text-gray-600 block mb-1">{label}</label>
       <input
         type="date"
         name={name}
-        className={className}
+        className={`${className} disabled:opacity-50 disabled:cursor-not-allowed`}
         value={value}
         onChange={onChange}
+        min={today}
         aria-label={label}
       />
     </div>
