@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { useAuth } from '../context/AuthContext';
-import { GET_USER_PROFILE, UPDATE_USER_PROFILE } from '../graphql/queries/user';
+import { GET_USER_PROFILE, UPDATE_USER_PROFILE, UPDATE_USER_PASSWORD } from '../graphql/queries/user';
 import { Navigate } from 'react-router-dom';
 
 interface UserProfile {
@@ -15,7 +15,9 @@ interface UserProfile {
 const ProfilePage: React.FC = () => {
   const { user, login } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const { loading, data } = useQuery(GET_USER_PROFILE, {
     variables: { userId: parseInt(user?.userId || '0', 10) },
@@ -40,6 +42,25 @@ const ProfilePage: React.FC = () => {
     }
   });
 
+  const [updatePassword] = useMutation(UPDATE_USER_PASSWORD, {
+    onCompleted: (data) => {
+      if (data.update_user_password.success) {
+        setIsChangingPassword(false);
+        setPasswordError(null);
+        setPasswordData({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        });
+      } else {
+        setPasswordError(data.update_user_password.message);
+      }
+    },
+    onError: (error) => {
+      setPasswordError(error.message);
+    }
+  });
+
   const [formData, setFormData] = useState<{
     firstName: string;
     lastName: string;
@@ -48,6 +69,16 @@ const ProfilePage: React.FC = () => {
     firstName: '',
     lastName: '',
     email: ''
+  });
+
+  const [passwordData, setPasswordData] = useState<{
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  }>({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
   });
 
   React.useEffect(() => {
@@ -94,6 +125,41 @@ const ProfilePage: React.FC = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPasswordData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError(null);
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError("New passwords don't match");
+      return;
+    }
+
+    if (passwordData.newPassword.length < 8) {
+      setPasswordError("New password must be at least 8 characters long");
+      return;
+    }
+
+    try {
+      await updatePassword({
+        variables: {
+          userId: parseInt(user.userId, 10),
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword
+        }
+      });
+    } catch (err) {
+      console.error('Error updating password:', err);
+    }
   };
 
   return (
@@ -174,7 +240,6 @@ const ProfilePage: React.FC = () => {
                 onClick={() => {
                   setIsEditing(false);
                   setError(null);
-                  // Reset form data to original values
                   if (data?.users_by_pk) {
                     setFormData({
                       firstName: data.users_by_pk.first_name,
@@ -201,8 +266,93 @@ const ProfilePage: React.FC = () => {
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Account Information</h2>
           <div className="text-gray-600">
             <p>Member since: {new Date(data?.users_by_pk?.created_at).toLocaleDateString()}</p>
+            {!isChangingPassword && (
+              <div className="mt-4">
+                <button
+                  onClick={() => setIsChangingPassword(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Change Password
+                </button>
+              </div>
+            )}
           </div>
         </div>
+
+        {isChangingPassword && (
+          <div className="mt-6 pt-6 border-t">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Change Password</h2>
+            {passwordError && (
+              <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+                {passwordError}
+              </div>
+            )}
+            <form onSubmit={handlePasswordSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Current Password
+                </label>
+                <input
+                  type="password"
+                  name="currentPassword"
+                  value={passwordData.currentPassword}
+                  onChange={handlePasswordChange}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  name="newPassword"
+                  value={passwordData.newPassword}
+                  onChange={handlePasswordChange}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Confirm New Password
+                </label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={passwordData.confirmPassword}
+                  onChange={handlePasswordChange}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div className="flex justify-end gap-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsChangingPassword(false);
+                    setPasswordError(null);
+                    setPasswordData({
+                      currentPassword: '',
+                      newPassword: '',
+                      confirmPassword: ''
+                    });
+                  }}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  Update Password
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );
