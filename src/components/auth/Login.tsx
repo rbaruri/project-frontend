@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/axios';
 
@@ -103,6 +103,15 @@ const Login: React.FC = () => {
             </button>
           </div>
         </form>
+
+        <div className="text-center">
+          <p className="text-sm text-gray-600">
+            Don't have an account?{' '}
+            <Link to="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
+              Create one here
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
