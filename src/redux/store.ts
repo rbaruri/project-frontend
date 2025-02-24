@@ -18,7 +18,7 @@ const rootReducer = combineReducers({
 });
 
 // Enable Redux DevTools if available
-const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;  //hit and try check without 
 
 // Create Store with Middleware
 export const store = createStore(

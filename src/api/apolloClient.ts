@@ -17,12 +17,11 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 // Auth link to add headers
 const authLink = new ApolloLink((operation, forward) => {
-  // You can get the token from localStorage or your auth context
   const token = localStorage.getItem('token');
 
   operation.setContext({
     headers: {
-      "x-hasura-admin-secret": "myadminsecretkey", // Use environment variables in production
+      "x-hasura-admin-secret": import.meta.env.VITE_HASURA_ADMIN_SECRET || '',
       ...(token ? { authorization: `Bearer ${token}` } : {}),
     },
   });
@@ -32,7 +31,7 @@ const authLink = new ApolloLink((operation, forward) => {
 
 // HTTP connection to the API
 const httpLink = new HttpLink({
-  uri: "http://localhost:8080/v1/graphql", // Replace with your Hasura GraphQL endpoint
+  uri: import.meta.env.VITE_HASURA_ENDPOINT || "http://localhost:8080/v1/graphql",
 });
 
 // Cache configuration

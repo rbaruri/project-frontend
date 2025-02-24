@@ -6,7 +6,7 @@ import Modules from "../../components/ui/Modules";
 
 const Module: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { modules, loading, error } = useSelector((state: RootState) => state.modules);
+  const { modules, loading, error } = useSelector((state: RootState) => state.modules); //add selector in separate file and use it here
   const [showQuiz, setShowQuiz] = useState(false);
 
   useEffect(() => {
