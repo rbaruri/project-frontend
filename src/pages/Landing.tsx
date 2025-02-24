@@ -5,7 +5,7 @@ const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-indigo-900 flex flex-col justify-center items-center px-4">
       <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold text-white mb-4">LearnSmart</h1>
+        <h1 className="text-5xl font-bold text-white mb-4">NerdNest</h1>
         <p className="text-xl text-indigo-200">Your Personalized Learning Journey Starts Here</p>
       </div>
 
@@ -47,7 +47,7 @@ const LandingPage: React.FC = () => {
       </div>
 
       <div className="mt-8 text-center text-sm text-indigo-200">
-        <p>© 2024 LearnSmart. All rights reserved.</p>
+        <p>© 2024 NerdNest. All rights reserved.</p>
       </div>
     </div>
   );
