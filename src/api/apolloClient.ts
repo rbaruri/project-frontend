@@ -8,6 +8,11 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
       console.error(
         `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
       );
+      // If we get an authentication error, redirect to login
+      if (message.includes('JWT')) {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
     });
   }
   if (networkError) {
@@ -18,12 +23,19 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 // Auth link to add headers
 const authLink = new ApolloLink((operation, forward) => {
   const token = localStorage.getItem('token');
+  
+  // Always include admin secret
+  const headers: Record<string, string> = {
+    'x-hasura-admin-secret': import.meta.env.VITE_HASURA_ADMIN_SECRET
+  };
+
+  if (token) {
+    // For authenticated users, use the JWT token
+    headers['Authorization'] = `Bearer ${token}`;
+  }
 
   operation.setContext({
-    headers: {
-      "x-hasura-admin-secret": import.meta.env.VITE_HASURA_ADMIN_SECRET || '',
-      ...(token ? { authorization: `Bearer ${token}` } : {}),
-    },
+    headers
   });
 
   return forward(operation);
@@ -31,7 +43,7 @@ const authLink = new ApolloLink((operation, forward) => {
 
 // HTTP connection to the API
 const httpLink = new HttpLink({
-  uri: import.meta.env.VITE_HASURA_ENDPOINT || "http://localhost:8080/v1/graphql",
+  uri: import.meta.env.VITE_HASURA_ENDPOINT || "http://localhost:8080/v1/graphql"
 });
 
 // Cache configuration
@@ -55,18 +67,18 @@ const client = new ApolloClient({
   cache,
   defaultOptions: {
     watchQuery: {
-      fetchPolicy: 'cache-first',
+      fetchPolicy: 'network-only',
       errorPolicy: 'all',
     },
     query: {
-      fetchPolicy: 'cache-first',
+      fetchPolicy: 'network-only',
       errorPolicy: 'all',
     },
     mutate: {
       errorPolicy: 'all',
     },
   },
-  connectToDevTools: true, // Enable Apollo dev tools
+  connectToDevTools: true
 });
 
 export { client };

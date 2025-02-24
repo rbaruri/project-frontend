@@ -35,6 +35,7 @@ const AppRoutes: React.FC = () => {
           path="/signup"
           element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignUpPage />}
         />
+        <Route path="/syllabus-upload" element={<SyllabusUploadPage />} />
 
         {/* Protected Routes - Only accessible when authenticated */}
         <Route element={<ProtectedRoute />}>
@@ -43,7 +44,6 @@ const AppRoutes: React.FC = () => {
           <Route path="/courses/:courseId" element={<CourseDetailsPage />} />
           <Route path="/modules/:moduleId" element={<ModuleDetailsPage />} />
           <Route path="/learning-path" element={<LearningPathPage />} />
-          <Route path="/syllabus-upload" element={<SyllabusUploadPage />} />
           <Route path="/quiz/:quizId" element={<QuizPage />} />
           <Route path="/profile" element={<ProfilePage />} />
         </Route>

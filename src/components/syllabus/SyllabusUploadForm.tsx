@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/axios';
 import Calendar from '../ui/Calendar';
 import { useApolloClient } from '@apollo/client';
 import { GET_COURSES_WITH_LEARNING_PATHS } from '../../graphql/queries/courses';
+import AuthModal from '../ui/AuthModal';
 
 const SyllabusUploadForm: React.FC = () => {
   const navigate = useNavigate();
@@ -18,16 +19,7 @@ const SyllabusUploadForm: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    console.log('Auth state:', { isAuthenticated, hasToken: !!token });
-    if (!isAuthenticated || !token) {
-      console.log('Not authenticated or no token, redirecting to login');
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      navigate('/login');
-    }
-  }, [isAuthenticated, token, navigate]);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,18 +38,18 @@ const SyllabusUploadForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // If user is not authenticated, show auth modal
+    if (!isAuthenticated || !token) {
+      setShowAuthModal(true);
+      return;
+    }
+
     setLoading(true);
 
     try {
       if (!file) {
         throw new Error('Please select a syllabus file');
-      }
-
-      if (!token) {
-        console.error('No auth token found');
-        setError('Authentication required. Please log in again.');
-        navigate('/login');
-        return;
       }
 
       // Validate file size before uploading (10MB)
@@ -78,22 +70,12 @@ const SyllabusUploadForm: React.FC = () => {
         return;
       }
 
-      console.log('Preparing to upload syllabus:', {
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type,
-        courseName: formData.courseName,
-        startDate: formData.startDate,
-        endDate: formData.endDate
-      });
-
       const formDataToSend = new FormData();
       formDataToSend.append('file', file);
       formDataToSend.append('courseName', formData.courseName);
       formDataToSend.append('startDate', formData.startDate);
       formDataToSend.append('endDate', formData.endDate);
 
-      console.log('Sending request to:', '/api/syllabus/process');
       const response = await api.post('/api/syllabus/process', formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -108,110 +90,22 @@ const SyllabusUploadForm: React.FC = () => {
       console.log('Syllabus uploaded successfully:', response.data);
       navigate('/courses');
     } catch (error: any) {
-      console.error('Syllabus upload error details:', {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
-        headers: error.response?.headers,
-        config: {
-          url: error.config?.url,
-          method: error.config?.method,
-          headers: error.config?.headers
-        }
-      });
-
-      if (error.response?.status === 401 || error.response?.status === 403) {
-        console.log('Authentication error - clearing token and redirecting to login');
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setError('Your session has expired. Please log in again.');
-        navigate('/login');
-        return;
-      }
-
-      // Handle specific error codes
-      const errorCode = error.response?.data?.code;
-      const errorField = error.response?.data?.field;
-      const errorDetails = error.response?.data?.details;
-      const hasuraError = error.response?.data?.hasuraError;
-
-      console.log('Full error response:', {
-        code: errorCode,
-        field: errorField,
-        details: errorDetails,
-        hasuraError
-      });
-
-      let errorMessage = 'Failed to upload syllabus';
-
-      switch (errorCode) {
-        case 'auth-required':
-          errorMessage = 'Authentication required. Please log in again.';
-          navigate('/login');
-          break;
-        case 'file-required':
-          errorMessage = 'Please select a file to upload.';
-          break;
-        case 'invalid-file-type':
-          errorMessage = 'Invalid file type. Only PDF and Word documents are allowed.';
-          break;
-        case 'file-too-large':
-          errorMessage = 'File size too large. Maximum size is 10MB.';
-          break;
-        case 'validation-failed':
-          if (errorField === 'courseName') {
-            errorMessage = 'Please enter a course name.';
-          } else if (errorField === 'startDate') {
-            errorMessage = errorDetails || 'Please enter a valid start date.';
-          } else if (errorField === 'endDate') {
-            errorMessage = errorDetails || 'Please enter a valid end date.';
-          } else {
-            errorMessage = errorDetails || 'Please check all required fields.';
-          }
-          break;
-        case 'ocr-failed':
-          errorMessage = 'Failed to process the syllabus file. Please ensure it is a valid document.';
-          break;
-        case 'ai-generation-failed':
-          errorMessage = 'Failed to generate the learning path. Please try again.';
-          break;
-        case 'course-creation-failed':
-          if (hasuraError?.extensions?.code === 'constraint-violation') {
-            errorMessage = 'A course with this name already exists. Please choose a different name.';
-          } else if (hasuraError?.extensions?.code === 'permission-denied') {
-            errorMessage = 'You do not have permission to create courses. Please contact support.';
-          } else if (hasuraError?.extensions?.code === 'not-null-violation') {
-            errorMessage = `Missing required field: ${hasuraError.extensions.column}`;
-          } else {
-            errorMessage = errorDetails || 'Failed to create the course. Please try again.';
-          }
-          break;
-        case 'learning-path-creation-failed':
-          errorMessage = errorDetails || 'Failed to create the learning path. Please try again.';
-          break;
-        default:
-          errorMessage = errorDetails || error.response?.data?.error || error.message || 'Failed to upload syllabus';
-      }
-      
-      setError(`Error: ${errorMessage}`);
-      
-      if (errorCode) {
-        console.error('Error details:', {
-          code: errorCode,
-          message: errorMessage,
-          details: errorDetails,
-          hasuraError
-        });
-      }
+      console.error('Syllabus upload error:', error);
+      handleUploadError(error);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!isAuthenticated || !token) {
-    return null;
-  }
+  const handleUploadError = (error: any) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      setShowAuthModal(true);
+      return;
+    }
+
+    // Handle other errors as before...
+    setError(error.message || 'Failed to upload syllabus');
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -235,7 +129,10 @@ const SyllabusUploadForm: React.FC = () => {
                 name="courseName"
                 type="text"
                 required
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                disabled={loading}
+                className={`appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                  loading ? 'bg-gray-100 cursor-not-allowed' : ''
+                }`}
                 value={formData.courseName}
                 onChange={handleChange}
               />
@@ -246,7 +143,10 @@ const SyllabusUploadForm: React.FC = () => {
                 name="startDate"
                 value={formData.startDate}
                 onChange={handleChange}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                disabled={loading}
+                className={`appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                  loading ? 'bg-gray-100 cursor-not-allowed' : ''
+                }`}
               />
             </div>
             <div>
@@ -255,7 +155,10 @@ const SyllabusUploadForm: React.FC = () => {
                 name="endDate"
                 value={formData.endDate}
                 onChange={handleChange}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                disabled={loading}
+                className={`appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                  loading ? 'bg-gray-100 cursor-not-allowed' : ''
+                }`}
               />
             </div>
             <div>
@@ -267,13 +170,21 @@ const SyllabusUploadForm: React.FC = () => {
                 name="syllabus"
                 type="file"
                 required
-                accept=".pdf"
+                disabled={loading}
+                accept=".pdf,.doc,.docx"
                 onChange={handleFileChange}
-                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className={`mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                  loading ? 'bg-gray-100 cursor-not-allowed' : ''
+                }`}
               />
               <p className="mt-1 text-xs text-gray-500">
-                Accepted formats: PDF
+                Accepted formats: PDF, DOC, DOCX
               </p>
+              {file && (
+                <p className={`mt-2 text-sm ${loading ? 'text-gray-500' : 'text-green-600'}`}>
+                  Selected file: {file.name}
+                </p>
+              )}
             </div>
           </div>
 
@@ -306,6 +217,12 @@ const SyllabusUploadForm: React.FC = () => {
           </div>
         </form>
       </div>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
     </div>
   );
 };

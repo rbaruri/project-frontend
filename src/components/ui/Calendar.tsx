@@ -6,9 +6,10 @@ interface CalendarProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   className?: string;
+  disabled?: boolean;
 }
 
-const Calendar: React.FC<CalendarProps> = ({ label, name, value, onChange, className }) => {
+const Calendar: React.FC<CalendarProps> = ({ label, name, value, onChange, className = '', disabled = false }) => {
   // Get today's date in YYYY-MM-DD format
   const today = new Date().toISOString().split('T')[0];
 
@@ -23,6 +24,7 @@ const Calendar: React.FC<CalendarProps> = ({ label, name, value, onChange, class
         onChange={onChange}
         min={today}
         aria-label={label}
+        disabled={disabled}
       />
     </div>
   );
