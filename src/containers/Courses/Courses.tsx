@@ -125,9 +125,38 @@ const calculateWeeksBetweenDates = (startDate: Date, endDate: Date): number => {
 };
 
 const calculateTotalHours = (generatedPath: any): number => {
-  // Implement this based on your generated_path JSON structure
-  // This is just a placeholder
-  return generatedPath?.totalHours || 0;
+  if (!generatedPath) return 0;
+  
+  // Try to get hours from totalHours field
+  if (typeof generatedPath.totalHours === 'number') {
+    return generatedPath.totalHours;
+  }
+  
+  // If totalHours is a string (e.g., "120 hours"), parse it
+  if (typeof generatedPath.totalHours === 'string') {
+    const match = generatedPath.totalHours.match(/(\d+)/);
+    if (match) {
+      return parseInt(match[0], 10);
+    }
+  }
+  
+  // If no totalHours, sum up hours from modules
+  if (Array.isArray(generatedPath.modules)) {
+    return generatedPath.modules.reduce((total: number, module: any) => {
+      if (typeof module.hoursRequired === 'number') {
+        return total + module.hoursRequired;
+      }
+      if (typeof module.hoursRequired === 'string') {
+        const match = module.hoursRequired.match(/(\d+)/);
+        if (match) {
+          return total + parseInt(match[0], 10);
+        }
+      }
+      return total;
+    }, 0);
+  }
+  
+  return 0;
 };
 
 const calculateHoursPerWeek = (totalHours: number, totalWeeks: number): number => {

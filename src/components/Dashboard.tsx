@@ -145,7 +145,7 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userI
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow p-6 border border-gray-100 transform hover:scale-105 transition-transform cursor-pointer">
           <div className="flex items-center justify-between">
             <div>
@@ -189,23 +189,6 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userI
           </div>
           <p className="text-sm text-gray-500 mt-4">
             Keep up the great work!
-          </p>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6 border border-gray-100 transform hover:scale-105 transition-transform cursor-pointer">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-500 text-sm">Learning Hours</p>
-              <h3 className="text-2xl font-bold text-gray-800">{getTotalLearningHours()}h</h3>
-            </div>
-            <div className="bg-purple-100 p-3 rounded-full">
-              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-sm text-gray-500 mt-4">
-            Total time invested in learning
           </p>
         </div>
       </div>

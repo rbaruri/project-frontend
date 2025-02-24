@@ -3,10 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/axios';
 import Calendar from '../ui/Calendar';
+import { useApolloClient } from '@apollo/client';
+import { GET_COURSES_WITH_LEARNING_PATHS } from '../../graphql/queries/courses';
 
 const SyllabusUploadForm: React.FC = () => {
   const navigate = useNavigate();
-  const { token, isAuthenticated } = useAuth();
+  const { token, isAuthenticated, user } = useAuth();
+  const client = useApolloClient();
   const [formData, setFormData] = useState({
     courseName: '',
     startDate: '',
@@ -95,6 +98,11 @@ const SyllabusUploadForm: React.FC = () => {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
+      });
+
+      // Refetch courses data after successful upload
+      await client.refetchQueries({
+        include: [GET_COURSES_WITH_LEARNING_PATHS]
       });
 
       console.log('Syllabus uploaded successfully:', response.data);

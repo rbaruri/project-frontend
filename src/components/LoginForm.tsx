@@ -63,13 +63,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ formData, error, loading, onSubmi
             <div className="text-red-600 text-sm text-center">{error}</div>
           )}
 
-          <div className="flex items-center justify-end">
-            <div className="text-sm">
-              <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-                Forgot your password?
-              </a>
-            </div>
-          </div>
+          
 
           <div>
             <button
