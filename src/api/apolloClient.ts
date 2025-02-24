@@ -10,7 +10,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
       );
       // If we get an authentication error, redirect to login
       if (message.includes('JWT')) {
-        localStorage.removeItem('token');
+        localStorage.removeItem('user');
         window.location.href = '/login';
       }
     });
@@ -22,20 +22,14 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 // Auth link to add headers
 const authLink = new ApolloLink((operation, forward) => {
-  const token = localStorage.getItem('token');
-  
   // Always include admin secret
   const headers: Record<string, string> = {
     'x-hasura-admin-secret': import.meta.env.VITE_HASURA_ADMIN_SECRET
   };
 
-  if (token) {
-    // For authenticated users, use the JWT token
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
   operation.setContext({
-    headers
+    headers,
+    credentials: 'include' // This enables sending cookies with requests
   });
 
   return forward(operation);
@@ -43,7 +37,8 @@ const authLink = new ApolloLink((operation, forward) => {
 
 // HTTP connection to the API
 const httpLink = new HttpLink({
-  uri: import.meta.env.VITE_HASURA_ENDPOINT || "http://localhost:8080/v1/graphql"
+  uri: import.meta.env.VITE_HASURA_ENDPOINT || "http://localhost:8080/v1/graphql",
+  credentials: 'include' // This enables sending cookies with requests
 });
 
 // Cache configuration

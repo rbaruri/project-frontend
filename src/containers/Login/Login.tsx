@@ -26,13 +26,13 @@ const LoginContainer: React.FC = () => {
         password: formData.password,
       });
 
-      const { user, token } = response.data;
+      const { user } = response.data;
       
-      if (!token) {
-        throw new Error('No token received from server');
+      if (!user) {
+        throw new Error('No user data received from server');
       }
 
-      login({ user, token });
+      login({ user });
       navigate('/dashboard');
     } catch (err: any) {
       console.error('Login error:', err);

@@ -7,11 +7,15 @@ interface CalendarProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   className?: string;
   disabled?: boolean;
+  minDate?: string;
 }
 
-const Calendar: React.FC<CalendarProps> = ({ label, name, value, onChange, className = '', disabled = false }) => {
+const Calendar: React.FC<CalendarProps> = ({ label, name, value, onChange, className = '', disabled = false, minDate }) => {
   // Get today's date in YYYY-MM-DD format
   const today = new Date().toISOString().split('T')[0];
+  
+  // Use minDate if provided, otherwise use today as minimum
+  const minimumDate = minDate || today;
 
   return (
     <div>
@@ -22,7 +26,7 @@ const Calendar: React.FC<CalendarProps> = ({ label, name, value, onChange, class
         className={`${className} disabled:opacity-50 disabled:cursor-not-allowed`}
         value={value}
         onChange={onChange}
-        min={today}
+        min={minimumDate}
         aria-label={label}
         disabled={disabled}
       />

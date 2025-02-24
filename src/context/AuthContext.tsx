@@ -11,74 +11,56 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  token: string | null;
-  login: (userData: { user: User; token: string }) => void;
-  logout: () => void;
   isAuthenticated: boolean;
   isLoading: boolean;
+  login: (userData: { user: User }) => void;
+  logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const savedToken = localStorage.getItem('token');
-        const savedUser = localStorage.getItem('user');
-
-        if (savedToken && savedUser) {
-          // Set the default authorization header
-          api.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
-          
-          // Parse and set user data
-          const userData = JSON.parse(savedUser);
-          setUser(userData);
-          setToken(savedToken);
-          setIsAuthenticated(true);
-        }
-      } catch (error) {
-        console.error('Error initializing auth:', error);
-        // Clear potentially corrupted data
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      } finally {
-        setIsLoading(false);
+  // Function to check authentication status
+  const checkAuthStatus = async () => {
+    try {
+      const response = await api.get('/api/auth/verify');
+      if (response.data.isValid && response.data.user) {
+        setUser(response.data.user);
+        setIsAuthenticated(true);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
       }
-    };
-
-    initializeAuth();
-  }, []);
-
-  const login = (userData: { user: User; token: string }) => {
-    setUser(userData.user);
-    setToken(userData.token);
-    setIsAuthenticated(true);
-    
-    // Set authorization header
-    api.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
-    
-    // Store in localStorage
-    localStorage.setItem('user', JSON.stringify(userData.user));
-    localStorage.setItem('token', userData.token);
+    } catch (error) {
+      console.error('Error checking auth status:', error);
+      setUser(null);
+      setIsAuthenticated(false);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    setIsAuthenticated(false);
-    
-    // Remove authorization header
-    delete api.defaults.headers.common['Authorization'];
-    
-    // Clear localStorage
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
+
+  const login = async (userData: { user: User }) => {
+    setUser(userData.user);
+    setIsAuthenticated(true);
+  };
+
+  const logout = async () => {
+    try {
+      await api.post('/api/auth/logout');
+      setUser(null);
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
   if (isLoading) {
@@ -86,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated, isLoading }}>
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
@@ -97,5 +79,5 @@ export const useAuth = () => {
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
-  return context as AuthContextType;
+  return context;
 }; 

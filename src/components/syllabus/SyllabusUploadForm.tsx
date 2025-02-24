@@ -9,7 +9,7 @@ import AuthModal from '../ui/AuthModal';
 
 const SyllabusUploadForm: React.FC = () => {
   const navigate = useNavigate();
-  const { token, isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const client = useApolloClient();
   const [formData, setFormData] = useState({
     courseName: '',
@@ -40,7 +40,7 @@ const SyllabusUploadForm: React.FC = () => {
     setError('');
 
     // If user is not authenticated, show auth modal
-    if (!isAuthenticated || !token) {
+    if (!isAuthenticated) {
       setShowAuthModal(true);
       return;
     }
@@ -102,8 +102,6 @@ const SyllabusUploadForm: React.FC = () => {
       setShowAuthModal(true);
       return;
     }
-
-    // Handle other errors as before...
     setError(error.message || 'Failed to upload syllabus');
   };
 
@@ -156,6 +154,7 @@ const SyllabusUploadForm: React.FC = () => {
                 value={formData.endDate}
                 onChange={handleChange}
                 disabled={loading}
+                minDate={formData.startDate}
                 className={`appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
                   loading ? 'bg-gray-100 cursor-not-allowed' : ''
                 }`}

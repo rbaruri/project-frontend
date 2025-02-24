@@ -31,9 +31,7 @@ const ProfilePage: React.FC = () => {
         firstName: data.update_users_by_pk.first_name,
         lastName: data.update_users_by_pk.last_name,
       };
-      // Get the token from localStorage instead of user object
-      const token = localStorage.getItem('token') || '';
-      login({ user: updatedUser, token });
+      login({ user: updatedUser });
       setIsEditing(false);
       setError(null);
     },
