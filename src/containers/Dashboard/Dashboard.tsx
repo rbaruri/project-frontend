@@ -7,14 +7,24 @@ const DashboardContainer: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  if (!user) return null; // Prevent rendering if user is not available
+  if (!user) {
+    navigate('/login');
+    return null;
+  }
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  return <Dashboard firstName={user.firstName} email={user.email} onLogout={handleLogout} />;
+  return (
+    <Dashboard 
+      firstName={user.firstName || ''} 
+      email={user.email || ''} 
+      userId={user.id || ''} 
+      onLogout={handleLogout} 
+    />
+  );
 };
 
 export default DashboardContainer;
