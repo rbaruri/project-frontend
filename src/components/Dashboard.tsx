@@ -136,7 +136,9 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userI
         whileHover={{ scale: 1.02 }}
         transition={{ type: "spring", stiffness: 300 }}
       >
-        <h1 className="text-3xl font-bold mb-2">Welcome back ! 👋</h1>
+        <h1 className="text-3xl font-bold mb-2">
+          {new Date().getHours() < 12 ? 'Good Morning ☀️' : 'Good Evening 🌙'} {firstName.toUpperCase()}! 👋
+        </h1>
         <p className="text-indigo-100">Continue your learning journey today.</p>
         {loading && <p className="text-indigo-200 mt-2">Loading your progress...</p>}
         {error && <p className="text-red-300 mt-2">Error loading data. Please try again later.</p>}
@@ -157,8 +159,8 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userI
               <div className="flex items-center space-x-4">
                 <motion.div 
                   className="bg-white/20 p-3 rounded-full"
-                  whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.5 }}
+                  whileHover={{ x: [0, -5, 5, -5, 5, 0] }}
+                  transition={{ duration: 0.2 }}
                 >
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -186,8 +188,8 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userI
               <div className="flex items-center space-x-4">
                 <motion.div 
                   className="bg-white/20 p-3 rounded-full"
-                  whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.5 }}
+                  whileHover={{ x: [0, -5, 5, -5, 5, 0] }}
+                  transition={{ duration: 0.2 }}
                 >
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -225,8 +227,8 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userI
             </div>
             <motion.div 
               className="bg-indigo-100 p-3 rounded-full"
-              whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.5 }}
+              whileHover={{ x: [0, -5, 5, -5, 5, 0] }}
+              transition={{ duration: 0.2 }}
             >
               <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -268,8 +270,8 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userI
             </div>
             <motion.div 
               className="bg-green-100 p-3 rounded-full"
-              whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.5 }}
+              whileHover={{ x: [0, -5, 5, -5, 5, 0] }}
+              transition={{ duration: 0.2 }}
             >
               <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
