@@ -7,7 +7,7 @@ const fetchQuizAPI = async () => {
   return response.json();
 };
 
-function* fetchQuizSaga() {
+function* fetchQuizSaga(): Generator<any, void, any> {
   try {
     const data = yield call(fetchQuizAPI);
     yield put(fetchQuizSuccess(data));
