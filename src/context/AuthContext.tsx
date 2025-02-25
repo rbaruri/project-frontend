@@ -64,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   if (isLoading) {
-    return <div>Loading...</div>; // Or your loading component
+    return <div>Loading...</div>; 
   }
 
   return (

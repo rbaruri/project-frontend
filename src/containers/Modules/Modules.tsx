@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchModulesRequest } from "./moduleActions";
-import { RootState, AppDispatch } from "../../redux/store";
+import { AppDispatch } from "../../redux/store";
 import Modules from "../../components/ui/Modules";
+import { selectModules, selectModulesLoading, selectModulesError } from "./moduleSelectors";
 
 const Module: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { modules, loading, error } = useSelector((state: RootState) => state.modules); //add selector in separate file and use it here
+  const modules = useSelector(selectModules);
+  const loading = useSelector(selectModulesLoading);
+  const error = useSelector(selectModulesError);
   const [showQuiz, setShowQuiz] = useState(false);
 
   useEffect(() => {

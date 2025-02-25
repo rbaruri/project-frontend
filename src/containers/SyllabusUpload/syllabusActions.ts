@@ -3,6 +3,13 @@ export const UPLOAD_SYLLABUS_REQUEST = 'UPLOAD_SYLLABUS_REQUEST';
 export const UPLOAD_SYLLABUS_SUCCESS = 'UPLOAD_SYLLABUS_SUCCESS';
 export const UPLOAD_SYLLABUS_FAILURE = 'UPLOAD_SYLLABUS_FAILURE';
 
+// State Type
+export interface SyllabusState {
+  status: 'idle' | 'uploading' | 'success' | 'error';
+  message: string | null;
+  syllabusId: string | null;
+}
+
 // Action Interfaces
 interface UploadSyllabusRequestAction {
   type: typeof UPLOAD_SYLLABUS_REQUEST;

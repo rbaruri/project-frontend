@@ -1,9 +1,10 @@
 import React, { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { uploadSyllabusRequest, uploadSyllabusFailure } from "./syllabusActions";
-import { RootState, AppDispatch } from "../../redux/store";
+import { AppDispatch } from "../../redux/store";
 import { useNavigate } from "react-router-dom";
 import SyllabusUploadForm from "../../components/ui/SyllabusUploadForm";
+import { selectSyllabusStatus, selectSyllabusMessage } from "./syllabusSelectors";
 
 const isValidFile = (file: File): boolean => {
   const validTypes = ["application/pdf", "image/png", "image/jpeg", "image/jpg"];
@@ -26,7 +27,8 @@ const SyllabusUpload = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigationAttempted = useRef(false);
   const dispatch = useDispatch<AppDispatch>();
-  const { status, message } = useSelector((state: RootState) => state.syllabus);
+  const status = useSelector(selectSyllabusStatus);
+  const message = useSelector(selectSyllabusMessage);
   const navigate = useNavigate();
 
   const isUploading = useMemo(() => status === "uploading", [status]);

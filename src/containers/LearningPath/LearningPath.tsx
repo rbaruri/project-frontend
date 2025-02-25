@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { selectLearningPath, selectLearningPathLoading, selectLearningPathError } from "./learningPathSelectors";
 import LearningPathComponent from "../../components/ui/LearningPath";
