@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { RouteObject, Navigate, useRoutes } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -19,43 +19,74 @@ const ProfilePage = lazy(() => import('../pages/Profile'));
 const AppRoutes: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Routes>
-        {/* Public Routes - Only accessible when not authenticated */}
-        <Route
-          path="/"
-          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />}
-        />
-        <Route
-          path="/login"
-          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />}
-        />
-        <Route
-          path="/signup"
-          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignUpPage />}
-        />
-        <Route path="/syllabus-upload" element={<SyllabusUploadPage />} />
+  const routes: RouteObject[] = [
+    // Authentication routes
+    {
+      path: "authentication",
+      children: [
+        {
+          path: "login",
+          element: isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />,
+        },
+        {
+          path: "signup",
+          element: isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignUpPage />,
+        },
+      ],
+    },
 
-        {/* Protected Routes - Only accessible when authenticated */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/courses/:courseId" element={<CourseDetailsPage />} />
-          <Route path="/modules/:moduleId" element={<ModuleDetailsPage />} />
-          <Route path="/learning-path" element={<LearningPathPage />} />
-          <Route path="/quiz/:quizId" element={<QuizPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-        </Route>
+    // Public route
+    {
+      path: "/syllabus-upload",
+      element: <SyllabusUploadPage />,
+    },
 
-        {/* Catch-all Route - Redirect to appropriate page based on auth status */}
-        <Route 
-          path="*" 
-          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/" replace />} 
-        />
-      </Routes>
-    </Suspense>
-  );
+    // Protected Routes
+    {
+      path: "*",
+      children: [
+        {
+          index: true,
+          element: isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />,
+        },
+        {
+          path: "dashboard",
+          element: <ProtectedRoute><DashboardPage /></ProtectedRoute>,
+        },
+        {
+          path: "courses",
+          element: <ProtectedRoute><CoursesPage /></ProtectedRoute>,
+        },
+        {
+          path: "courses/:courseId",
+          element: <ProtectedRoute><CourseDetailsPage /></ProtectedRoute>,
+        },
+        {
+          path: "modules/:moduleId",
+          element: <ProtectedRoute><ModuleDetailsPage /></ProtectedRoute>,
+        },
+        {
+          path: "learning-path",
+          element: <ProtectedRoute><LearningPathPage /></ProtectedRoute>,
+        },
+        {
+          path: "quiz/:quizId",
+          element: <ProtectedRoute><QuizPage /></ProtectedRoute>,
+        },
+        {
+          path: "profile",
+          element: <ProtectedRoute><ProfilePage /></ProtectedRoute>,
+        },
+
+        {
+          path: "*",
+          element: isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/authentication/login" replace />,
+        },
+      ],
+    },
+  ];
+
+  return <Suspense fallback={<div>Loading...</div>}>{useRoutes(routes)}</Suspense>;
 };
 
 export default AppRoutes;
