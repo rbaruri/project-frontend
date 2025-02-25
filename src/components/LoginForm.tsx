@@ -89,7 +89,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ formData, error, loading, onSubmi
         <div className="text-center">
           <p className="text-sm text-gray-600">
             New to LearnSmart?{' '}
-            <Link to="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
+            <Link to="/authentication/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
               Create an account
             </Link>
           </p>

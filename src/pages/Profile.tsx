@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { useAuth } from '../context/AuthContext';
 import { GET_USER_PROFILE, UPDATE_USER_PROFILE, UPDATE_USER_PASSWORD } from '../graphql/queries/user';
+import { UPDATE_PASSWORD } from '../graphql/mutations/updatePassword';
 import { Navigate } from 'react-router-dom';
+import bcrypt from 'bcryptjs';
 
 interface UserProfile {
   id: number;
@@ -10,6 +12,7 @@ interface UserProfile {
   first_name: string;
   last_name: string;
   created_at: string;
+  hashed_password: string;
 }
 
 const ProfilePage: React.FC = () => {
@@ -18,6 +21,7 @@ const ProfilePage: React.FC = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
 
   const { loading, data } = useQuery(GET_USER_PROFILE, {
     variables: { userId: parseInt(user?.userId || '0', 10) },
@@ -42,22 +46,15 @@ const ProfilePage: React.FC = () => {
     }
   });
 
-  const [updatePassword] = useMutation(UPDATE_USER_PASSWORD, {
-    onCompleted: (data) => {
-      if (data.update_user_password.success) {
-        setIsChangingPassword(false);
-        setPasswordError(null);
-        setPasswordData({
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: ''
-        });
-      } else {
-        setPasswordError(data.update_user_password.message);
-      }
+  const [updatePassword] = useMutation(UPDATE_PASSWORD, {
+    onCompleted: () => {
+      setIsChangingPassword(false);
+      setPasswordError(null);
+      setPasswordSuccess('Password updated successfully!');
     },
     onError: (error) => {
       setPasswordError(error.message);
+      setPasswordSuccess(null);
     }
   });
 
@@ -127,17 +124,10 @@ const ProfilePage: React.FC = () => {
     }));
   };
 
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setPasswordData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordError(null);
+    setPasswordSuccess(null);
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setPasswordError("New passwords don't match");
@@ -150,15 +140,19 @@ const ProfilePage: React.FC = () => {
     }
 
     try {
+      // Hash the new password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(passwordData.newPassword, salt);
+
       await updatePassword({
         variables: {
-          userId: parseInt(user.userId, 10),
-          currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword
+          userId: parseInt(user?.userId || '0', 10),
+          hashedPassword: hashedPassword
         }
       });
     } catch (err) {
       console.error('Error updating password:', err);
+      setPasswordError('Failed to update password');
     }
   };
 
@@ -287,44 +281,32 @@ const ProfilePage: React.FC = () => {
                 {passwordError}
               </div>
             )}
+            {passwordSuccess && (
+              <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
+                {passwordSuccess}
+              </div>
+            )}
             <form onSubmit={handlePasswordSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Current Password
-                </label>
+                <label className="block text-sm font-medium text-gray-700">New Password</label>
                 <input
                   type="password"
-                  name="currentPassword"
-                  value={passwordData.currentPassword}
-                  onChange={handlePasswordChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  New Password
-                </label>
-                <input
-                  type="password"
-                  name="newPassword"
                   value={passwordData.newPassword}
-                  onChange={handlePasswordChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   required
+                  minLength={8}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm New Password
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>
                 <input
                   type="password"
-                  name="confirmPassword"
                   value={passwordData.confirmPassword}
-                  onChange={handlePasswordChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   required
+                  minLength={8}
                 />
               </div>
               <div className="flex justify-end gap-4">
