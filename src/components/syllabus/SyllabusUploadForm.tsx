@@ -61,12 +61,10 @@ const SyllabusUploadForm: React.FC = () => {
 
       // Validate file type
       const allowedTypes = [
-        'application/pdf',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        'application/pdf'
       ];
       if (!allowedTypes.includes(file.type)) {
-        setError('Invalid file type. Only PDF and Word documents are allowed.');
+        setError('Invalid file type. Only PDF documents are allowed.');
         return;
       }
 
@@ -170,14 +168,14 @@ const SyllabusUploadForm: React.FC = () => {
                 type="file"
                 required
                 disabled={loading}
-                accept=".pdf,.doc,.docx"
+                accept=".pdf"
                 onChange={handleFileChange}
                 className={`mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
                   loading ? 'bg-gray-100 cursor-not-allowed' : ''
                 }`}
               />
               <p className="mt-1 text-xs text-gray-500">
-                Accepted formats: PDF, DOC, DOCX
+                Accepted formats: PDF
               </p>
               {file && (
                 <p className={`mt-2 text-sm ${loading ? 'text-gray-500' : 'text-green-600'}`}>
