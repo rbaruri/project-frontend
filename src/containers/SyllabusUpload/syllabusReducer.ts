@@ -1,48 +1,56 @@
+import { produce } from 'immer';
+import { SyllabusState } from './syllabusTypes';
 import {
   UPLOAD_SYLLABUS_REQUEST,
   UPLOAD_SYLLABUS_SUCCESS,
   UPLOAD_SYLLABUS_FAILURE,
-  SyllabusActionTypes,
-} from './syllabusActions';
-
-export interface SyllabusState {
-  status: 'idle' | 'uploading' | 'success' | 'error';
-  syllabusId: string | null;
-  message: string | null;
-}
+  UPDATE_UPLOAD_PROGRESS,
+  RESET_SYLLABUS_STATE,
+} from './syllabusConstants';
 
 const initialState: SyllabusState = {
-  status: 'idle',
-  syllabusId: null,
-  message: null,
+  loading: false,
+  error: null,
+  success: false,
+  data: null,
+  uploadProgress: 0,
 };
 
-export const syllabusReducer = (
-  state = initialState,
-  action: SyllabusActionTypes
-): SyllabusState => {
-  switch (action.type) {
-    case UPLOAD_SYLLABUS_REQUEST:
-      return {
-        ...state,
-        status: 'uploading',
-        syllabusId: null,
-        message: null,
-      };
-    case UPLOAD_SYLLABUS_SUCCESS:
-      return {
-        ...state,
-        status: 'success',
-        syllabusId: action.payload.syllabusId,
-        message: action.payload.message,
-      };
-    case UPLOAD_SYLLABUS_FAILURE:
-      return {
-        ...state,
-        status: 'error',
-        message: action.payload,
-      };
-    default:
-      return state;
-  }
-};
+const syllabusReducer = (state = initialState, action: any) =>
+  produce(state, (draft) => {
+    switch (action.type) {
+      case UPLOAD_SYLLABUS_REQUEST:
+        draft.loading = true;
+        draft.error = null;
+        draft.success = false;
+        draft.uploadProgress = 0;
+        break;
+
+      case UPLOAD_SYLLABUS_SUCCESS:
+        draft.loading = false;
+        draft.error = null;
+        draft.success = true;
+        draft.data = action.payload;
+        draft.uploadProgress = 100;
+        break;
+
+      case UPLOAD_SYLLABUS_FAILURE:
+        draft.loading = false;
+        draft.error = action.payload;
+        draft.success = false;
+        draft.uploadProgress = 0;
+        break;
+
+      case UPDATE_UPLOAD_PROGRESS:
+        draft.uploadProgress = action.payload;
+        break;
+
+      case RESET_SYLLABUS_STATE:
+        return initialState;
+
+      default:
+        break;
+    }
+  });
+
+export default syllabusReducer;

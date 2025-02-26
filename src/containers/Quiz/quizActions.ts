@@ -16,8 +16,7 @@ import {
 
 import { 
   QuizData, 
-  UpdateQuizStatusPayload, 
-  UpdateModuleStatusPayload 
+  UpdateQuizStatusPayload
 } from './quizTypes';
 
 // Quiz Data Loading Actions

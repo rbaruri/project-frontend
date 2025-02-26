@@ -1,51 +1,44 @@
 import { takeLatest, call, put } from 'redux-saga/effects';
-import { api } from '../../api/axios';
+import axios, { AxiosResponse, AxiosProgressEvent } from 'axios';
+import { get } from 'lodash';
+import { UPLOAD_SYLLABUS_REQUEST } from './syllabusConstants';
 import {
-  UPLOAD_SYLLABUS_REQUEST,
   uploadSyllabusSuccess,
   uploadSyllabusFailure,
-  SyllabusActionTypes
+  updateUploadProgress,
 } from './syllabusActions';
+import { UploadSyllabusPayload, SyllabusResponse } from './syllabusTypes';
 
-// API call function
-const uploadSyllabusAPI = async (formData: FormData) => {
+function* uploadSyllabusSaga(action: { type: string; payload: UploadSyllabusPayload }): Generator<any, void, AxiosResponse<SyllabusResponse>> {
   try {
-    // First, extract text from the syllabus
-    const textExtractionResponse = await api.post('/ocr/extract-text', formData);
-    const { extractedText } = textExtractionResponse.data;
+    const { formData, courseId } = action.payload;
 
-    // Then, generate learning path with the extracted text
-    const learningPathResponse = await api.post('/api/learning-path', {
-      extractedText,
-      courseName: formData.get('courseName'),
-      startDate: formData.get('startDate'),
-      endDate: formData.get('endDate')
-    });
+    const response: AxiosResponse<SyllabusResponse> = yield call(() => 
+      axios.post(
+        `${import.meta.env.VITE_API_URL}/api/syllabus/upload/${courseId}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+          onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+            const percentCompleted = progressEvent.total
+              ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
+              : 0;
+            put(updateUploadProgress(percentCompleted));
+          },
+        }
+      )
+    );
 
-    if (!learningPathResponse.data.learningPath) {
-      throw new Error('No learning path generated');
-    }
-
-    return {
-      syllabusId: learningPathResponse.data.courseId,
-      message: 'Syllabus processed and learning path created successfully'
-    };
+    yield put(uploadSyllabusSuccess(response.data));
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.response?.data?.details || 'Upload failed');
-  }
-};
-
-// Worker Saga
-function* handleSyllabusUpload(action: { type: string; payload: FormData }): Generator<any, void, any> {
-  try {
-    const response = yield call(uploadSyllabusAPI, action.payload);
-    yield put(uploadSyllabusSuccess(response));
-  } catch (error) {
-    yield put(uploadSyllabusFailure(error instanceof Error ? error.message : 'Upload failed'));
+    const errorMessage = get(error, 'response.data.message', 'Failed to upload syllabus');
+    yield put(uploadSyllabusFailure(errorMessage));
   }
 }
 
-// Watcher Saga
-export function* syllabusSaga() {
-  yield takeLatest(UPLOAD_SYLLABUS_REQUEST, handleSyllabusUpload);
+export function* watchSyllabusSaga(): Generator {
+  yield takeLatest(UPLOAD_SYLLABUS_REQUEST, uploadSyllabusSaga);
 }
