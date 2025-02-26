@@ -124,14 +124,14 @@ const Dashboard: React.FC<DashboardProps> = ({  userId }) => { //firstName, emai
 
   return (
     <motion.div 
-      className="space-y-6"
+      className="space-y-6 relative z-0"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
       {/* Welcome Section */}
       <motion.div 
-        className="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg shadow-lg p-6 text-white"
+        className="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg shadow-lg p-6 text-white relative z-10"
         variants={itemVariants}
         whileHover={{ scale: 1.02 }}
         transition={{ type: "spring", stiffness: 300 }}
@@ -146,9 +146,9 @@ const Dashboard: React.FC<DashboardProps> = ({  userId }) => { //firstName, emai
       </motion.div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
         <motion.div variants={itemVariants}>
-          <Link to="/courses" className="block">
+          <Link to="/courses" className="block relative">
             <motion.div 
               className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white"
               whileHover={{ 
@@ -177,7 +177,7 @@ const Dashboard: React.FC<DashboardProps> = ({  userId }) => { //firstName, emai
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <Link to="/syllabus-upload" className="block">
+          <Link to="/syllabus-upload" className="block relative">
             <motion.div 
               className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white"
               whileHover={{ 
@@ -207,7 +207,7 @@ const Dashboard: React.FC<DashboardProps> = ({  userId }) => { //firstName, emai
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
         <motion.div 
           variants={itemVariants}
           whileHover={{ scale: 1.03 }}
@@ -286,7 +286,7 @@ const Dashboard: React.FC<DashboardProps> = ({  userId }) => { //firstName, emai
       {/* Current Courses */}
       <motion.div 
         variants={itemVariants}
-        className="bg-white rounded-lg shadow-lg overflow-hidden"
+        className="bg-white rounded-lg shadow-lg overflow-hidden relative z-10"
       >
         <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
           <h2 className="text-xl font-semibold text-gray-800">Current Courses</h2>
