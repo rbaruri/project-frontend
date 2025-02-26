@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/client';
-import { GET_QUIZ_WITH_QUESTIONS, GET_NEXT_MODULE } from '../graphql/queries/quiz.queries';
+import { GET_QUIZ_WITH_QUESTIONS, GET_NEXT_MODULE } from '../graphql/queries/quiz';
 import { UPDATE_QUIZ_STATUS, UPDATE_MODULE_STATUS } from '../graphql/mutations/quiz';
 import { QuizData, NextModuleData } from '../types/quiz.types';
 import QuizQuestion from '../components/Quiz/QuizQuestion';
