@@ -27,20 +27,24 @@ export interface SignUpFormData {
 export interface SignUpRequestAction {
   type: typeof SIGNUP_REQUEST;
   payload: Omit<SignUpFormData, 'confirmPassword'>;
+  [key: string]: any;
 }
 
 export interface SignUpSuccessAction {
   type: typeof SIGNUP_SUCCESS;
   payload: User;
+  [key: string]: any;
 }
 
 export interface SignUpErrorAction {
   type: typeof SIGNUP_ERROR;
   payload: string;
+  [key: string]: any;
 }
 
 export interface ResetSignUpStateAction {
   type: typeof RESET_SIGNUP_STATE;
+  [key: string]: any;
 }
 
 export type SignUpActionTypes = 
