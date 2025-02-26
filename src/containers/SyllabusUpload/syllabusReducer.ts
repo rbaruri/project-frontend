@@ -16,7 +16,7 @@ const initialState: SyllabusState = {
   uploadProgress: 0,
 };
 
-const syllabusReducer = (state = initialState, action: any) =>
+export const syllabusReducer = (state = initialState, action: any) =>
   produce(state, (draft) => {
     switch (action.type) {
       case UPLOAD_SYLLABUS_REQUEST:
@@ -52,5 +52,3 @@ const syllabusReducer = (state = initialState, action: any) =>
         break;
     }
   });
-
-export default syllabusReducer;
