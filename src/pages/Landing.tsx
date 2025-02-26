@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="flex flex-col justify-center items-center min-h-[calc(100vh-4rem)] bg-gradient-to-br from-indigo-600 to-indigo-900 px-4">
+    <div className="flex flex-col justify-center items-center min-h-[calc(100vh-8rem)] bg-gradient-to-br from-indigo-600 to-indigo-900 px-4">
       <div className="text-center mb-6">
         <h1 className="text-4xl font-bold text-white mb-2">NerdNest</h1>
         <p className="text-lg text-indigo-200">Your Personalized Learning Journey Starts Here</p>

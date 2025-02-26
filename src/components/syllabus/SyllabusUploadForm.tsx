@@ -1,11 +1,11 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { api } from '../../api/axios';
-import Calendar from '../ui/Calendar';
-import { useApolloClient } from '@apollo/client';
-import { GET_COURSES_WITH_LEARNING_PATHS } from '../../graphql/queries/courses';
-import AuthModal from '../ui/AuthModal';
+import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { api } from "../../api/axios";
+import Calendar from "../ui/Calendar";
+import { useApolloClient } from "@apollo/client";
+import { GET_COURSES_WITH_LEARNING_PATHS } from "../../graphql/queries/courses";
+import AuthModal from "../ui/AuthModal";
 
 interface FormData {
   courseName: string;
@@ -20,20 +20,20 @@ const SyllabusUploadForm: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState<FormData>({
-    courseName: '',
-    startDate: '',
-    endDate: '',
+    courseName: "",
+    startDate: "",
+    endDate: "",
   });
   const [file, setFile] = useState<File | null>(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -43,22 +43,22 @@ const SyllabusUploadForm: React.FC = () => {
       // Validate file size and type
       if (validateFile(selectedFile)) {
         setFile(selectedFile);
-        setError('');
+        setError("");
       }
     }
   };
 
   const validateFile = (file: File): boolean => {
     const maxSize = 10 * 1024 * 1024; // 10MB
-    const allowedTypes = ['application/pdf'];
+    const allowedTypes = ["application/pdf"];
 
     if (file.size > maxSize) {
-      setError('File size too large. Maximum size is 10MB.');
+      setError("File size too large. Maximum size is 10MB.");
       return false;
     }
 
     if (!allowedTypes.includes(file.type)) {
-      setError('Invalid file type. Only PDF documents are allowed.');
+      setError("Invalid file type. Only PDF documents are allowed.");
       return false;
     }
 
@@ -67,15 +67,20 @@ const SyllabusUploadForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!isAuthenticated) {
       setShowAuthModal(true);
       return;
     }
 
-    if (!file || !formData.courseName || !formData.startDate || !formData.endDate) {
-      setError('Please fill in all required fields');
+    if (
+      !file ||
+      !formData.courseName ||
+      !formData.startDate ||
+      !formData.endDate
+    ) {
+      setError("Please fill in all required fields");
       return;
     }
 
@@ -83,26 +88,26 @@ const SyllabusUploadForm: React.FC = () => {
 
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append('file', file);
-      formDataToSend.append('courseName', formData.courseName);
-      formDataToSend.append('startDate', formData.startDate);
-      formDataToSend.append('endDate', formData.endDate);
+      formDataToSend.append("file", file);
+      formDataToSend.append("courseName", formData.courseName);
+      formDataToSend.append("startDate", formData.startDate);
+      formDataToSend.append("endDate", formData.endDate);
 
-      const response = await api.post('/api/syllabus/process', formDataToSend, {
+      const response = await api.post("/api/syllabus/process", formDataToSend, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       // Refetch courses data after successful upload
       await client.refetchQueries({
-        include: [GET_COURSES_WITH_LEARNING_PATHS]
+        include: [GET_COURSES_WITH_LEARNING_PATHS],
       });
 
-      console.log('Syllabus uploaded successfully:', response.data);
-      navigate('/courses');
+      console.log("Syllabus uploaded successfully:", response.data);
+      navigate("/courses");
     } catch (error: any) {
-      console.error('Syllabus upload error:', error);
+      console.error("Syllabus upload error:", error);
       handleUploadError(error);
     } finally {
       setLoading(false);
@@ -114,7 +119,7 @@ const SyllabusUploadForm: React.FC = () => {
       setShowAuthModal(true);
       return;
     }
-    setError(error.message || 'Failed to upload syllabus');
+    setError(error.message || "Failed to upload syllabus");
   };
 
   return (
@@ -122,21 +127,35 @@ const SyllabusUploadForm: React.FC = () => {
       {/* Header Section */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-lg p-8 text-white">
         <h1 className="text-3xl font-bold mb-3">Upload Your Syllabus</h1>
-        <p className="text-blue-100 text-lg">Get personalized learning recommendations based on your syllabus</p>
+        <p className="text-blue-100 text-lg">
+          Get personalized learning recommendations based on your syllabus
+        </p>
       </div>
 
       {/* Sample PDF Section */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
         <div className="flex items-start space-x-4">
           <div className="flex-shrink-0 mt-1">
-            <svg className="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="h-6 w-6 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
-          <div>
-            <h3 className="text-lg font-medium text-blue-800 mb-2">Not sure about the format?</h3>
-            <p className="text-blue-600">
-              Check out our{' '}
+          <div className="text-xs space-y-1">
+            <h3 className="text-sm font-medium text-blue-800 mb-1">
+              Not sure about the format?
+            </h3>
+            <p className="text-s text-blue-600">
+              Check out our{" "}
               <a
                 href="/sample-syllabus.pdf"
                 target="_blank"
@@ -144,12 +163,16 @@ const SyllabusUploadForm: React.FC = () => {
                 className="font-medium underline hover:text-blue-800 transition-colors"
                 onClick={(e) => {
                   e.preventDefault();
-                  window.open('https://drive.google.com/file/d/1QgtxhzR_Kk1B6Qf9x4PL4xh5RqfOGHEw/view?usp=sharing', '_blank');
+                  window.open(
+                    "https://drive.google.com/file/d/1QgtxhzR_Kk1B6Qf9x4PL4xh5RqfOGHEw/view?usp=sharing",
+                    "_blank"
+                  );
                 }}
               >
                 sample syllabus
-              </a>
-              {' '}to understand the expected format. Your syllabus should include course details, learning objectives, and weekly topics.
+              </a>{" "}
+              to understand the expected format. Your syllabus should include
+              course details, learning objectives, and weekly topics.
             </p>
           </div>
         </div>
@@ -160,8 +183,10 @@ const SyllabusUploadForm: React.FC = () => {
         <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-8">
           {/* File Upload Section */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Upload Syllabus</label>
-            <div 
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Upload Syllabus
+            </label>
+            <div
               className="mt-1 flex justify-center px-6 pt-8 pb-8 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-500 transition-colors cursor-pointer"
               onClick={() => fileInputRef.current?.click()}
             >
@@ -211,7 +236,10 @@ const SyllabusUploadForm: React.FC = () => {
 
           {/* Course Name Input */}
           <div className="space-y-2">
-            <label htmlFor="courseName" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="courseName"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Course Name
             </label>
             <input
@@ -224,7 +252,7 @@ const SyllabusUploadForm: React.FC = () => {
               onChange={handleChange}
               placeholder="Enter course name"
               className={`w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                loading ? 'bg-gray-100 cursor-not-allowed' : ''
+                loading ? "bg-gray-100 cursor-not-allowed" : ""
               }`}
             />
           </div>
@@ -239,7 +267,7 @@ const SyllabusUploadForm: React.FC = () => {
                 onChange={handleChange}
                 disabled={loading}
                 className={`w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  loading ? 'bg-gray-100 cursor-not-allowed' : ''
+                  loading ? "bg-gray-100 cursor-not-allowed" : ""
                 }`}
               />
             </div>
@@ -252,7 +280,7 @@ const SyllabusUploadForm: React.FC = () => {
                 disabled={loading}
                 minDate={formData.startDate}
                 className={`w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  loading ? 'bg-gray-100 cursor-not-allowed' : ''
+                  loading ? "bg-gray-100 cursor-not-allowed" : ""
                 }`}
               />
             </div>
@@ -268,23 +296,49 @@ const SyllabusUploadForm: React.FC = () => {
           <div className="flex flex-col items-center pt-4">
             <button
               type="submit"
-              disabled={loading || !file || !formData.courseName || !formData.startDate || !formData.endDate}
+              disabled={
+                loading ||
+                !file ||
+                !formData.courseName ||
+                !formData.startDate ||
+                !formData.endDate
+              }
               className={`w-full md:w-auto px-8 py-3 border border-transparent text-base font-medium rounded-md text-white shadow-sm ${
-                loading || !file || !formData.courseName || !formData.startDate || !formData.endDate
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                loading ||
+                !file ||
+                !formData.courseName ||
+                !formData.startDate ||
+                !formData.endDate
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               }`}
             >
               {loading ? (
                 <div className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Uploading...
                 </div>
               ) : (
-                'Upload Syllabus'
+                "Upload Syllabus"
               )}
             </button>
           </div>
@@ -300,4 +354,4 @@ const SyllabusUploadForm: React.FC = () => {
   );
 };
 
-export default SyllabusUploadForm; 
+export default SyllabusUploadForm;
