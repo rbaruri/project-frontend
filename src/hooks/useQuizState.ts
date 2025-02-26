@@ -1,8 +1,12 @@
 import { useState, useCallback, useEffect, Dispatch, SetStateAction } from 'react';
 import { useMutation } from '@apollo/client';
-import { UserAnswers, QuizData } from '../types/quiz.types';
+import { QuizData } from '../containers/Quiz/quizTypes';
 import { UPDATE_QUIZ_STATUS, UPDATE_MODULE_STATUS } from '../graphql/mutations/quiz';
 import { QUIZ_TIME_LIMIT } from '../helper/quizHelper';
+
+interface UserAnswers {
+  [questionId: string]: string;
+}
 
 interface QuizState {
   userAnswers: UserAnswers;
@@ -23,9 +27,9 @@ interface QuizActions {
   setShowResults: Dispatch<SetStateAction<boolean>>;
   setAttempts: Dispatch<SetStateAction<number>>;
   handleAnswerSelect: (questionId: string, selectedOption: string) => void;
-  calculateScore: (questions: QuizData['quizzes_by_pk']['quiz_questions'], answers: UserAnswers) => number;
+  calculateScore: (questions: QuizData['quiz_questions'], answers: UserAnswers) => number;
   resetQuiz: () => void;
-  handleSubmit: (questions?: QuizData['quizzes_by_pk']['quiz_questions'], moduleId?: string, cutoffScore?: number) => Promise<void>;
+  handleSubmit: (questions?: QuizData['quiz_questions'], moduleId?: string, cutoffScore?: number) => Promise<void>;
   handleRetake: (moduleId?: string) => Promise<void>;
 }
 
@@ -84,9 +88,11 @@ export const useQuizState = ({ quizId, refetch }: UseQuizStateProps) => {
     return null;
   }, [quizId]);
 
-  const calculateScore = useCallback((questions: QuizData['quizzes_by_pk']['quiz_questions'], answers: UserAnswers): number => {
+  const calculateScore = useCallback((questions: QuizData['quiz_questions'], answers: UserAnswers): number => {
     if (!questions.length) return 0;
-    const correctAnswers = questions.filter(q => answers[q.id] === q.correct_option).length;
+    const correctAnswers = questions.filter((q: { id: string; correct_option: string }) => 
+      answers[q.id] === q.correct_option
+    ).length;
     return Math.round((correctAnswers / questions.length) * 100);
   }, []);
 
@@ -100,7 +106,7 @@ export const useQuizState = ({ quizId, refetch }: UseQuizStateProps) => {
   }, [userAnswers, saveAnswersToLocalStorage]);
 
   const handleSubmit = useCallback(async (
-    questions?: QuizData['quizzes_by_pk']['quiz_questions'],
+    questions?: QuizData['quiz_questions'],
     moduleId?: string,
     cutoffScore?: number
   ) => {

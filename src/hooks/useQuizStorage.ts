@@ -1,6 +1,9 @@
 import { useCallback } from 'react';
-import { UserAnswers } from '../types/quiz.types';
 import { QUIZ_TIME_LIMIT } from '../helper/quizHelper';
+
+interface UserAnswers {
+  [questionId: string]: string;
+}
 
 export const useQuizStorage = (quizId: string | undefined) => {
   const saveAnswersToLocalStorage = useCallback((answers: UserAnswers) => {
