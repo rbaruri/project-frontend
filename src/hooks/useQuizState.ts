@@ -38,7 +38,18 @@ export const useQuizState = ({ quizId, refetch }: UseQuizStateProps) => {
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [score, setScore] = useState<number>(0);
-  const [timeLeft, setTimeLeft] = useState(QUIZ_TIME_LIMIT);
+  const [timeLeft, setTimeLeft] = useState(() => {
+    if (!quizId) return QUIZ_TIME_LIMIT;
+    const savedTime = localStorage.getItem(`quiz_${quizId}_time`);
+    const savedTimestamp = localStorage.getItem(`quiz_${quizId}_last_timestamp`);
+    
+    if (savedTime && savedTimestamp) {
+      const elapsedSeconds = Math.floor((Date.now() - parseInt(savedTimestamp)) / 1000);
+      const remainingTime = Math.max(parseInt(savedTime) - elapsedSeconds, 0);
+      return remainingTime > 0 ? remainingTime : QUIZ_TIME_LIMIT;
+    }
+    return QUIZ_TIME_LIMIT;
+  });
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [attempts, setAttempts] = useState(0);
@@ -172,7 +183,11 @@ export const useQuizState = ({ quizId, refetch }: UseQuizStateProps) => {
     setCurrentQuestionIndex(0);
     setShowResults(false);
     setAttempts(prev => prev + 1);
-  }, []);
+    if (quizId) {
+      localStorage.removeItem(`quiz_${quizId}_time`);
+      localStorage.removeItem(`quiz_${quizId}_last_timestamp`);
+    }
+  }, [quizId]);
 
   // Load saved answers when component mounts
   useEffect(() => {
@@ -222,6 +237,22 @@ export const useQuizState = ({ quizId, refetch }: UseQuizStateProps) => {
       }
     };
   }, [isSubmitted, showResults, handleSubmit]);
+
+  // Save time to localStorage
+  useEffect(() => {
+    if (quizId && !isSubmitted && !showResults) {
+      localStorage.setItem(`quiz_${quizId}_time`, timeLeft.toString());
+      localStorage.setItem(`quiz_${quizId}_last_timestamp`, Date.now().toString());
+    }
+  }, [timeLeft, quizId, isSubmitted, showResults]);
+
+  // Clear time from localStorage when quiz is submitted or retaken
+  useEffect(() => {
+    if (quizId && (isSubmitted || showResults)) {
+      localStorage.removeItem(`quiz_${quizId}_time`);
+      localStorage.removeItem(`quiz_${quizId}_last_timestamp`);
+    }
+  }, [quizId, isSubmitted, showResults]);
 
   return {
     state: {

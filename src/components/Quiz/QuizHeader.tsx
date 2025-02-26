@@ -24,6 +24,9 @@ export const QuizHeader: React.FC<QuizHeaderProps> = ({
   score,
   progress
 }) => {
+  // Calculate actual marks based on percentage
+  const scoreMarks = Math.round((score / 100) * totalQuestions);
+
   return (
     <div className="mb-8">
       <div className="flex justify-between items-center mb-4">
@@ -43,9 +46,10 @@ export const QuizHeader: React.FC<QuizHeaderProps> = ({
             {attempts > 0 && <span>Attempts: {attempts + 1}</span>}
           </div>
           {isSubmitted && (
-            <span className={`font-bold ${score >= cutoffScore ? 'text-green-600' : 'text-red-600'}`}>
-              Score: {score}%
-            </span>
+            <div className={`font-bold ${score >= cutoffScore ? 'text-green-600' : 'text-red-600'}`}>
+              <span className="mr-2">Score: {scoreMarks}/{totalQuestions}</span>
+              <span>({score}%)</span>
+            </div>
           )}
         </div>
         

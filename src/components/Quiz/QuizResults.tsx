@@ -39,6 +39,10 @@ export const QuizResults: React.FC<QuizResultsProps> = ({
   onNextModule,
   hasNextModule
 }) => {
+  // Calculate actual marks
+  const correctAnswers = questions.filter(q => userAnswers[q.id] === q.correct_option).length;
+  const totalQuestions = questions.length;
+
   return (
     <div className="space-y-8">
       {questions.map((question, index) => {
@@ -101,7 +105,7 @@ export const QuizResults: React.FC<QuizResultsProps> = ({
       <div className="mt-8">
         <div className="text-center mb-6">
           <h2 className={`text-2xl font-bold ${score >= cutoffScore ? 'text-green-600' : 'text-red-600'}`}>
-            Final Score: {score}%
+            Final Score: {correctAnswers}/{totalQuestions} ({score}%)
           </h2>
           <p className="mt-2 text-lg">
             {score >= cutoffScore ? (
