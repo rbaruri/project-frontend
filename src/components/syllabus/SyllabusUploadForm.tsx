@@ -118,24 +118,24 @@ const SyllabusUploadForm: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-lg p-6 text-white">
-        <h1 className="text-3xl font-bold mb-2">Upload Your Syllabus</h1>
-        <p className="text-blue-100">Get personalized learning recommendations based on your syllabus</p>
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-lg p-8 text-white">
+        <h1 className="text-3xl font-bold mb-3">Upload Your Syllabus</h1>
+        <p className="text-blue-100 text-lg">Get personalized learning recommendations based on your syllabus</p>
       </div>
 
       {/* Sample PDF Section */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start space-x-3">
-          <div className="flex-shrink-0">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div className="flex items-start space-x-4">
+          <div className="flex-shrink-0 mt-1">
             <svg className="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
           <div>
-            <h3 className="text-sm font-medium text-blue-800">Not sure about the format?</h3>
-            <p className="mt-1 text-sm text-blue-600">
+            <h3 className="text-lg font-medium text-blue-800 mb-2">Not sure about the format?</h3>
+            <p className="text-blue-600">
               Check out our{' '}
               <a
                 href="/sample-syllabus.pdf"
@@ -157,12 +157,15 @@ const SyllabusUploadForm: React.FC = () => {
 
       {/* Upload Form */}
       <div className="bg-white rounded-lg shadow-sm p-8">
-        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
+        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-8">
           {/* File Upload Section */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Upload Syllabus</label>
-            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-500 transition-colors">
-              <div className="space-y-1 text-center">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Upload Syllabus</label>
+            <div 
+              className="mt-1 flex justify-center px-6 pt-8 pb-8 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-500 transition-colors cursor-pointer"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <div className="space-y-2 text-center">
                 <svg
                   className="mx-auto h-12 w-12 text-gray-400"
                   stroke="currentColor"
@@ -177,7 +180,7 @@ const SyllabusUploadForm: React.FC = () => {
                     strokeLinejoin="round"
                   />
                 </svg>
-                <div className="flex text-sm text-gray-600">
+                <div className="flex text-sm text-gray-600 justify-center">
                   <label
                     htmlFor="file-upload"
                     className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500"
@@ -208,7 +211,7 @@ const SyllabusUploadForm: React.FC = () => {
 
           {/* Course Name Input */}
           <div className="space-y-2">
-            <label htmlFor="courseName" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="courseName" className="block text-sm font-medium text-gray-700 mb-2">
               Course Name
             </label>
             <input
@@ -220,14 +223,14 @@ const SyllabusUploadForm: React.FC = () => {
               value={formData.courseName}
               onChange={handleChange}
               placeholder="Enter course name"
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
+              className={`w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                 loading ? 'bg-gray-100 cursor-not-allowed' : ''
               }`}
             />
           </div>
 
           {/* Date Range Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
               <Calendar
                 label="Start Date"
@@ -235,7 +238,7 @@ const SyllabusUploadForm: React.FC = () => {
                 value={formData.startDate}
                 onChange={handleChange}
                 disabled={loading}
-                className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
+                className={`w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                   loading ? 'bg-gray-100 cursor-not-allowed' : ''
                 }`}
               />
@@ -248,7 +251,7 @@ const SyllabusUploadForm: React.FC = () => {
                 onChange={handleChange}
                 disabled={loading}
                 minDate={formData.startDate}
-                className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
+                className={`w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                   loading ? 'bg-gray-100 cursor-not-allowed' : ''
                 }`}
               />
@@ -256,17 +259,17 @@ const SyllabusUploadForm: React.FC = () => {
           </div>
 
           {error && (
-            <div className="text-red-500 text-sm text-center">
+            <div className="text-red-500 text-sm text-center p-4 bg-red-50 rounded-md">
               {error}
             </div>
           )}
 
           {/* Submit Button */}
-          <div className="flex flex-col items-center space-y-4">
+          <div className="flex flex-col items-center pt-4">
             <button
               type="submit"
               disabled={loading || !file || !formData.courseName || !formData.startDate || !formData.endDate}
-              className={`w-full md:w-auto px-6 py-3 border border-transparent text-base font-medium rounded-md text-white ${
+              className={`w-full md:w-auto px-8 py-3 border border-transparent text-base font-medium rounded-md text-white shadow-sm ${
                 loading || !file || !formData.courseName || !formData.startDate || !formData.endDate
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
