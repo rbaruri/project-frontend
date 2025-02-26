@@ -57,16 +57,16 @@ const SignupForm: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-5rem)] bg-gray-50">
+    <div className="flex items-center justify-center min-h-[calc(100vh-8rem)] bg-gray-50">
       <div className="w-full max-w-md space-y-4 px-4 sm:px-6 lg:px-8">
-        <div>
+        <div className="bg-white shadow-md rounded-lg p-6 space-y-4">
           <h2 className="text-center text-2xl font-extrabold text-gray-900">
             Create your account
           </h2>
           <p className="mt-1 text-center text-sm text-gray-600">
             Join us to start your journey
           </p>
-        </div>
+
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
@@ -152,6 +152,7 @@ const SignupForm: React.FC = () => {
             </Link>
           </p>
         </div>
+      </div>
       </div>
     </div>
   );
