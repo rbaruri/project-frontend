@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/axios';
@@ -7,11 +7,19 @@ import { useApolloClient } from '@apollo/client';
 import { GET_COURSES_WITH_LEARNING_PATHS } from '../../graphql/queries/courses';
 import AuthModal from '../ui/AuthModal';
 
+interface FormData {
+  courseName: string;
+  startDate: string;
+  endDate: string;
+}
+
 const SyllabusUploadForm: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const client = useApolloClient();
-  const [formData, setFormData] = useState({
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [formData, setFormData] = useState<FormData>({
     courseName: '',
     startDate: '',
     endDate: '',
@@ -31,43 +39,49 @@ const SyllabusUploadForm: React.FC = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      const selectedFile = e.target.files[0];
+      // Validate file size and type
+      if (validateFile(selectedFile)) {
+        setFile(selectedFile);
+        setError('');
+      }
     }
+  };
+
+  const validateFile = (file: File): boolean => {
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    const allowedTypes = ['application/pdf'];
+
+    if (file.size > maxSize) {
+      setError('File size too large. Maximum size is 10MB.');
+      return false;
+    }
+
+    if (!allowedTypes.includes(file.type)) {
+      setError('Invalid file type. Only PDF documents are allowed.');
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    // If user is not authenticated, show auth modal
     if (!isAuthenticated) {
       setShowAuthModal(true);
+      return;
+    }
+
+    if (!file || !formData.courseName || !formData.startDate || !formData.endDate) {
+      setError('Please fill in all required fields');
       return;
     }
 
     setLoading(true);
 
     try {
-      if (!file) {
-        throw new Error('Please select a syllabus file');
-      }
-
-      // Validate file size before uploading (10MB)
-      const maxSize = 10 * 1024 * 1024; // 10MB in bytes
-      if (file.size > maxSize) {
-        setError('File size too large. Maximum size is 10MB.');
-        return;
-      }
-
-      // Validate file type
-      const allowedTypes = [
-        'application/pdf'
-      ];
-      if (!allowedTypes.includes(file.type)) {
-        setError('Invalid file type. Only PDF documents are allowed.');
-        return;
-      }
-
       const formDataToSend = new FormData();
       formDataToSend.append('file', file);
       formDataToSend.append('courseName', formData.courseName);
@@ -104,48 +118,99 @@ const SyllabusUploadForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Upload Course Syllabus
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Create a new course by uploading your syllabus
-          </p>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label htmlFor="courseName" className="block text-sm font-medium text-gray-700">
-                Course Name
-              </label>
-              <input
-                id="courseName"
-                name="courseName"
-                type="text"
-                required
-                disabled={loading}
-                className={`appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                  loading ? 'bg-gray-100 cursor-not-allowed' : ''
-                }`}
-                value={formData.courseName}
-                onChange={handleChange}
-              />
+    <div className="space-y-6">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-lg p-6 text-white">
+        <h1 className="text-3xl font-bold mb-2">Upload Your Syllabus</h1>
+        <p className="text-blue-100">Get personalized learning recommendations based on your syllabus</p>
+      </div>
+
+      {/* Upload Form */}
+      <div className="bg-white rounded-lg shadow-sm p-8">
+        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
+          {/* File Upload Section */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">Upload Syllabus</label>
+            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-500 transition-colors">
+              <div className="space-y-1 text-center">
+                <svg
+                  className="mx-auto h-12 w-12 text-gray-400"
+                  stroke="currentColor"
+                  fill="none"
+                  viewBox="0 0 48 48"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <div className="flex text-sm text-gray-600">
+                  <label
+                    htmlFor="file-upload"
+                    className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500"
+                  >
+                    <span>Upload a file</span>
+                    <input
+                      id="file-upload"
+                      name="file-upload"
+                      type="file"
+                      className="sr-only"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      accept=".pdf"
+                      disabled={loading}
+                    />
+                  </label>
+                  <p className="pl-1">or drag and drop</p>
+                </div>
+                <p className="text-xs text-gray-500">PDF up to 10MB</p>
+                {file && (
+                  <p className="text-sm text-green-600 mt-2">
+                    Selected: {file.name}
+                  </p>
+                )}
+              </div>
             </div>
-            <div>
+          </div>
+
+          {/* Course Name Input */}
+          <div className="space-y-2">
+            <label htmlFor="courseName" className="block text-sm font-medium text-gray-700">
+              Course Name
+            </label>
+            <input
+              id="courseName"
+              name="courseName"
+              type="text"
+              required
+              disabled={loading}
+              value={formData.courseName}
+              onChange={handleChange}
+              placeholder="Enter course name"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
+                loading ? 'bg-gray-100 cursor-not-allowed' : ''
+              }`}
+            />
+          </div>
+
+          {/* Date Range Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
               <Calendar
                 label="Start Date"
                 name="startDate"
                 value={formData.startDate}
                 onChange={handleChange}
                 disabled={loading}
-                className={`appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
                   loading ? 'bg-gray-100 cursor-not-allowed' : ''
                 }`}
               />
             </div>
-            <div>
+            <div className="space-y-2">
               <Calendar
                 label="End Date"
                 name="endDate"
@@ -153,35 +218,10 @@ const SyllabusUploadForm: React.FC = () => {
                 onChange={handleChange}
                 disabled={loading}
                 minDate={formData.startDate}
-                className={`appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
                   loading ? 'bg-gray-100 cursor-not-allowed' : ''
                 }`}
               />
-            </div>
-            <div>
-              <label htmlFor="syllabus" className="block text-sm font-medium text-gray-700">
-                Syllabus File
-              </label>
-              <input
-                id="syllabus"
-                name="syllabus"
-                type="file"
-                required
-                disabled={loading}
-                accept=".pdf"
-                onChange={handleFileChange}
-                className={`mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                  loading ? 'bg-gray-100 cursor-not-allowed' : ''
-                }`}
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                Accepted formats: PDF
-              </p>
-              {file && (
-                <p className={`mt-2 text-sm ${loading ? 'text-gray-500' : 'text-green-600'}`}>
-                  Selected file: {file.name}
-                </p>
-              )}
             </div>
           </div>
 
@@ -191,22 +231,25 @@ const SyllabusUploadForm: React.FC = () => {
             </div>
           )}
 
-          <div>
+          {/* Submit Button */}
+          <div className="flex flex-col items-center space-y-4">
             <button
               type="submit"
-              disabled={loading}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                loading ? 'bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-700'
-              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+              disabled={loading || !file || !formData.courseName || !formData.startDate || !formData.endDate}
+              className={`w-full md:w-auto px-6 py-3 border border-transparent text-base font-medium rounded-md text-white ${
+                loading || !file || !formData.courseName || !formData.startDate || !formData.endDate
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+              }`}
             >
               {loading ? (
-                <span className="flex items-center">
+                <div className="flex items-center justify-center">
                   <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                   Uploading...
-                </span>
+                </div>
               ) : (
                 'Upload Syllabus'
               )}
