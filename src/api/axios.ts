@@ -14,6 +14,13 @@ api.interceptors.request.use(
         if (!(config.data instanceof FormData)) {
             config.headers['Content-Type'] = 'application/json';
         }
+
+        // Get token from localStorage if available
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers['Authorization'] = `Bearer ${token}`;
+        }
+
         return config;
     },
     (error) => {
@@ -28,6 +35,7 @@ api.interceptors.response.use(
         if (error.response?.status === 401) {
             // Clear user data on unauthorized
             localStorage.removeItem('user');
+            localStorage.removeItem('token');
             window.location.href = '/login';
         }
         return Promise.reject(error);

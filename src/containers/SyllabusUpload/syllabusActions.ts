@@ -1,3 +1,15 @@
+import {
+  SYLLABUS_UPLOAD_REQUEST,
+  SYLLABUS_UPLOAD_SUCCESS,
+  SYLLABUS_UPLOAD_FAILURE,
+  RESET_SYLLABUS_STATE,
+  SyllabusUploadRequestAction,
+  SyllabusUploadSuccessAction,
+  SyllabusUploadFailureAction,
+  ResetSyllabusStateAction,
+  SyllabusUploadResponse
+} from './types';
+
 // Action Types
 export const UPLOAD_SYLLABUS_REQUEST = 'UPLOAD_SYLLABUS_REQUEST';
 export const UPLOAD_SYLLABUS_SUCCESS = 'UPLOAD_SYLLABUS_SUCCESS';
@@ -32,17 +44,21 @@ export type SyllabusActionTypes =
   | UploadSyllabusFailureAction;
 
 // Action Creators
-export const uploadSyllabusRequest = (formData: FormData): UploadSyllabusRequestAction => ({
-  type: UPLOAD_SYLLABUS_REQUEST,
+export const uploadSyllabusRequest = (formData: FormData): SyllabusUploadRequestAction => ({
+  type: SYLLABUS_UPLOAD_REQUEST,
   payload: formData,
 });
 
-export const uploadSyllabusSuccess = (data: { syllabusId: string; message: string }): UploadSyllabusSuccessAction => ({
-  type: UPLOAD_SYLLABUS_SUCCESS,
+export const uploadSyllabusSuccess = (data: SyllabusUploadResponse): SyllabusUploadSuccessAction => ({
+  type: SYLLABUS_UPLOAD_SUCCESS,
   payload: data,
 });
 
-export const uploadSyllabusFailure = (error: string): UploadSyllabusFailureAction => ({
-  type: UPLOAD_SYLLABUS_FAILURE,
+export const uploadSyllabusFailure = (error: string): SyllabusUploadFailureAction => ({
+  type: SYLLABUS_UPLOAD_FAILURE,
   payload: error,
+});
+
+export const resetSyllabusState = (): ResetSyllabusStateAction => ({
+  type: RESET_SYLLABUS_STATE,
 });

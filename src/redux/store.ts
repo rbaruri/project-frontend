@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
 import { all } from 'redux-saga/effects';
 import { signUpReducer, signUpSaga } from '../containers/SignUp';
+import { syllabusReducer, syllabusSaga } from '../containers/SyllabusUpload';
 
 // Create saga middleware
 const sagaMiddleware = createSagaMiddleware();
@@ -10,6 +11,7 @@ const sagaMiddleware = createSagaMiddleware();
 function* rootSaga() {
   yield all([
     signUpSaga(),
+    syllabusSaga(),
   ]);
 }
 
@@ -17,6 +19,7 @@ function* rootSaga() {
 const store = configureStore({
   reducer: {
     signup: signUpReducer,
+    syllabus: syllabusReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

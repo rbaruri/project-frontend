@@ -1,25 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { useAuth } from '../../context/AuthContext';
-import { api } from '../../api/axios';
 import Calendar from '../ui/Calendar';
 import { useApolloClient } from '@apollo/client';
 import { GET_COURSES_WITH_LEARNING_PATHS } from '../../graphql/queries/courses';
 import AuthModal from '../ui/AuthModal';
+import {
+  uploadSyllabusRequest,
+  resetSyllabusState,
+  selectSyllabusLoading,
+  selectSyllabusError,
+  selectSyllabusData,
+  validateSyllabusFile,
+  createSyllabusFormData,
+  type SyllabusFormData
+} from '../../containers/SyllabusUpload';
 
 const SyllabusUploadForm: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { isAuthenticated } = useAuth();
   const client = useApolloClient();
-  const [formData, setFormData] = useState({
+
+  const loading = useSelector(selectSyllabusLoading);
+  const error = useSelector(selectSyllabusError);
+  const uploadedData = useSelector(selectSyllabusData);
+
+  const [formData, setFormData] = useState<SyllabusFormData>({
     courseName: '',
     startDate: '',
     endDate: '',
+    file: null,
   });
-  const [file, setFile] = useState<File | null>(null);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+
+  useEffect(() => {
+    // Reset syllabus state when component unmounts
+    return () => {
+      dispatch(resetSyllabusState());
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Navigate to courses page on successful upload
+    if (uploadedData) {
+      navigate('/courses');
+    }
+  }, [uploadedData, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -31,13 +60,21 @@ const SyllabusUploadForm: React.FC = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      const file = e.target.files[0];
+      const error = validateSyllabusFile(file);
+      setValidationError(error);
+      if (!error) {
+        setFormData(prev => ({
+          ...prev,
+          file
+        }));
+      }
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setValidationError(null);
 
     // If user is not authenticated, show auth modal
     if (!isAuthenticated) {
@@ -45,62 +82,28 @@ const SyllabusUploadForm: React.FC = () => {
       return;
     }
 
-    setLoading(true);
-
     try {
-      if (!file) {
-        throw new Error('Please select a syllabus file');
-      }
-
-      // Validate file size before uploading (10MB)
-      const maxSize = 10 * 1024 * 1024; // 10MB in bytes
-      if (file.size > maxSize) {
-        setError('File size too large. Maximum size is 10MB.');
+      if (!formData.file) {
+        setValidationError('Please select a syllabus file');
         return;
       }
 
-      // Validate file type
-      const allowedTypes = [
-        'application/pdf'
-      ];
-      if (!allowedTypes.includes(file.type)) {
-        setError('Invalid file type. Only PDF documents are allowed.');
+      const error = validateSyllabusFile(formData.file);
+      if (error) {
+        setValidationError(error);
         return;
       }
 
-      const formDataToSend = new FormData();
-      formDataToSend.append('file', file);
-      formDataToSend.append('courseName', formData.courseName);
-      formDataToSend.append('startDate', formData.startDate);
-      formDataToSend.append('endDate', formData.endDate);
-
-      const response = await api.post('/api/syllabus/process', formDataToSend, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      const formDataToSend = createSyllabusFormData(formData);
+      dispatch(uploadSyllabusRequest(formDataToSend));
 
       // Refetch courses data after successful upload
       await client.refetchQueries({
         include: [GET_COURSES_WITH_LEARNING_PATHS]
       });
-
-      console.log('Syllabus uploaded successfully:', response.data);
-      navigate('/courses');
     } catch (error: any) {
-      console.error('Syllabus upload error:', error);
-      handleUploadError(error);
-    } finally {
-      setLoading(false);
+      setValidationError(error.message);
     }
-  };
-
-  const handleUploadError = (error: any) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      setShowAuthModal(true);
-      return;
-    }
-    setError(error.message || 'Failed to upload syllabus');
   };
 
   return (
@@ -177,17 +180,17 @@ const SyllabusUploadForm: React.FC = () => {
               <p className="mt-1 text-xs text-gray-500">
                 Accepted formats: PDF
               </p>
-              {file && (
+              {formData.file && (
                 <p className={`mt-2 text-sm ${loading ? 'text-gray-500' : 'text-green-600'}`}>
-                  Selected file: {file.name}
+                  Selected file: {formData.file.name}
                 </p>
               )}
             </div>
           </div>
 
-          {error && (
+          {(error || validationError) && (
             <div className="text-red-500 text-sm text-center">
-              {error}
+              {error || validationError}
             </div>
           )}
 

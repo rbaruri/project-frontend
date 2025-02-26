@@ -1,48 +1,59 @@
+import { produce } from 'immer';
+import { isNull } from 'lodash';
 import {
-  UPLOAD_SYLLABUS_REQUEST,
-  UPLOAD_SYLLABUS_SUCCESS,
-  UPLOAD_SYLLABUS_FAILURE,
+  SYLLABUS_UPLOAD_REQUEST,
+  SYLLABUS_UPLOAD_SUCCESS,
+  SYLLABUS_UPLOAD_FAILURE,
+  RESET_SYLLABUS_STATE,
+  SyllabusState,
   SyllabusActionTypes,
-} from './syllabusActions';
-
-export interface SyllabusState {
-  status: 'idle' | 'uploading' | 'success' | 'error';
-  syllabusId: string | null;
-  message: string | null;
-}
+  SyllabusUploadSuccessAction,
+  SyllabusUploadFailureAction
+} from './types';
 
 const initialState: SyllabusState = {
-  status: 'idle',
-  syllabusId: null,
-  message: null,
+  loading: false,
+  error: null,
+  data: null,
 };
+
+const isSyllabusUploadSuccessAction = (action: SyllabusActionTypes): action is SyllabusUploadSuccessAction =>
+  action.type === SYLLABUS_UPLOAD_SUCCESS;
+
+const isSyllabusUploadFailureAction = (action: SyllabusActionTypes): action is SyllabusUploadFailureAction =>
+  action.type === SYLLABUS_UPLOAD_FAILURE;
 
 export const syllabusReducer = (
   state = initialState,
   action: SyllabusActionTypes
 ): SyllabusState => {
-  switch (action.type) {
-    case UPLOAD_SYLLABUS_REQUEST:
-      return {
-        ...state,
-        status: 'uploading',
-        syllabusId: null,
-        message: null,
-      };
-    case UPLOAD_SYLLABUS_SUCCESS:
-      return {
-        ...state,
-        status: 'success',
-        syllabusId: action.payload.syllabusId,
-        message: action.payload.message,
-      };
-    case UPLOAD_SYLLABUS_FAILURE:
-      return {
-        ...state,
-        status: 'error',
-        message: action.payload,
-      };
-    default:
-      return state;
-  }
+  return produce(state, draft => {
+    switch (action.type) {
+      case SYLLABUS_UPLOAD_REQUEST:
+        draft.loading = true;
+        draft.error = null;
+        break;
+
+      case SYLLABUS_UPLOAD_SUCCESS:
+        if (isSyllabusUploadSuccessAction(action)) {
+          draft.loading = false;
+          draft.data = action.payload;
+          draft.error = null;
+        }
+        break;
+
+      case SYLLABUS_UPLOAD_FAILURE:
+        if (isSyllabusUploadFailureAction(action)) {
+          draft.loading = false;
+          draft.error = action.payload;
+          if (!isNull(draft.data)) {
+            draft.data = null;
+          }
+        }
+        break;
+
+      case RESET_SYLLABUS_STATE:
+        return initialState;
+    }
+  });
 };

@@ -1,51 +1,31 @@
 import { takeLatest, call, put } from 'redux-saga/effects';
+import { get, isError } from 'lodash';
 import { api } from '../../api/axios';
 import {
-  UPLOAD_SYLLABUS_REQUEST,
-  uploadSyllabusSuccess,
-  uploadSyllabusFailure,
-  SyllabusActionTypes
-} from './syllabusActions';
+  SYLLABUS_UPLOAD_REQUEST,
+  SyllabusUploadRequestAction,
+  SyllabusUploadResponse
+} from './types';
+import { uploadSyllabusSuccess, uploadSyllabusFailure } from './syllabusActions';
 
-// API call function
-const uploadSyllabusAPI = async (formData: FormData) => {
+function* uploadSyllabus(action: SyllabusUploadRequestAction): Generator<any, void, any> {
   try {
-    // First, extract text from the syllabus
-    const textExtractionResponse = await api.post('/ocr/extract-text', formData);
-    const { extractedText } = textExtractionResponse.data;
-
-    // Then, generate learning path with the extracted text
-    const learningPathResponse = await api.post('/api/learning-path', {
-      extractedText,
-      courseName: formData.get('courseName'),
-      startDate: formData.get('startDate'),
-      endDate: formData.get('endDate')
+    const response = yield call(api.post, '/api/syllabus/process', action.payload, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
     });
-
-    if (!learningPathResponse.data.learningPath) {
-      throw new Error('No learning path generated');
-    }
-
-    return {
-      syllabusId: learningPathResponse.data.courseId,
-      message: 'Syllabus processed and learning path created successfully'
-    };
-  } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.response?.data?.details || 'Upload failed');
-  }
-};
-
-// Worker Saga
-function* handleSyllabusUpload(action: { type: string; payload: FormData }): Generator<any, void, any> {
-  try {
-    const response = yield call(uploadSyllabusAPI, action.payload);
-    yield put(uploadSyllabusSuccess(response));
-  } catch (error) {
-    yield put(uploadSyllabusFailure(error instanceof Error ? error.message : 'Upload failed'));
+    
+    const data: SyllabusUploadResponse = get(response, 'data');
+    yield put(uploadSyllabusSuccess(data));
+  } catch (error: unknown) {
+    const errorMessage = isError(error)
+      ? get(error, 'response.data.error', 'An error occurred during syllabus upload')
+      : 'An error occurred during syllabus upload';
+    yield put(uploadSyllabusFailure(errorMessage));
   }
 }
 
-// Watcher Saga
 export function* syllabusSaga() {
-  yield takeLatest(UPLOAD_SYLLABUS_REQUEST, handleSyllabusUpload);
+  yield takeLatest(SYLLABUS_UPLOAD_REQUEST, uploadSyllabus);
 }
