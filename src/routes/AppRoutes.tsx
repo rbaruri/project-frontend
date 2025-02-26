@@ -20,10 +20,14 @@ const AppRoutes: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
   const routes: RouteObject[] = [
-    // Authentication routes
+    // Public routes
     {
-      path: "authentication",
+      path: "/",
       children: [
+        {
+          index: true,
+          element: isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />,
+        },
         {
           path: "login",
           element: isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />,
@@ -32,23 +36,17 @@ const AppRoutes: React.FC = () => {
           path: "signup",
           element: isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignUpPage />,
         },
+        {
+          path: "syllabus-upload",
+          element: <SyllabusUploadPage />,
+        },
       ],
-    },
-
-    // Public route
-    {
-      path: "/syllabus-upload",
-      element: <SyllabusUploadPage />,
     },
 
     // Protected Routes
     {
-      path: "*",
+      path: "/",
       children: [
-        {
-          index: true,
-          element: isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />,
-        },
         {
           path: "dashboard",
           element: <ProtectedRoute><DashboardPage /></ProtectedRoute>,
@@ -62,12 +60,12 @@ const AppRoutes: React.FC = () => {
           element: <ProtectedRoute><CourseDetailsPage /></ProtectedRoute>,
         },
         {
-          path: "modules/:moduleId",
-          element: <ProtectedRoute><ModuleDetailsPage /></ProtectedRoute>,
-        },
-        {
           path: "learning-path",
           element: <ProtectedRoute><LearningPathPage /></ProtectedRoute>,
+        },
+        {
+          path: "modules/:moduleId",
+          element: <ProtectedRoute><ModuleDetailsPage /></ProtectedRoute>,
         },
         {
           path: "quiz/:quizId",
@@ -77,16 +75,23 @@ const AppRoutes: React.FC = () => {
           path: "profile",
           element: <ProtectedRoute><ProfilePage /></ProtectedRoute>,
         },
-
-        {
-          path: "*",
-          element: isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/authentication/login" replace />,
-        },
       ],
+    },
+
+    // Catch all route
+    {
+      path: "*",
+      element: <Navigate to="/" replace />,
     },
   ];
 
-  return <Suspense fallback={<div>Loading...</div>}>{useRoutes(routes)}</Suspense>;
+  const element = useRoutes(routes);
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      {element}
+    </Suspense>
+  );
 };
 
 export default AppRoutes;

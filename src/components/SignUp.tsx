@@ -1,9 +1,21 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
+import { signupRequest, resetSignupState } from '../containers/SignUp/actions';
+import { 
+  selectSignUpLoading, 
+  selectSignUpError, 
+  selectSignUpUser 
+} from '../containers/SignUp/selectors';
 
-const SignupForm: React.FC = () => {
+const SignUp: React.FC = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  
+  const loading = useSelector(selectSignUpLoading);
+  const error = useSelector(selectSignUpError);
+  const user = useSelector(selectSignUpUser);
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -11,8 +23,21 @@ const SignupForm: React.FC = () => {
     password: '',
     confirmPassword: ''
   });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+
+  useEffect(() => {
+    // Reset signup state when component unmounts
+    return () => {
+      dispatch(resetSignupState());
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Redirect to login page on successful signup
+    if (user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -24,31 +49,21 @@ const SignupForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
+    setPasswordError('');
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
+      setPasswordError('Passwords do not match');
       return;
     }
 
-    try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/signup`, {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        password: formData.password
-      });
-      
-      console.log('Signup successful:', response.data);
-      navigate('/login');
-    } catch (error: any) {
-      setError(error.response?.data?.message || 'An error occurred during signup');
-    } finally {
-      setLoading(false);
-    }
+    // Dispatch signup action
+    dispatch(signupRequest({
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      password: formData.password,
+    }));
   };
 
   return (
@@ -121,9 +136,9 @@ const SignupForm: React.FC = () => {
             </div>
           </div>
 
-          {error && (
+          {(error || passwordError) && (
             <div className="text-red-500 text-sm text-center">
-              {error}
+              {error || passwordError}
             </div>
           )}
 
@@ -151,4 +166,4 @@ const SignupForm: React.FC = () => {
   );
 };
 
-export default SignupForm; 
+export default SignUp; 
