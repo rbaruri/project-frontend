@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, gql } from '@apollo/client';
-import { ModuleStatus } from '../graphql/queries/modules';
+// import { ModuleStatus } from '../graphql/queries/modules';
 
 const GET_QUIZ_WITH_QUESTIONS = gql`
   query GetQuizWithQuestions($quizId: uuid!) {

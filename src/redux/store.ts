@@ -14,7 +14,7 @@ const rootReducer = combineReducers({
   learningPath: learningPathReducer,
   syllabus: syllabusReducer,
   modules: moduleReducer,
-  quiz: quizReducer, // ✅ Include quizReducer
+  quiz: quizReducer, 
 });
 
 // Enable Redux DevTools if available

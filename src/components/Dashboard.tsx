@@ -29,7 +29,7 @@ interface DashboardProps {
   userId: string;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userId }) => {
+const Dashboard: React.FC<DashboardProps> = ({  userId }) => { //firstName, email, onLogout,
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [coursesInProgress, setCoursesInProgress] = useState<number>(0);
   
@@ -39,19 +39,19 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userI
     fetchPolicy: 'network-only'
   });
 
-  const isInProgress = (course: Course): boolean => {
-    if (!course.modules || course.modules.length === 0) return false;
+  // const isInProgress = (course: Course): boolean => {
+  //   if (!course.modules || course.modules.length === 0) return false;
 
-    const hasInProgressModules = course.modules.some(m => m.status === 'in_progress');
-    const completedCount = course.modules.filter(m => m.status === 'completed').length;
-    const notStartedCount = course.modules.filter(m => m.status === 'not_started').length;
-    const totalModules = course.modules.length;
+  //   const hasInProgressModules = course.modules.some(m => m.status === 'in_progress');
+  //   const completedCount = course.modules.filter(m => m.status === 'completed').length;
+  //   const notStartedCount = course.modules.filter(m => m.status === 'not_started').length;
+  //   const totalModules = course.modules.length;
 
-    // A course is in progress if:
-    // 1. It has any modules marked as 'in_progress' OR
-    // 2. It has some completed modules AND some not started modules (partially completed)
-    return hasInProgressModules || (completedCount > 0 && completedCount < totalModules && notStartedCount > 0);
-  };
+  //   // A course is in progress if:
+  //   // 1. It has any modules marked as 'in_progress' OR
+  //   // 2. It has some completed modules AND some not started modules (partially completed)
+  //   return hasInProgressModules || (completedCount > 0 && completedCount < totalModules && notStartedCount > 0);
+  // };
 
   useEffect(() => {
     if (data?.courses) {
@@ -93,12 +93,12 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userI
     return Math.round(totalProgress / data.courses.length);
   };
 
-  const getTotalLearningHours = () => {
-    if (!data?.courses) return 0;
-    return data.courses.reduce((acc: number, course: Course) => {
-      return acc + (course.learning_paths[0]?.generated_path?.totalHours || 0);
-    }, 0);
-  };
+  // const getTotalLearningHours = () => {
+  //   if (!data?.courses) return 0;
+  //   return data.courses.reduce((acc: number, course: Course) => {
+  //     return acc + (course.learning_paths[0]?.generated_path?.totalHours || 0);
+  //   }, 0);
+  // };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -137,7 +137,8 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userI
         transition={{ type: "spring", stiffness: 300 }}
       >
         <h1 className="text-3xl font-bold mb-2">
-          {new Date().getHours() < 12 ? 'Good Morning ☀️' : 'Good Evening 🌙'} {firstName.toUpperCase()}! 👋
+          {new Date().getHours() < 12 ? 'Good Morning ☀️' : 'Good Evening 🌙'} 
+          {/* {firstName.toUpperCase()}! 👋 */}
         </h1>
         <p className="text-indigo-100">Continue your learning journey today.</p>
         {loading && <p className="text-indigo-200 mt-2">Loading your progress...</p>}

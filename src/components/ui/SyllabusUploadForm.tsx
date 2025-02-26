@@ -1,5 +1,4 @@
 import React from "react";
-import Card from "../ui/Card";
 import Calendar from "../ui/Calendar";
 import Button from "../ui/Button";
 

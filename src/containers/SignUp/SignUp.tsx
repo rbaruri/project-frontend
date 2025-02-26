@@ -1,11 +1,10 @@
 import React, { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/UseAuth';
+// import { useAuth } from '../../hooks/UseAuth';
 import SignUpForm from '../../components/SignUpForm';
 
 const SignUpContainer: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     firstName: '',

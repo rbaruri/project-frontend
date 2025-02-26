@@ -86,7 +86,7 @@ const AppRoutes: React.FC = () => {
     },
   ];
 
-  return <Suspense fallback={<div>Loading...</div>}>{useRoutes(routes)}</Suspense>;
+  return <Suspense fallback={<div></div>}>{useRoutes(routes)}</Suspense>;
 };
 
 export default AppRoutes;
