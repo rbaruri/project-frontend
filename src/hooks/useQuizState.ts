@@ -217,34 +217,36 @@ export const useQuizState = ({ quizId, refetch }: UseQuizStateProps) => {
 
   // Timer functionality
   useEffect(() => {
-    let timerId: NodeJS.Timeout;
+    let timerId: number;
 
-    if (!isSubmitted && !showResults) {
-      timerId = setInterval(() => {
+    const updateTimer = () => {
+      if (!isSubmitted && !showResults) {
         setTimeLeft(prev => {
           if (prev <= 1) {
             handleSubmit();
             return 0;
           }
+          // Save time to localStorage
+          if (quizId) {
+            localStorage.setItem(`quiz_${quizId}_time`, (prev - 1).toString());
+            localStorage.setItem(`quiz_${quizId}_last_timestamp`, Date.now().toString());
+          }
           return prev - 1;
         });
-      }, 1000);
+        timerId = window.setTimeout(updateTimer, 1000);
+      }
+    };
+
+    if (!isSubmitted && !showResults) {
+      timerId = window.setTimeout(updateTimer, 1000);
     }
 
     return () => {
       if (timerId) {
-        clearInterval(timerId);
+        window.clearTimeout(timerId);
       }
     };
-  }, [isSubmitted, showResults, handleSubmit]);
-
-  // Save time to localStorage
-  useEffect(() => {
-    if (quizId && !isSubmitted && !showResults) {
-      localStorage.setItem(`quiz_${quizId}_time`, timeLeft.toString());
-      localStorage.setItem(`quiz_${quizId}_last_timestamp`, Date.now().toString());
-    }
-  }, [timeLeft, quizId, isSubmitted, showResults]);
+  }, [isSubmitted, showResults, quizId, handleSubmit]);
 
   // Clear time from localStorage when quiz is submitted or retaken
   useEffect(() => {

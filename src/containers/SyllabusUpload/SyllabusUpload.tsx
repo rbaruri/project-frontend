@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { uploadSyllabusRequest, uploadSyllabusFailure } from "./syllabusActions";
 import { AppDispatch } from "../../redux/store";
 import { useNavigate } from "react-router-dom";
-import SyllabusUploadForm from "../../components/ui/SyllabusUploadForm";
+import SyllabusUploadForm from "../../components/syllabus/SyllabusUploadForm";
 import { selectSyllabusStatus, selectSyllabusMessage } from "./syllabusSelectors";
 
 const isValidFile = (file: File): boolean => {
