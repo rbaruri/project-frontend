@@ -125,6 +125,36 @@ const SyllabusUploadForm: React.FC = () => {
         <p className="text-blue-100">Get personalized learning recommendations based on your syllabus</p>
       </div>
 
+      {/* Sample PDF Section */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-start space-x-3">
+          <div className="flex-shrink-0">
+            <svg className="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-sm font-medium text-blue-800">Not sure about the format?</h3>
+            <p className="mt-1 text-sm text-blue-600">
+              Check out our{' '}
+              <a
+                href="/sample-syllabus.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium underline hover:text-blue-800 transition-colors"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.open('https://drive.google.com/file/d/1QgtxhzR_Kk1B6Qf9x4PL4xh5RqfOGHEw/view?usp=sharing', '_blank');
+                }}
+              >
+                sample syllabus
+              </a>
+              {' '}to understand the expected format. Your syllabus should include course details, learning objectives, and weekly topics.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Upload Form */}
       <div className="bg-white rounded-lg shadow-sm p-8">
         <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
