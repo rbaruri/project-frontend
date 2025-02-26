@@ -1,55 +1,42 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import LoginForm from '../components/LoginForm';
-import { api } from '../api/axios';
-import { useAuth } from '../context/AuthContext';
+import {
+  loginRequest,
+  loginReset,
+  selectLoginLoading,
+  selectLoginError,
+  selectLoginSuccess,
+} from '../containers/Login/loginIndex';
+import { LoginFormData } from '../containers/Login/loginTypes';
 
-const Login: React.FC = () => {
+const LoginPage: React.FC = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { login } = useAuth();
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  
+  const loading = useSelector(selectLoginLoading);
+  const error = useSelector(selectLoginError);
+  const success = useSelector(selectLoginSuccess);
 
-  const handleChange = (field: 'email' | 'password', value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+  useEffect(() => {
+    // Reset login state when component unmounts
+    return () => {
+      dispatch(loginReset());
+    };
+  }, [dispatch]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      const response = await api.post('/api/auth/login', {
-        email: formData.email,
-        password: formData.password
-      });
-
-      await login(response.data);
+  useEffect(() => {
+    if (success) {
       navigate('/dashboard');
-    } catch (error: any) {
-      setError(error.response?.data?.message || 'Failed to login');
-    } finally {
-      setLoading(false);
     }
+  }, [success, navigate]);
+
+  const handleLogin = (formData: LoginFormData) => {
+    dispatch(loginRequest(formData));
   };
 
-  return (
-    <LoginForm
-      formData={formData}
-      error={error}
-      loading={loading}
-      onSubmit={handleSubmit}
-      onChange={handleChange}
-    />
-  );
+  return <LoginForm onSubmit={handleLogin} loading={loading} error={error} />;
 };
 
-export default Login; 
+export default LoginPage; 
