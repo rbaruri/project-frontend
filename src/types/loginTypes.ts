@@ -24,3 +24,13 @@ export interface LoginResponse {
   user: User;
   token: string;
 }
+
+export interface LoginFormProps {
+  onSubmit: (data: LoginFormData) => void;
+  loading: boolean;
+  error: string | null;
+}
+
+export interface LoginPageProps {
+  // Empty for now, can be extended if needed
+}

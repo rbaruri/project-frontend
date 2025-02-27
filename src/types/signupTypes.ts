@@ -16,7 +16,22 @@ export interface SignUpResponse {
   user: {
     id: string;
     email: string;
-    firstName: string;
-    lastName: string;
+    first_name: string;
+    last_name: string;
   };
+}
+
+export interface SignUpFormProps {
+  onSubmit: (data: SignUpFormData) => void;
+  loading: boolean;
+  error: string | null;
+}
+
+export interface SignUpPageProps {
+  // Empty for now, can be extended if needed
+}
+
+export interface ValidationState {
+  error: string | null;
+  setError: (error: string | null) => void;
 }

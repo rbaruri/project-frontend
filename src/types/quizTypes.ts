@@ -5,6 +5,60 @@ export interface QuizQuestion {
   correct_option: string;
 }
 
+export interface UserAnswers {
+  [key: string]: string;
+}
+
+export interface QuizResultsProps {
+  questions: QuizQuestion[];
+  userAnswers: UserAnswers;
+  score: number;
+  cutoffScore: number;
+  onRetake: () => void;
+  onBackToModule: () => void;
+  onNextModule: () => void;
+  hasNextModule: boolean;
+  timeExpired?: boolean;
+}
+
+export interface AnswerStatus {
+  isCorrect: boolean;
+  className: string;
+}
+
+export interface QuizState {
+  currentQuestionIndex: number;
+  userAnswers: UserAnswers;
+  score: number;
+  isSubmitted: boolean;
+  showResults: boolean;
+  timeLeft: number;
+  attempts: number;
+}
+
+export interface QuizData {
+  quizzes_by_pk: {
+    id: string;
+    cutoff_score: number;
+    status: string;
+    score: number;
+    created_at: string;
+    module: {
+      id: string;
+      title: string;
+      course_id: string;
+    };
+    quiz_questions: QuizQuestion[];
+  };
+}
+
+export interface NextModuleData {
+  modules: {
+    id: string;
+    title: string;
+  }[];
+}
+
 export interface QuizModule {
   id: string;
   title: string;
@@ -24,20 +78,6 @@ export interface QuizData {
 export interface NextModule {
   id: string;
   title: string;
-}
-
-export interface QuizState {
-  loading: boolean;
-  error: string | null;
-  data: QuizData | null;
-  nextModule: NextModule | null;
-  currentQuestionIndex: number;
-  userAnswers: { [questionId: string]: string };
-  timeLeft: number;
-  score: number;
-  isSubmitted: boolean;
-  showResults: boolean;
-  attempts: number;
 }
 
 export const QuizStatus = {

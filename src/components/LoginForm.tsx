@@ -1,15 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { LoginFormData } from '../types/loginTypes';
-
-interface LoginFormProps {
-  onSubmit: (data: LoginFormData) => void;
-  loading: boolean;
-  error: string | null;
-}
+import { LoginFormData, LoginFormProps } from '../types/loginTypes';
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, loading, error }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
   });

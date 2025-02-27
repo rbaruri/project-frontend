@@ -1,15 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { SignUpFormData } from '../types/signupTypes';
-
-interface SignUpFormProps {
-  onSubmit: (data: SignUpFormData) => void;
-  loading: boolean;
-  error: string | null;
-}
+import { SignUpFormData, SignUpFormProps, ValidationState } from '../types/signupTypes';
 
 const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit, loading, error }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<SignUpFormData & { confirmPassword: string }>({
     firstName: "",
     lastName: "",
     email: "",
@@ -17,7 +11,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit, loading, error }) => 
     confirmPassword: "",
   });
 
-  const [validationError, setValidationError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<ValidationState['error']>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

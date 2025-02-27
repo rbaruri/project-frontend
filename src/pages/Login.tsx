@@ -1,15 +1,14 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import LoginForm from '../components/LoginForm';
-import { selectLoginLoading, selectLoginError, selectLoginSuccess } from '../containers/Login/loginSelectors';
+import { selectLoginLoading, selectLoginError } from '../containers/Login/loginSelectors';
 import { loginRequest } from '../containers/Login/loginActions';
-import { LoginFormData } from '../types/loginTypes';
+import { LoginFormData, LoginPageProps } from '../types/loginTypes';
 
-const LoginPage: React.FC = () => {
+const LoginPage: React.FC<LoginPageProps> = () => {
   const dispatch = useDispatch();
   const loading = useSelector(selectLoginLoading);
   const error = useSelector(selectLoginError);
-  const success = useSelector(selectLoginSuccess);
 
   const handleSubmit = (formData: LoginFormData) => {
     dispatch(loginRequest(formData));

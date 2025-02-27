@@ -1,22 +1,7 @@
 import React from 'react';
-import { QuizQuestion, UserAnswers } from '../../types/quiz.types';
+import { QuizQuestion, UserAnswers, QuizResultsProps, AnswerStatus } from '../../types/quizTypes';
 
-interface QuizResultsProps {
-  questions: QuizQuestion[];
-  userAnswers: UserAnswers;
-  score: number;
-  cutoffScore: number;
-  onRetake: () => void;
-  onBackToModule: () => void;
-  onNextModule: () => void;
-  hasNextModule: boolean;
-  timeExpired?: boolean;
-}
-
-const getAnswerStatus = (question: QuizQuestion, userAnswer: string | undefined): {
-  isCorrect: boolean;
-  className: string;
-} => {
+const getAnswerStatus = (question: QuizQuestion, userAnswer: string | undefined): AnswerStatus => {
   if (!userAnswer) {
     return { isCorrect: false, className: '' };
   }
@@ -30,7 +15,7 @@ const getAnswerStatus = (question: QuizQuestion, userAnswer: string | undefined)
   };
 };
 
-export const QuizResults: React.FC<QuizResultsProps> = ({
+const QuizResults: React.FC<QuizResultsProps> = ({
   questions,
   userAnswers,
   score,
@@ -39,88 +24,148 @@ export const QuizResults: React.FC<QuizResultsProps> = ({
   onBackToModule,
   onNextModule,
   hasNextModule,
-  timeExpired
+  timeExpired = false
 }) => {
-  const isPassed = score >= cutoffScore;
+  // Calculate actual marks
+  const correctAnswers = questions.filter(q => userAnswers[q.id] === q.correct_option).length;
+  const totalQuestions = questions.length;
+
+  if (timeExpired) {
+    return (
+      <div className="text-center space-y-6">
+        <h2 className="text-3xl font-bold text-red-600">Uh Oh! Time's Up!</h2>
+        <p className="text-gray-600 text-lg">
+          Don't worry, you can try again. Take your time to review the questions carefully.
+        </p>
+        <button
+          onClick={onRetake}
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 transform hover:scale-105"
+        >
+          Retake Quiz
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
-      {timeExpired ? (
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-red-600 mb-4">Uh Oh! Time's Up!</h2>
-          <p className="text-gray-600 text-lg mb-6">
-            Don't worry, you can try again. Take your time to review the questions carefully.
-          </p>
-          <button
-            onClick={onRetake}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 transform hover:scale-105"
+      {questions.map((question, index) => {
+        const answerStatus = getAnswerStatus(question, userAnswers[question.id]);
+        
+        return (
+          <div
+            key={question.id}
+            className={`bg-white rounded-lg shadow-md p-6 ${answerStatus.className}`}
           >
-            Retake Quiz
-          </button>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+              Question {index + 1}
+            </h3>
+            <p className="text-gray-700 mb-4">{question.question}</p>
+            
+            <div className="space-y-2">
+              {question.options.map((option, optionIndex) => {
+                const isSelected = userAnswers[question.id] === option;
+                const isCorrectOption = question.correct_option === option;
+                
+                let optionClassName = "flex items-center p-3 rounded-lg border transition-colors ";
+                
+                if (isCorrectOption) {
+                  optionClassName += "border-green-500 bg-green-50";
+                } else if (isSelected && !isCorrectOption) {
+                  optionClassName += "border-red-500 bg-red-50";
+                } else {
+                  optionClassName += "border-gray-200";
+                }
+
+                return (
+                  <div
+                    key={optionIndex}
+                    className={optionClassName}
+                  >
+                    <span className="ml-3">{option}</span>
+                    {isCorrectOption && (
+                      <span className="ml-2 text-green-600">
+                        (Correct Answer)
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            
+            <div className="mt-4">
+              {answerStatus.isCorrect ? (
+                <p className="text-green-600">✓ Correct!</p>
+              ) : (
+                <p className="text-red-600">
+                  ✗ Incorrect. The correct answer is: {question.correct_option}
+                </p>
+              )}
+            </div>
+          </div>
+        );
+      })}
+
+      <div className="mt-8">
+        <div className="text-center mb-6">
+          <h2 className={`text-2xl font-bold ${score >= cutoffScore ? 'text-green-600' : 'text-red-600'}`}>
+            Final Score: {correctAnswers}/{totalQuestions} ({score}%)
+          </h2>
+          <p className="mt-2 text-lg">
+            {score >= cutoffScore ? (
+              <>
+                Congratulations! You've passed the quiz.
+                {hasNextModule && (
+                  <span className="block mt-1 text-gray-600">
+                    You can now proceed to the next module.
+                  </span>
+                )}
+              </>
+            ) : (
+              <span className="text-red-600">
+                You need {cutoffScore}% to pass. Please try again.
+              </span>
+            )}
+          </p>
         </div>
-      ) : (
-        <>
-          <div className="text-center mb-8">
-            <h2 className={`text-3xl font-bold ${isPassed ? 'text-green-600' : 'text-red-600'} mb-4`}>
-              {isPassed ? 'Congratulations!' : 'Almost There!'}
-            </h2>
-            <p className="text-gray-600 text-lg mb-2">
-              You scored {score}% {isPassed ? '- You passed!' : '- Keep trying!'}
-            </p>
-            <p className="text-gray-500">
-              Required score to pass: {cutoffScore}%
-            </p>
-          </div>
 
-          <div className="space-y-6 mb-8">
-            {questions.map((question, index) => {
-              const answerStatus = getAnswerStatus(question, userAnswers[question.id]);
-              
-              return (
-                <div
-                  key={question.id}
-                  className={`p-4 rounded-lg bg-gray-50 ${answerStatus.className}`}
-                >
-                  <p className="font-medium text-gray-800 mb-2">
-                    Question {index + 1}: {question.question}
-                  </p>
-                  <p className="text-sm text-gray-600 mb-1">
-                    Your answer: {userAnswers[question.id] || 'Not answered'}
-                  </p>
-                  <p className={`text-sm ${userAnswers[question.id] === question.correct_option ? 'text-green-600' : 'text-red-600'}`}>
-                    Correct answer: {question.correct_option}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="flex justify-center space-x-4">
-            {!isPassed && (
+        <div className="flex justify-center space-x-4">
+          {score < cutoffScore ? (
+            <>
               <button
                 onClick={onRetake}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300"
+                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300"
               >
-                Try Again
+                Retake Quiz
               </button>
-            )}
-            {isPassed && hasNextModule && (
               <button
-                onClick={onNextModule}
-                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-300"
+                onClick={onBackToModule}
+                className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors duration-300"
               >
-                Next Module
+                Back to Course
               </button>
-            )}
-            <button
-              onClick={onBackToModule}
-              className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-300"
-            >
-              Back to Module
-            </button>
-          </div>
-        </>
-      )}
+            </>
+          ) : (
+            <>
+              {hasNextModule ? (
+                <button
+                  onClick={onNextModule}
+                  className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-300"
+                >
+                  Next Module
+                </button>
+              ) : (
+                <button
+                  onClick={onBackToModule}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300"
+                >
+                  Complete Module
+                </button>
+              )}
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
