@@ -1,4 +1,5 @@
-export const QUIZ_TIME_LIMIT = 30 * 60; // 30 minutes in seconds
+// 2 minutes in seconds
+export const QUIZ_TIME_LIMIT = 120;
 
 export const formatTime = (seconds: number): string => {
   const minutes = Math.floor(seconds / 60);

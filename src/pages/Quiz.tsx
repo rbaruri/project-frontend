@@ -8,6 +8,7 @@ import QuizQuestion from '../components/quiz/QuizQuestion';
 import QuizResults from '../components/quiz/QuizResults';
 import QuizHeader from '../components/quiz/QuizHeader';
 import QuizNavigation from '../components/quiz/QuizNavigation';
+import TimeoutModal from '../components/quiz/TimeoutModal';
 import { useQuizState } from '../hooks/useQuizState';
 import { useQuizStorage } from '../hooks/useQuizStorage';
 
@@ -156,6 +157,11 @@ const Quiz: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <TimeoutModal 
+        isOpen={state.timeLeft === 0 && !state.showResults} 
+        onRetake={() => actions.handleRetake(quiz.module.id)}
+      />
+
       <div className="max-w-3xl mx-auto">
         <QuizHeader
           moduleTitle={quiz.module.title}
