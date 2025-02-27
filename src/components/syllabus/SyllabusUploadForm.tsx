@@ -15,7 +15,6 @@ interface FormData {
 
 const SyllabusUploadForm: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { isAuthenticated } = useAuth();
   const client = useApolloClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -29,20 +28,6 @@ const SyllabusUploadForm: React.FC = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-
-  useEffect(() => {
-    // Reset syllabus state when component unmounts
-    return () => {
-      dispatch(resetSyllabusState());
-    };
-  }, [dispatch]);
-
-  useEffect(() => {
-    // Navigate to courses page on successful upload
-    if (uploadedData) {
-      navigate('/courses');
-    }
-  }, [uploadedData, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

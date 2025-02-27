@@ -1,26 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
-import { ApolloProvider as BaseApolloProvider } from '@apollo/client';
-import store from './redux/store';
-import { client } from './api/apolloClient';
+import { store } from './redux/store';
 import { AuthProvider } from './context/AuthContext';
+import { ApolloProvider } from '@apollo/client';
+import { client } from './api/apolloClient';
 import App from './App';
-import './index.css';
+import './index.css'; 
 
-const ApolloProvider = BaseApolloProvider as React.FC<{ children: React.ReactNode; client: typeof client }>;
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const root = ReactDOM.createRoot(document.getElementById('root')!);
+root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Provider store={store}>
-        <ApolloProvider client={client}>
-          <AuthProvider>
-            <App />
-          </AuthProvider>
-        </ApolloProvider>
+    <ApolloProvider client={client}>
+      <Provider store={store}> 
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </Provider>
-    </BrowserRouter>
+    </ApolloProvider>
   </React.StrictMode>
 );

@@ -56,13 +56,24 @@ const cache = new InMemoryCache({
   },
 });
 
-// Create Apollo Client instance
-export const client = new ApolloClient({
+// Create the Apollo Client instance
+const client = new ApolloClient({
   link: from([errorLink, authLink, httpLink]),
   cache,
   defaultOptions: {
     watchQuery: {
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: 'network-only',
+      errorPolicy: 'all',
+    },
+    query: {
+      fetchPolicy: 'network-only',
+      errorPolicy: 'all',
+    },
+    mutate: {
+      errorPolicy: 'all',
     },
   },
+  connectToDevTools: true
 });
+
+export { client };
