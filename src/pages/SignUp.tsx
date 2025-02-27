@@ -46,7 +46,7 @@ const SignUpPage: React.FC = () => {
   return (
     <>
       {(loading || success) && <LoadingOverlay />}
-      <div className="min-h-screen bg-gray-50">
+      <div className="fixed inset-0 top-16 flex items-center justify-center bg-white">
         <SignUpForm onSubmit={handleSignup} loading={loading} error={error} />
       </div>
     </>

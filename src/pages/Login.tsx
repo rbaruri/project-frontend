@@ -16,7 +16,7 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="fixed inset-0 top-16 flex items-center justify-center bg-white">
       <LoginForm 
         onSubmit={handleSubmit}
         loading={loading}
