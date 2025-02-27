@@ -9,7 +9,7 @@ import {
 } from './syllabusActions';
 import { UploadSyllabusPayload, SyllabusResponse } from './syllabusTypes';
 
-export function* uploadSyllabusSaga(action: { type: string; payload: UploadSyllabusPayload }): Generator<any, void, AxiosResponse<SyllabusResponse>> {
+function* uploadSyllabusSaga(action: { type: string; payload: UploadSyllabusPayload }): Generator<any, void, AxiosResponse<SyllabusResponse>> {
   try {
     const { formData, courseId } = action.payload;
 
