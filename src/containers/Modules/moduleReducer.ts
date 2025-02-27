@@ -4,7 +4,7 @@ import {
     FETCH_MODULES_FAILURE,
     ModuleState,
     ModuleActionTypes,
-  } from "./moduleTypes";
+  } from "../../types/moduleTypes";
   
   const initialState: ModuleState = {
     modules: [],

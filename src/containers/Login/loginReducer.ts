@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { LoginState } from './loginTypes';
+import { LoginState } from '../../types/loginTypes';
 import {
   LOGIN_REQUEST,
   LOGIN_SUCCESS,

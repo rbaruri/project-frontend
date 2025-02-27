@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { SyllabusState } from './syllabusTypes';
+import { SyllabusState } from '../../types/syllabusTypes';
 import {
   UPLOAD_SYLLABUS_REQUEST,
   UPLOAD_SYLLABUS_SUCCESS,

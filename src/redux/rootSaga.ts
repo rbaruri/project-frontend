@@ -3,6 +3,7 @@ import { watchLearningPathSaga } from "../containers/LearningPath/learningPathSa
 import { watchSyllabusSaga } from "../containers/SyllabusUpload/syllabusSaga";
 import { moduleSaga } from "../containers/Modules/moduleSaga";
 import { watchQuizSaga } from "../containers/Quiz/quizSaga";
+import { watchLoginSaga } from "../containers/Login/loginSaga";
 
 export default function* rootSaga() {
   yield all([
@@ -10,5 +11,6 @@ export default function* rootSaga() {
     watchSyllabusSaga(),
     moduleSaga(),
     watchQuizSaga(),
+    watchLoginSaga(),
   ]);
 }

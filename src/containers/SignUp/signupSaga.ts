@@ -3,12 +3,12 @@ import axios from 'axios';
 import { get } from 'lodash';
 import { SIGNUP_REQUEST } from './signupConstants';
 import { signupSuccess, signupFailure } from './signupActions';
-import { SignUpFormData, SignUpResponse } from './signupTypes';
+import { SignUpFormData, SignUpResponse } from '../../types/signupTypes';
 
 function* signupSaga(action: { type: string; payload: SignUpFormData }) {
   try {
     const response: { data: SignUpResponse } = yield call(axios.post, 
-      `${import.meta.env.VITE_API_URL}/auth/signup`,
+      `${import.meta.env.VITE_API_URL}/signup`,
       action.payload
     );
 

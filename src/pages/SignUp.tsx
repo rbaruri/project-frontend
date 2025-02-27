@@ -9,7 +9,7 @@ import {
   selectSignupError,
   selectSignupSuccess
 } from '../containers/SignUp/signupIndex';
-import { SignUpFormData } from '../containers/SignUp/signupTypes';
+import { SignUpFormData } from '../types/signupTypes';
 
 const SignUpPage: React.FC = () => {
   const dispatch = useDispatch();

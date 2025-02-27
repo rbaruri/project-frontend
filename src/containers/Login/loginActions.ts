@@ -1,4 +1,4 @@
-import { LoginFormData, LoginResponse } from './loginTypes';
+import { LoginFormData, LoginResponse } from '../../types/loginTypes';
 import {
   LOGIN_REQUEST,
   LOGIN_SUCCESS,

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { api } from "../../api/axios";
@@ -6,16 +6,19 @@ import Calendar from "../ui/Calendar";
 import { useApolloClient } from "@apollo/client";
 import { GET_COURSES_WITH_LEARNING_PATHS } from "../../graphql/queries/courses";
 import AuthModal from "../ui/AuthModal";
+import { FormData, SyllabusUploadFormProps } from "./SyllabusUploadForm.types";
 
-interface FormData {
-  courseName: string;
-  startDate: string;
-  endDate: string;
-}
-
-const SyllabusUploadForm: React.FC = () => {
+const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
+  isAuthenticated,
+  loading,
+  error: serverError,
+  uploadedData,
+  onSubmit,
+  onReset
+}) => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const dispatch = useDispatch();
+  const { isAuthenticated: authIsAuthenticated } = useAuth();
   const client = useApolloClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -26,8 +29,21 @@ const SyllabusUploadForm: React.FC = () => {
   });
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+
+  useEffect(() => {
+    // Reset form state when component unmounts
+    return () => {
+      onReset();
+    };
+  }, [onReset]);
+
+  useEffect(() => {
+    // Navigate to courses page on successful upload
+    if (uploadedData) {
+      navigate('/courses');
+    }
+  }, [uploadedData, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -69,7 +85,7 @@ const SyllabusUploadForm: React.FC = () => {
     e.preventDefault();
     setError("");
 
-    if (!isAuthenticated) {
+    if (!authIsAuthenticated) {
       setShowAuthModal(true);
       return;
     }
@@ -84,43 +100,10 @@ const SyllabusUploadForm: React.FC = () => {
       return;
     }
 
-    setLoading(true);
-
-    try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("file", file);
-      formDataToSend.append("courseName", formData.courseName);
-      formDataToSend.append("startDate", formData.startDate);
-      formDataToSend.append("endDate", formData.endDate);
-
-      const response = await api.post("/api/syllabus/process", formDataToSend, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      // Refetch courses data after successful upload
-      await client.refetchQueries({
-        include: [GET_COURSES_WITH_LEARNING_PATHS],
-      });
-
-      console.log("Syllabus uploaded successfully:", response.data);
-      navigate("/courses");
-    } catch (error: any) {
-      console.error("Syllabus upload error:", error);
-      handleUploadError(error);
-    } finally {
-      setLoading(false);
-    }
+    onSubmit(formData, file);
   };
 
-  const handleUploadError = (error: any) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      setShowAuthModal(true);
-      return;
-    }
-    setError(error.message || "Failed to upload syllabus");
-  };
+  const displayError = error || serverError;
 
   return (
     <div className="space-y-6 p-6">
@@ -286,9 +269,9 @@ const SyllabusUploadForm: React.FC = () => {
             </div>
           </div>
 
-          {error && (
+          {displayError && (
             <div className="text-red-500 text-sm text-center p-4 bg-red-50 rounded-md">
-              {error}
+              {displayError}
             </div>
           )}
 

@@ -3,7 +3,7 @@ import {
   fetchModulesSuccess,
   fetchModulesFailure,
 } from "./moduleActions";
-import { FETCH_MODULES_REQUEST, Module } from "./moduleTypes";
+import { FETCH_MODULES_REQUEST, Module } from "../../types/moduleTypes";
 import { api } from "../../api/axios";
 
 function* fetchModulesSaga() {

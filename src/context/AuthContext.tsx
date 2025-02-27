@@ -1,19 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { api } from '../api/axios';
-
-interface User {
-  id: string;
-  userId: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-}
+import { User } from '../types/loginTypes';
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (userData: { user: User }) => void;
+  login: (userData: User) => void;
   logout: () => void;
 }
 
@@ -24,47 +17,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Function to check authentication status
-  const checkAuthStatus = async () => {
-    try {
-      const response = await api.get('/api/auth/verify');
-      if (response.data.isValid && response.data.user) {
-        setUser(response.data.user);
-        setIsAuthenticated(true);
-      } else {
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        // Verify session using cookies
+        const response = await api.get('/api/auth/verify');
+        if (response.data.isValid && response.data.user) {
+          setUser(response.data.user);
+          setIsAuthenticated(true);
+        } else {
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error('Error verifying auth:', error);
         setUser(null);
         setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Error checking auth status:', error);
-      setUser(null);
-      setIsAuthenticated(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
 
-  useEffect(() => {
-    checkAuthStatus();
+    initializeAuth();
   }, []);
 
-  const login = async (userData: { user: User }) => {
-    setUser(userData.user);
+  const login = (userData: User) => {
+    setUser(userData);
     setIsAuthenticated(true);
   };
 
   const logout = async () => {
     try {
       await api.post('/api/auth/logout');
-      setUser(null);
-      setIsAuthenticated(false);
     } catch (error) {
       console.error('Error during logout:', error);
+    } finally {
+      setUser(null);
+      setIsAuthenticated(false);
     }
   };
 
   if (isLoading) {
-    return <div></div>; 
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
   }
 
   return (
@@ -74,13 +72,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
+export { AuthContext };
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-};
-
-// Export the context separately for cases where direct access is needed
-export { AuthContext }; 
+}; 

@@ -1,5 +1,5 @@
 import { get } from 'lodash';
-import { SignUpState } from './signupTypes';
+import { SignUpState } from '../../types/signupTypes';
 
 interface RootState {
   signup: SignUpState;

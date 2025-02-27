@@ -2,8 +2,7 @@ export interface LoginState {
   loading: boolean;
   error: string | null;
   success: boolean;
-  token: string | null;
-  user: UserData | null;
+  data: LoginResponse | null;
 }
 
 export interface LoginFormData {
@@ -11,15 +10,15 @@ export interface LoginFormData {
   password: string;
 }
 
-export interface UserData {
+export interface User {
   id: string;
+  userId: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
 }
 
 export interface LoginResponse {
-  token: string;
-  user: UserData;
   message: string;
+  user: User;
 }

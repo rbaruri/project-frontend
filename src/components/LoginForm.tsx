@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { LoginFormData } from '../containers/Login/loginTypes';
+import { LoginFormData } from '../types/loginTypes';
 
 interface LoginFormProps {
   onSubmit: (data: LoginFormData) => void;

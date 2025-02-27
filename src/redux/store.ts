@@ -5,12 +5,13 @@ import { syllabusReducer } from "../containers/SyllabusUpload/syllabusReducer";
 import moduleReducer from "../containers/Modules/moduleReducer";
 import quizReducer from "../containers/Quiz/quizReducer";
 import rootSaga from "./rootSaga";
-
+import loginReducer  from "../containers/Login/loginReducer";
 // Create Saga Middleware
 const sagaMiddleware = createSagaMiddleware();
 
 // Combine Reducers
 const rootReducer = combineReducers({
+  login: loginReducer,
   learningPath: learningPathReducer,
   syllabus: syllabusReducer,
   modules: moduleReducer,

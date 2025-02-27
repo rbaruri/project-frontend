@@ -1,4 +1,4 @@
-import { SignUpFormData, SignUpResponse } from './signupTypes';
+import { SignUpFormData, SignUpResponse } from '../../types/signupTypes';
 import {
   SIGNUP_REQUEST,
   SIGNUP_SUCCESS,

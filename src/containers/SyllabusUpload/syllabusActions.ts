@@ -9,7 +9,7 @@ import {
 import {
   SyllabusResponse,
   UploadSyllabusPayload,
-} from './syllabusTypes';
+} from '../../types/syllabusTypes';
 
 // Action Interfaces
 interface UploadSyllabusRequestAction {
