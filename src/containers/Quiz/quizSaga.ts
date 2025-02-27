@@ -10,7 +10,7 @@ import {
   updateQuizStatusSuccess,
   updateQuizStatusFailure,
 } from './quizActions';
-import { QuizData, UpdateQuizStatusPayload } from './quizTypes';
+import { QuizData, UpdateQuizStatusPayload } from '../../types/quizTypes';
 import { GET_QUIZ_WITH_QUESTIONS, GET_NEXT_MODULE } from '../../graphql/queries/quiz';
 import { UPDATE_QUIZ_STATUS, UPDATE_MODULE_STATUS } from '../../graphql/mutations/quiz';
 import { client } from '../../graphql/client';

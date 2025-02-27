@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_QUIZ_WITH_QUESTIONS, GET_NEXT_MODULE } from '../graphql/queries/quiz';
 import { UPDATE_QUIZ_STATUS, UPDATE_MODULE_STATUS } from '../graphql/mutations/quiz';
-import { QuizData, NextModuleData } from '../types/quiz.types';
+import { QuizData, NextModuleData } from '../types/quizypes';
 import QuizQuestion from '../components/Quiz/QuizQuestion';
 import QuizResults from '../components/Quiz/QuizResults';
 import QuizHeader from '../components/Quiz/QuizHeader';
@@ -30,7 +30,7 @@ const Quiz: React.FC = () => {
 
   const storage = useQuizStorage(quizId);
 
-  const { loading: nextModuleLoading, data: nextModuleData } = useQuery<NextModuleData>(GET_NEXT_MODULE, {
+  const { data: nextModuleData } = useQuery<NextModuleData>(GET_NEXT_MODULE, {
     variables: {
       courseId: data?.quizzes_by_pk.module.course_id,
       currentModuleId: data?.quizzes_by_pk.module.id

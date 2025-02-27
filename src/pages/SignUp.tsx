@@ -20,23 +20,40 @@ const SignUpPage: React.FC = () => {
   const success = useSelector(selectSignupSuccess);
 
   useEffect(() => {
+    console.log('SignUp component mounted');
     // Reset signup state when component unmounts
     return () => {
+      console.log('SignUp component unmounting, resetting state');
       dispatch(signupReset());
     };
   }, [dispatch]);
 
   useEffect(() => {
+    console.log('Signup state changed:', { loading, error, success });
+    
     if (success) {
-      navigate('/login');
+      console.log('Signup successful, preparing to redirect...');
+      // Add a small delay to show the success state before redirecting
+      const timer = setTimeout(() => {
+        navigate('/authentication/login', { 
+          state: { message: 'Account created successfully! Please log in.' }
+        });
+      }, 1500);
+
+      return () => clearTimeout(timer);
     }
-  }, [success, navigate]);
+  }, [success, loading, error, navigate]);
 
   const handleSignup = (formData: SignUpFormData) => {
+    console.log('Handling signup submission:', formData);
     dispatch(signupRequest(formData));
   };
 
-  return <SignUpForm onSubmit={handleSignup} loading={loading} error={error} />;
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <SignUpForm onSubmit={handleSignup} loading={loading} error={error} />
+    </div>
+  );
 };
 
 export default SignUpPage; 

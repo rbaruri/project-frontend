@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { QuizState } from './quizTypes';
+import { QuizState } from '../../types/quizTypes';
 import {
   FETCH_QUIZ_REQUEST,
   FETCH_QUIZ_SUCCESS,

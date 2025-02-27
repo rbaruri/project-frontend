@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SignUpFormData } from '../types/signupTypes';
 
@@ -9,7 +9,7 @@ interface SignUpFormProps {
 }
 
 const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit, loading, error }) => {
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
@@ -17,25 +17,58 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit, loading, error }) => 
     confirmPassword: "",
   });
 
+  const [validationError, setValidationError] = useState<string | null>(null);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+    // Clear validation error when user starts typing again
+    setValidationError(null);
+  };
+
+  const validateForm = () => {
+    if (!formData.firstName.trim()) {
+      setValidationError('First name is required');
+      return false;
+    }
+    if (!formData.lastName.trim()) {
+      setValidationError('Last name is required');
+      return false;
+    }
+    if (!formData.email.trim()) {
+      setValidationError('Email is required');
+      return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setValidationError('Please enter a valid email address');
+      return false;
+    }
+    if (formData.password.length < 8) {
+      setValidationError('Password must be at least 8 characters long');
+      return false;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setValidationError('Passwords do not match');
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setValidationError(null);
 
-    if (formData.password !== formData.confirmPassword) {
+    if (!validateForm()) {
       return;
     }
 
     const signupData: SignUpFormData = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
+      firstName: formData.firstName.trim(),
+      lastName: formData.lastName.trim(),
+      email: formData.email.trim(),
       password: formData.password,
     };
 
@@ -112,17 +145,45 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit, loading, error }) => 
               </div>
             </div>
 
-            {error && (
-              <div className="text-red-500 text-sm text-center">{error}</div>
+            {(validationError || error) && (
+              <div className="text-red-500 text-sm text-center">
+                {validationError || error}
+              </div>
             )}
 
             <div>
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
               >
-                {loading ? "Signing up..." : "Sign up"}
+                {loading ? (
+                  <span className="flex items-center">
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Signing up...
+                  </span>
+                ) : (
+                  "Sign up"
+                )}
               </button>
             </div>
           </form>
