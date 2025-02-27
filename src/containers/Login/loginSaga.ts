@@ -1,4 +1,4 @@
-import { takeLatest, call, put } from 'redux-saga/effects';
+import { takeLatest, call, put, delay } from 'redux-saga/effects';
 import { api } from '../../api/axios';
 import { get } from 'lodash';
 import { LOGIN_REQUEST, LOGOUT } from './loginConstants';
@@ -48,7 +48,7 @@ function* loginSaga(action: { type: string; payload: LoginFormData }) {
     // Transform the user data
     const user: User = {
       id: rawUser.id,
-      userId: rawUser.id, // Use id as userId since they're the same
+      userId: rawUser.id,
       email: rawUser.email,
       first_name: rawUser.first_name,
       last_name: rawUser.last_name
@@ -56,11 +56,24 @@ function* loginSaga(action: { type: string; payload: LoginFormData }) {
 
     const responseData: LoginResponse = {
       message: response.data.message || 'Login successful',
-      user
+      user,
+      token: response.data.token
     };
 
     console.log('Transformed response data:', responseData);
+    
+    // Store token in localStorage if needed by other parts of the app
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+    }
+
     yield put(loginSuccess(responseData));
+
+    // Add a small delay for smooth transition
+    yield delay(800);
+
+    // Redirect to dashboard
+    window.location.href = '/dashboard';
   } catch (error: any) {
     // Enhanced error logging
     console.error('Login error details:', {
@@ -85,6 +98,11 @@ function* loginSaga(action: { type: string; payload: LoginFormData }) {
 function* logoutSaga() {
   try {
     yield call(api.post, '/api/auth/logout');
+    localStorage.removeItem('token');
+    
+    // Add a small delay for logout as well
+    yield delay(800);
+    window.location.href = '/login';
   } catch (error) {
     console.error('Error during logout:', error);
   }

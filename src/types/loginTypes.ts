@@ -2,7 +2,8 @@ export interface LoginState {
   loading: boolean;
   error: string | null;
   success: boolean;
-  data: LoginResponse | null;
+  token: string | null;
+  user: User | null;
 }
 
 export interface LoginFormData {
@@ -21,4 +22,5 @@ export interface User {
 export interface LoginResponse {
   message: string;
   user: User;
+  token: string;
 }

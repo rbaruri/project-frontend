@@ -10,6 +10,7 @@ import {
   selectSignupSuccess
 } from '../containers/SignUp/signupIndex';
 import { SignUpFormData } from '../types/signupTypes';
+import LoadingOverlay from '../components/ui/LoadingOverlay';
 
 const SignUpPage: React.FC = () => {
   const dispatch = useDispatch();
@@ -20,39 +21,35 @@ const SignUpPage: React.FC = () => {
   const success = useSelector(selectSignupSuccess);
 
   useEffect(() => {
-    console.log('SignUp component mounted');
     // Reset signup state when component unmounts
     return () => {
-      console.log('SignUp component unmounting, resetting state');
       dispatch(signupReset());
     };
   }, [dispatch]);
 
   useEffect(() => {
-    console.log('Signup state changed:', { loading, error, success });
-    
     if (success) {
-      console.log('Signup successful, preparing to redirect...');
-      // Add a small delay to show the success state before redirecting
       const timer = setTimeout(() => {
         navigate('/authentication/login', { 
           state: { message: 'Account created successfully! Please log in.' }
         });
-      }, 1500);
+      }, 800); // Smooth 800ms transition
 
       return () => clearTimeout(timer);
     }
-  }, [success, loading, error, navigate]);
+  }, [success, navigate]);
 
   const handleSignup = (formData: SignUpFormData) => {
-    console.log('Handling signup submission:', formData);
     dispatch(signupRequest(formData));
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <SignUpForm onSubmit={handleSignup} loading={loading} error={error} />
-    </div>
+    <>
+      {(loading || success) && <LoadingOverlay />}
+      <div className="min-h-screen bg-gray-50">
+        <SignUpForm onSubmit={handleSignup} loading={loading} error={error} />
+      </div>
+    </>
   );
 };
 

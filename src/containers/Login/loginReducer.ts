@@ -13,7 +13,7 @@ const initialState: LoginState = {
   error: null,
   success: false,
   token: null,
-  user: null,
+  user: null
 };
 
 const loginReducer = (state = initialState, action: any) =>
@@ -26,7 +26,7 @@ const loginReducer = (state = initialState, action: any) =>
         break;
 
       case LOGIN_SUCCESS:
-        draft.loading = false;
+        draft.loading = true; // Keep loading true for transition
         draft.error = null;
         draft.success = true;
         draft.token = action.payload.token;

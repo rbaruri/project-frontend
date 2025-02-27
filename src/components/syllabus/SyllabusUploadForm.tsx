@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useDispatch, useSelector } from "react-redux";
 import Calendar from "../ui/Calendar";
 import AuthModal from "../ui/AuthModal";
+import { selectIsAuthenticated } from "../../containers/Login/loginSelectors";
 
 // Temporary type definitions until we create the proper types file
 interface FormData {
@@ -28,7 +29,7 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
   onReset
 }) => {
   const navigate = useNavigate();
-  const { isAuthenticated: authIsAuthenticated } = useAuth();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState<FormData>({
@@ -94,7 +95,7 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
     e.preventDefault();
     setError("");
 
-    if (!authIsAuthenticated) {
+    if (!isAuthenticated) {
       console.log("Authentication check failed");
       setShowAuthModal(true);
       return;
