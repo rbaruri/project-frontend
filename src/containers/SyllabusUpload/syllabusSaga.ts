@@ -11,22 +11,27 @@ import { UploadSyllabusPayload, SyllabusResponse } from '../../types/syllabusTyp
 
 export function* uploadSyllabusSaga(action: { type: string; payload: UploadSyllabusPayload }): Generator<any, void, AxiosResponse<SyllabusResponse>> {
   try {
-    const { formData, courseId } = action.payload;
+    const { formData } = action.payload;
+
+    function* onUploadProgress(progressEvent: AxiosProgressEvent) {
+      const percentCompleted = progressEvent.total
+        ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
+        : 0;
+      yield put(updateUploadProgress(percentCompleted));
+    }
 
     const response: AxiosResponse<SyllabusResponse> = yield call(() => 
       axios.post(
-        `${import.meta.env.VITE_API_URL}/api/syllabus/upload/${courseId}`,
+        `${import.meta.env.VITE_API_URL}/api/syllabus/process`,
         formData,
         {
           headers: {
             'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
-          onUploadProgress: (progressEvent: AxiosProgressEvent) => {
-            const percentCompleted = progressEvent.total
-              ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
-              : 0;
-            put(updateUploadProgress(percentCompleted));
+          withCredentials: true,
+          onUploadProgress: function(progressEvent: AxiosProgressEvent) {
+            const saga = onUploadProgress(progressEvent);
+            saga.next();
           },
         }
       )

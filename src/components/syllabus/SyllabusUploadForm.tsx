@@ -1,12 +1,28 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { useAuth } from "../../context/AuthContext";
 import { api } from "../../api/axios";
 import Calendar from "../ui/Calendar";
 import { useApolloClient } from "@apollo/client";
 import { GET_COURSES_WITH_LEARNING_PATHS } from "../../graphql/queries/courses";
 import AuthModal from "../ui/AuthModal";
-import { FormData, SyllabusUploadFormProps } from "./SyllabusUploadForm.types";
+
+// Temporary type definitions until we create the proper types file
+interface FormData {
+  courseName: string;
+  startDate: string;
+  endDate: string;
+}
+
+interface SyllabusUploadFormProps {
+  isAuthenticated?: boolean;
+  loading?: boolean;
+  error?: string;
+  uploadedData?: any;
+  onSubmit: (formData: FormData, file: File) => void;
+  onReset: () => void;
+}
 
 const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
   isAuthenticated,
@@ -47,7 +63,7 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData((prev: FormData) => ({
       ...prev,
       [name]: value,
     }));
@@ -86,21 +102,36 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
     setError("");
 
     if (!authIsAuthenticated) {
+      console.log("Authentication check failed");
       setShowAuthModal(true);
       return;
     }
 
-    if (
-      !file ||
-      !formData.courseName ||
-      !formData.startDate ||
-      !formData.endDate
-    ) {
+    if (!file || !formData.courseName || !formData.startDate || !formData.endDate) {
+      console.log("Form validation failed:", {
+        file: !!file,
+        courseName: !!formData.courseName,
+        startDate: !!formData.startDate,
+        endDate: !!formData.endDate
+      });
       setError("Please fill in all required fields");
       return;
     }
 
-    onSubmit(formData, file);
+    try {
+      console.log("Submitting form with data:", {
+        courseName: formData.courseName,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type
+      });
+      onSubmit(formData, file);
+    } catch (error) {
+      console.error("Form submission error:", error);
+      setError("An error occurred while uploading the syllabus");
+    }
   };
 
   const displayError = error || serverError;

@@ -4,10 +4,10 @@ import { useQuery, useMutation } from '@apollo/client';
 import { GET_QUIZ_WITH_QUESTIONS, GET_NEXT_MODULE } from '../graphql/queries/quiz';
 import { UPDATE_QUIZ_STATUS, UPDATE_MODULE_STATUS } from '../graphql/mutations/quiz';
 import { QuizData, NextModuleData } from '../types/quizypes';
-import QuizQuestion from '../components/Quiz/QuizQuestion';
-import QuizResults from '../components/Quiz/QuizResults';
-import QuizHeader from '../components/Quiz/QuizHeader';
-import QuizNavigation from '../components/Quiz/QuizNavigation';
+import QuizQuestion from '../components/quiz/QuizQuestion';
+import QuizResults from '../components/quiz/QuizResults';
+import QuizHeader from '../components/quiz/QuizHeader';
+import QuizNavigation from '../components/quiz/QuizNavigation';
 import { useQuizState } from '../hooks/useQuizState';
 import { useQuizStorage } from '../hooks/useQuizStorage';
 
