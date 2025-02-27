@@ -29,7 +29,7 @@ interface DashboardProps {
   userId: string;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userId }) => {
+const Dashboard: React.FC<DashboardProps> = ({  userId }) => { //firstName, email, onLogout,
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [coursesInProgress, setCoursesInProgress] = useState<number>(0);
   
@@ -39,19 +39,19 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userI
     fetchPolicy: 'network-only'
   });
 
-  const isInProgress = (course: Course): boolean => {
-    if (!course.modules || course.modules.length === 0) return false;
+  // const isInProgress = (course: Course): boolean => {
+  //   if (!course.modules || course.modules.length === 0) return false;
 
-    const hasInProgressModules = course.modules.some(m => m.status === 'in_progress');
-    const completedCount = course.modules.filter(m => m.status === 'completed').length;
-    const notStartedCount = course.modules.filter(m => m.status === 'not_started').length;
-    const totalModules = course.modules.length;
+  //   const hasInProgressModules = course.modules.some(m => m.status === 'in_progress');
+  //   const completedCount = course.modules.filter(m => m.status === 'completed').length;
+  //   const notStartedCount = course.modules.filter(m => m.status === 'not_started').length;
+  //   const totalModules = course.modules.length;
 
-    // A course is in progress if:
-    // 1. It has any modules marked as 'in_progress' OR
-    // 2. It has some completed modules AND some not started modules (partially completed)
-    return hasInProgressModules || (completedCount > 0 && completedCount < totalModules && notStartedCount > 0);
-  };
+  //   // A course is in progress if:
+  //   // 1. It has any modules marked as 'in_progress' OR
+  //   // 2. It has some completed modules AND some not started modules (partially completed)
+  //   return hasInProgressModules || (completedCount > 0 && completedCount < totalModules && notStartedCount > 0);
+  // };
 
   useEffect(() => {
     if (data?.courses) {
@@ -93,12 +93,12 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userI
     return Math.round(totalProgress / data.courses.length);
   };
 
-  const getTotalLearningHours = () => {
-    if (!data?.courses) return 0;
-    return data.courses.reduce((acc: number, course: Course) => {
-      return acc + (course.learning_paths[0]?.generated_path?.totalHours || 0);
-    }, 0);
-  };
+  // const getTotalLearningHours = () => {
+  //   if (!data?.courses) return 0;
+  //   return data.courses.reduce((acc: number, course: Course) => {
+  //     return acc + (course.learning_paths[0]?.generated_path?.totalHours || 0);
+  //   }, 0);
+  // };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -124,20 +124,21 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userI
 
   return (
     <motion.div 
-      className="space-y-6"
+      className="space-y-6 relative z-0"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
       {/* Welcome Section */}
       <motion.div 
-        className="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg shadow-lg p-6 text-white"
+        className="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg shadow-lg p-6 text-white relative z-10"
         variants={itemVariants}
         whileHover={{ scale: 1.02 }}
         transition={{ type: "spring", stiffness: 300 }}
       >
         <h1 className="text-3xl font-bold mb-2">
-          {new Date().getHours() < 12 ? 'Good Morning ☀️' : 'Good Evening 🌙'} {firstName.toUpperCase()}! 👋
+          {new Date().getHours() < 12 ? 'Good Morning ☀️' : 'Good Evening 🌙'} 
+          {/* {firstName.toUpperCase()}! 👋 */}
         </h1>
         <p className="text-indigo-100">Continue your learning journey today.</p>
         {loading && <p className="text-indigo-200 mt-2">Loading your progress...</p>}
@@ -145,9 +146,9 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userI
       </motion.div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
         <motion.div variants={itemVariants}>
-          <Link to="/courses" className="block">
+          <Link to="/courses" className="block relative">
             <motion.div 
               className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white"
               whileHover={{ 
@@ -176,7 +177,7 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userI
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <Link to="/syllabus-upload" className="block">
+          <Link to="/syllabus-upload" className="block relative">
             <motion.div 
               className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white"
               whileHover={{ 
@@ -206,7 +207,7 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userI
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
         <motion.div 
           variants={itemVariants}
           whileHover={{ scale: 1.03 }}
@@ -285,7 +286,7 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, onLogout, userI
       {/* Current Courses */}
       <motion.div 
         variants={itemVariants}
-        className="bg-white rounded-lg shadow-lg overflow-hidden"
+        className="bg-white rounded-lg shadow-lg overflow-hidden relative z-10"
       >
         <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
           <h2 className="text-xl font-semibold text-gray-800">Current Courses</h2>

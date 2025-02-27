@@ -7,25 +7,12 @@ import { syllabusReducer, syllabusSaga } from '../containers/SyllabusUpload';
 // Create saga middleware
 const sagaMiddleware = createSagaMiddleware();
 
-// Root saga
-function* rootSaga() {
-  yield all([
-    signUpSaga(),
-    syllabusSaga(),
-  ]);
-}
-
-// Create store
-const store = configureStore({
-  reducer: {
-    signup: signUpReducer,
-    syllabus: syllabusReducer,
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      thunk: false,
-      serializableCheck: false,
-    }).concat(sagaMiddleware),
+// Combine Reducers
+const rootReducer = combineReducers({
+  learningPath: learningPathReducer,
+  syllabus: syllabusReducer,
+  modules: moduleReducer,
+  quiz: quizReducer, 
 });
 
 // Run saga middleware

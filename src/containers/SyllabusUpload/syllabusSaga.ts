@@ -1,31 +1,44 @@
 import { takeLatest, call, put } from 'redux-saga/effects';
-import { get, isError } from 'lodash';
-import { api } from '../../api/axios';
+import axios, { AxiosResponse, AxiosProgressEvent } from 'axios';
+import { get } from 'lodash';
+import { UPLOAD_SYLLABUS_REQUEST } from './syllabusConstants';
 import {
-  SYLLABUS_UPLOAD_REQUEST,
-  SyllabusUploadRequestAction,
-  SyllabusUploadResponse
-} from './types';
-import { uploadSyllabusSuccess, uploadSyllabusFailure } from './syllabusActions';
+  uploadSyllabusSuccess,
+  uploadSyllabusFailure,
+  updateUploadProgress,
+} from './syllabusActions';
+import { UploadSyllabusPayload, SyllabusResponse } from './syllabusTypes';
 
-function* uploadSyllabus(action: SyllabusUploadRequestAction): Generator<any, void, any> {
+export function* uploadSyllabusSaga(action: { type: string; payload: UploadSyllabusPayload }): Generator<any, void, AxiosResponse<SyllabusResponse>> {
   try {
-    const response = yield call(api.post, '/api/syllabus/process', action.payload, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    
-    const data: SyllabusUploadResponse = get(response, 'data');
-    yield put(uploadSyllabusSuccess(data));
-  } catch (error: unknown) {
-    const errorMessage = isError(error)
-      ? get(error, 'response.data.error', 'An error occurred during syllabus upload')
-      : 'An error occurred during syllabus upload';
+    const { formData, courseId } = action.payload;
+
+    const response: AxiosResponse<SyllabusResponse> = yield call(() => 
+      axios.post(
+        `${import.meta.env.VITE_API_URL}/api/syllabus/upload/${courseId}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+          onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+            const percentCompleted = progressEvent.total
+              ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
+              : 0;
+            put(updateUploadProgress(percentCompleted));
+          },
+        }
+      )
+    );
+
+    yield put(uploadSyllabusSuccess(response.data));
+  } catch (error: any) {
+    const errorMessage = get(error, 'response.data.message', 'Failed to upload syllabus');
     yield put(uploadSyllabusFailure(errorMessage));
   }
 }
 
-export function* syllabusSaga() {
-  yield takeLatest(SYLLABUS_UPLOAD_REQUEST, uploadSyllabus);
+export function* watchSyllabusSaga(): Generator {
+  yield takeLatest(UPLOAD_SYLLABUS_REQUEST, uploadSyllabusSaga);
 }

@@ -1,5 +1,4 @@
 import React from "react";
-import "./ModuleDetail.css";
 import Quiz from "../../containers/Quiz/Quiz";
 
 interface QuizQuestion {

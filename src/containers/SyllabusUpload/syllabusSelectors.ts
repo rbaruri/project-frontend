@@ -1,25 +1,23 @@
-import { createSelector } from '@reduxjs/toolkit';
 import { get } from 'lodash';
-import { SyllabusState, SyllabusUploadResponse } from './types';
+import { SyllabusState } from './syllabusTypes';
 
 interface RootState {
   syllabus: SyllabusState;
 }
 
-const selectSyllabusDomain = (state: RootState): SyllabusState =>
-  get(state, 'syllabus', { loading: false, error: null, data: null });
+export const selectSyllabusState = (state: RootState) => get(state, 'syllabus', {});
 
-export const selectSyllabusLoading = createSelector(
-  [selectSyllabusDomain],
-  (syllabusState: SyllabusState): boolean => get(syllabusState, 'loading', false)
-);
+export const selectSyllabusLoading = (state: RootState) =>
+  get(state, 'syllabus.loading', false);
 
-export const selectSyllabusError = createSelector(
-  [selectSyllabusDomain],
-  (syllabusState: SyllabusState): string | null => get(syllabusState, 'error', null)
-);
+export const selectSyllabusError = (state: RootState) =>
+  get(state, 'syllabus.error', null);
 
-export const selectSyllabusData = createSelector(
-  [selectSyllabusDomain],
-  (syllabusState: SyllabusState): SyllabusUploadResponse | null => get(syllabusState, 'data', null)
-); 
+export const selectSyllabusSuccess = (state: RootState) =>
+  get(state, 'syllabus.success', false);
+
+export const selectSyllabusData = (state: RootState) =>
+  get(state, 'syllabus.data', null);
+
+export const selectUploadProgress = (state: RootState) =>
+  get(state, 'syllabus.uploadProgress', 0); 

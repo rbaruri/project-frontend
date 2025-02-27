@@ -1,59 +1,54 @@
 import { produce } from 'immer';
-import { isNull } from 'lodash';
+import { SyllabusState } from './syllabusTypes';
 import {
-  SYLLABUS_UPLOAD_REQUEST,
-  SYLLABUS_UPLOAD_SUCCESS,
-  SYLLABUS_UPLOAD_FAILURE,
+  UPLOAD_SYLLABUS_REQUEST,
+  UPLOAD_SYLLABUS_SUCCESS,
+  UPLOAD_SYLLABUS_FAILURE,
+  UPDATE_UPLOAD_PROGRESS,
   RESET_SYLLABUS_STATE,
-  SyllabusState,
-  SyllabusActionTypes,
-  SyllabusUploadSuccessAction,
-  SyllabusUploadFailureAction
-} from './types';
+} from './syllabusConstants';
 
 const initialState: SyllabusState = {
   loading: false,
   error: null,
+  success: false,
   data: null,
+  uploadProgress: 0,
 };
 
-const isSyllabusUploadSuccessAction = (action: SyllabusActionTypes): action is SyllabusUploadSuccessAction =>
-  action.type === SYLLABUS_UPLOAD_SUCCESS;
-
-const isSyllabusUploadFailureAction = (action: SyllabusActionTypes): action is SyllabusUploadFailureAction =>
-  action.type === SYLLABUS_UPLOAD_FAILURE;
-
-export const syllabusReducer = (
-  state = initialState,
-  action: SyllabusActionTypes
-): SyllabusState => {
-  return produce(state, draft => {
+export const syllabusReducer = (state = initialState, action: any) =>
+  produce(state, (draft) => {
     switch (action.type) {
-      case SYLLABUS_UPLOAD_REQUEST:
+      case UPLOAD_SYLLABUS_REQUEST:
         draft.loading = true;
         draft.error = null;
+        draft.success = false;
+        draft.uploadProgress = 0;
         break;
 
-      case SYLLABUS_UPLOAD_SUCCESS:
-        if (isSyllabusUploadSuccessAction(action)) {
-          draft.loading = false;
-          draft.data = action.payload;
-          draft.error = null;
-        }
+      case UPLOAD_SYLLABUS_SUCCESS:
+        draft.loading = false;
+        draft.error = null;
+        draft.success = true;
+        draft.data = action.payload;
+        draft.uploadProgress = 100;
         break;
 
-      case SYLLABUS_UPLOAD_FAILURE:
-        if (isSyllabusUploadFailureAction(action)) {
-          draft.loading = false;
-          draft.error = action.payload;
-          if (!isNull(draft.data)) {
-            draft.data = null;
-          }
-        }
+      case UPLOAD_SYLLABUS_FAILURE:
+        draft.loading = false;
+        draft.error = action.payload;
+        draft.success = false;
+        draft.uploadProgress = 0;
+        break;
+
+      case UPDATE_UPLOAD_PROGRESS:
+        draft.uploadProgress = action.payload;
         break;
 
       case RESET_SYLLABUS_STATE:
         return initialState;
+
+      default:
+        break;
     }
   });
-};

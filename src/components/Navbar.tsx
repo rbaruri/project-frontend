@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -12,7 +12,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-indigo-800 text-white shadow-lg">
+    <nav className="fixed w-full top-0 left-0 bg-indigo-800 text-white shadow-lg z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
@@ -46,7 +46,7 @@ const Navbar = () => {
                   <button
                     className="flex items-center space-x-2 text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 ease-in-out transform group-hover:-translate-y-0.5"
                   >
-                    <span>{user?.firstName}</span>
+                    {/* <span>{user?.firstName}</span> */}
                     <svg className="w-4 h-4 transition-transform duration-300 ease-in-out group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                     </svg>
