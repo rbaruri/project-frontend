@@ -79,23 +79,6 @@ const Quiz: React.FC = () => {
     }
   }, [state.isSubmitted, state.showResults, storage]);
 
-  // Timer functionality
-  useEffect(() => {
-    if (!state.isSubmitted && !state.showResults) {
-      const timer = setInterval(() => {
-        actions.setTimeLeft((prevTime: number) => {
-          if (prevTime <= 1) {
-            handleSubmit();
-            return 0;
-          }
-          return prevTime - 1;
-        });
-      }, 1000);
-
-      return () => clearInterval(timer);
-    }
-  }, [state.isSubmitted, state.showResults]);
-
   const handleSubmit = async () => {
     if (!data?.quizzes_by_pk.quiz_questions) return;
     

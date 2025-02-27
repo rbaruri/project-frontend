@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { useAuth } from '../context/AuthContext';
-import { GET_USER_PROFILE, UPDATE_USER_PROFILE, UPDATE_USER_PASSWORD } from '../graphql/queries/user';
+import { GET_USER_PROFILE, UPDATE_USER_PROFILE } from '../graphql/queries/user';
 import { UPDATE_PASSWORD } from '../graphql/mutations/updatePassword';
 import { Navigate } from 'react-router-dom';
 import bcrypt from 'bcryptjs';
@@ -12,7 +12,6 @@ interface UserProfile {
   first_name: string;
   last_name: string;
   created_at: string;
-  hashed_password: string;
 }
 
 const ProfilePage: React.FC = () => {
@@ -22,24 +21,34 @@ const ProfilePage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
+  const [hasChanges, setHasChanges] = useState(false);
 
   const { loading, data } = useQuery(GET_USER_PROFILE, {
     variables: { userId: parseInt(user?.userId || '0', 10) },
     skip: !user?.userId
   });
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(date);
+  };
+
   const [updateProfile] = useMutation(UPDATE_USER_PROFILE, {
     onCompleted: (data) => {
-      // Update the auth context with new user data
       const updatedUser = {
         ...user!,
         email: data.update_users_by_pk.email,
-        firstName: data.update_users_by_pk.first_name,
-        lastName: data.update_users_by_pk.last_name,
+        first_name: data.update_users_by_pk.first_name,
+        last_name: data.update_users_by_pk.last_name,
       };
-      login({ user: updatedUser });
+      login(updatedUser);
       setIsEditing(false);
       setError(null);
+      setHasChanges(false);
     },
     onError: (error) => {
       setError(error.message);
@@ -51,9 +60,7 @@ const ProfilePage: React.FC = () => {
       setIsChangingPassword(false);
       setPasswordError(null);
       setPasswordSuccess('Password updated successfully!');
-      // Reset password fields
       setPasswordData({
-        currentPassword: '',
         newPassword: '',
         confirmPassword: ''
       });
@@ -74,12 +81,16 @@ const ProfilePage: React.FC = () => {
     email: ''
   });
 
+  const [initialFormData, setInitialFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: ''
+  });
+
   const [passwordData, setPasswordData] = useState<{
-    currentPassword: string;
     newPassword: string;
     confirmPassword: string;
   }>({
-    currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
@@ -88,24 +99,36 @@ const ProfilePage: React.FC = () => {
   const isProfileFormValid = () => {
     return formData.firstName.trim() !== '' && 
            formData.lastName.trim() !== '' && 
-           formData.email.trim() !== '';
+           formData.email.trim() !== '' &&
+           hasChanges;
   };
 
   const isPasswordFormValid = () => {
-    return passwordData.currentPassword.trim() !== '' && 
-           passwordData.newPassword.trim() !== '' && 
+    return passwordData.newPassword.trim() !== '' && 
            passwordData.confirmPassword.trim() !== '';
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (data?.users_by_pk) {
-      setFormData({
+      const newFormData = {
         firstName: data.users_by_pk.first_name,
         lastName: data.users_by_pk.last_name,
         email: data.users_by_pk.email
-      });
+      };
+      setFormData(newFormData);
+      setInitialFormData(newFormData);
     }
   }, [data]);
+
+  useEffect(() => {
+    // Check if current form data is different from initial data
+    const hasFormChanges = 
+      formData.firstName !== initialFormData.firstName ||
+      formData.lastName !== initialFormData.lastName ||
+      formData.email !== initialFormData.email;
+    
+    setHasChanges(hasFormChanges);
+  }, [formData, initialFormData]);
 
   if (!user) {
     return <Navigate to="/login" />;
@@ -178,7 +201,6 @@ const ProfilePage: React.FC = () => {
     }
 
     try {
-      // Hash the new password
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(passwordData.newPassword, salt);
 
@@ -198,7 +220,14 @@ const ProfilePage: React.FC = () => {
     <div className="max-w-4xl mx-auto p-6">
       <div className="bg-white rounded-lg shadow-md p-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Profile Settings</h1>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">Profile Settings</h1>
+            {data?.users_by_pk?.created_at && (
+              <p className="text-sm text-gray-600 mt-1">
+                Member since {formatDate(data.users_by_pk.created_at)}
+              </p>
+            )}
+          </div>
           {!isEditing && (
             <button
               onClick={() => setIsEditing(true)}
@@ -275,13 +304,8 @@ const ProfilePage: React.FC = () => {
                 onClick={() => {
                   setIsEditing(false);
                   setError(null);
-                  if (data?.users_by_pk) {
-                    setFormData({
-                      firstName: data.users_by_pk.first_name,
-                      lastName: data.users_by_pk.last_name,
-                      email: data.users_by_pk.email
-                    });
-                  }
+                  setFormData(initialFormData);
+                  setHasChanges(false);
                 }}
                 className="px-4 py-2 text-gray-600 hover:text-gray-800"
               >
@@ -331,20 +355,6 @@ const ProfilePage: React.FC = () => {
             <form onSubmit={handlePasswordSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Current Password
-                </label>
-                <input
-                  type="password"
-                  name="currentPassword"
-                  value={passwordData.currentPassword}
-                  onChange={handlePasswordChange}
-                  required
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
                   New Password
                 </label>
                 <input
@@ -379,7 +389,6 @@ const ProfilePage: React.FC = () => {
                     setPasswordError(null);
                     setPasswordSuccess(null);
                     setPasswordData({
-                      currentPassword: '',
                       newPassword: '',
                       confirmPassword: ''
                     });
