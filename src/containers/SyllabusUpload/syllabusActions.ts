@@ -1,25 +1,36 @@
 import {
-  UPLOAD_SYLLABUS_REQUEST,
-  UPLOAD_SYLLABUS_SUCCESS,
-  UPLOAD_SYLLABUS_FAILURE,
-  UPDATE_UPLOAD_PROGRESS,
+  SYLLABUS_UPLOAD_REQUEST,
+  SYLLABUS_UPLOAD_SUCCESS,
+  SYLLABUS_UPLOAD_FAILURE,
   RESET_SYLLABUS_STATE,
-} from './syllabusConstants';
+  SyllabusUploadRequestAction,
+  SyllabusUploadSuccessAction,
+  SyllabusUploadFailureAction,
+  ResetSyllabusStateAction,
+  SyllabusUploadResponse
+} from './types';
 
-import {
-  SyllabusResponse,
-  UploadSyllabusPayload,
-} from './syllabusTypes';
+// Action Types
+export const UPLOAD_SYLLABUS_REQUEST = 'UPLOAD_SYLLABUS_REQUEST';
+export const UPLOAD_SYLLABUS_SUCCESS = 'UPLOAD_SYLLABUS_SUCCESS';
+export const UPLOAD_SYLLABUS_FAILURE = 'UPLOAD_SYLLABUS_FAILURE';
+
+// State Type
+export interface SyllabusState {
+  status: 'idle' | 'uploading' | 'success' | 'error';
+  message: string | null;
+  syllabusId: string | null;
+}
 
 // Action Interfaces
 interface UploadSyllabusRequestAction {
   type: typeof UPLOAD_SYLLABUS_REQUEST;
-  payload: UploadSyllabusPayload;
+  payload: FormData;
 }
 
 interface UploadSyllabusSuccessAction {
   type: typeof UPLOAD_SYLLABUS_SUCCESS;
-  payload: SyllabusResponse;
+  payload: { syllabusId: string; message: string };
 }
 
 interface UploadSyllabusFailureAction {
@@ -27,45 +38,27 @@ interface UploadSyllabusFailureAction {
   payload: string;
 }
 
-interface UpdateUploadProgressAction {
-  type: typeof UPDATE_UPLOAD_PROGRESS;
-  payload: number;
-}
-
-interface ResetSyllabusStateAction {
-  type: typeof RESET_SYLLABUS_STATE;
-}
-
 export type SyllabusActionTypes =
   | UploadSyllabusRequestAction
   | UploadSyllabusSuccessAction
-  | UploadSyllabusFailureAction
-  | UpdateUploadProgressAction
-  | ResetSyllabusStateAction;
+  | UploadSyllabusFailureAction;
 
-// Upload Actions
-export const uploadSyllabusRequest = (payload: UploadSyllabusPayload) => ({
-  type: UPLOAD_SYLLABUS_REQUEST,
-  payload,
+// Action Creators
+export const uploadSyllabusRequest = (formData: FormData): SyllabusUploadRequestAction => ({
+  type: SYLLABUS_UPLOAD_REQUEST,
+  payload: formData,
 });
 
-export const uploadSyllabusSuccess = (response: SyllabusResponse) => ({
-  type: UPLOAD_SYLLABUS_SUCCESS,
-  payload: response,
+export const uploadSyllabusSuccess = (data: SyllabusUploadResponse): SyllabusUploadSuccessAction => ({
+  type: SYLLABUS_UPLOAD_SUCCESS,
+  payload: data,
 });
 
-export const uploadSyllabusFailure = (error: string) => ({
-  type: UPLOAD_SYLLABUS_FAILURE,
+export const uploadSyllabusFailure = (error: string): SyllabusUploadFailureAction => ({
+  type: SYLLABUS_UPLOAD_FAILURE,
   payload: error,
 });
 
-// Progress Action
-export const updateUploadProgress = (progress: number) => ({
-  type: UPDATE_UPLOAD_PROGRESS,
-  payload: progress,
-});
-
-// Reset Action
-export const resetSyllabusState = () => ({
+export const resetSyllabusState = (): ResetSyllabusStateAction => ({
   type: RESET_SYLLABUS_STATE,
 });

@@ -1,5 +1,3 @@
-import { BrowserRouter as Router } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
 import AppRoutes from './routes/AppRoutes';
 import Navbar from './components/Navbar';
 import { FC } from 'react';
@@ -16,8 +14,8 @@ const App: FC = () => {
             </div>
           </main>
         </div>
-      </Router>
-    </AuthProvider>
+      </main>
+    </div>
   );
 };
 

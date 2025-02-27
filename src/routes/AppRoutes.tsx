@@ -26,10 +26,14 @@ const AppRoutes: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
   const routes: RouteObject[] = [
-    // Authentication routes
+    // Public routes
     {
-      path: "authentication",
+      path: "/",
       children: [
+        {
+          index: true,
+          element: isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />,
+        },
         {
           path: "login",
           element: isAuthenticated ? (
@@ -50,6 +54,10 @@ const AppRoutes: React.FC = () => {
             </Suspense>
           ),
         },
+        {
+          path: "syllabus-upload",
+          element: <SyllabusUploadPage />,
+        },
       ],
     },
 
@@ -65,7 +73,7 @@ const AppRoutes: React.FC = () => {
 
     // Protected Routes
     {
-      path: "*",
+      path: "/",
       children: [
         {
           index: true,
@@ -128,6 +136,10 @@ const AppRoutes: React.FC = () => {
           ),
         },
         {
+          path: "modules/:moduleId",
+          element: <ProtectedRoute><ModuleDetailsPage /></ProtectedRoute>,
+        },
+        {
           path: "quiz/:quizId",
           element: (
             <ProtectedRoute>
@@ -156,6 +168,12 @@ const AppRoutes: React.FC = () => {
           ),
         },
       ],
+    },
+
+    // Catch all route
+    {
+      path: "*",
+      element: <Navigate to="/" replace />,
     },
   ];
 
