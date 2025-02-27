@@ -1,9 +1,9 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import LoginForm from '../components/LoginForm';
-import { selectLoginLoading, selectLoginError } from '../containers/Login/loginSelectors';
-import { loginRequest } from '../containers/Login/loginActions';
-import { LoginFormData, LoginPageProps } from '../types/loginTypes';
+import LoginForm from '@/components/LoginForm';
+import { selectLoginLoading, selectLoginError } from '@/containers/Login/loginSelectors';
+import { loginRequest } from '@/containers/Login/loginActions';
+import { LoginFormData, LoginPageProps } from '@/types/loginTypes';
 
 const LoginPage: React.FC<LoginPageProps> = () => {
   const dispatch = useDispatch();
