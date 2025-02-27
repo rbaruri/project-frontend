@@ -51,6 +51,12 @@ const ProfilePage: React.FC = () => {
       setIsChangingPassword(false);
       setPasswordError(null);
       setPasswordSuccess('Password updated successfully!');
+      // Reset password fields
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
     },
     onError: (error) => {
       setPasswordError(error.message);
@@ -78,6 +84,19 @@ const ProfilePage: React.FC = () => {
     confirmPassword: ''
   });
 
+  // Validation functions
+  const isProfileFormValid = () => {
+    return formData.firstName.trim() !== '' && 
+           formData.lastName.trim() !== '' && 
+           formData.email.trim() !== '';
+  };
+
+  const isPasswordFormValid = () => {
+    return passwordData.currentPassword.trim() !== '' && 
+           passwordData.newPassword.trim() !== '' && 
+           passwordData.confirmPassword.trim() !== '';
+  };
+
   React.useEffect(() => {
     if (data?.users_by_pk) {
       setFormData({
@@ -102,13 +121,19 @@ const ProfilePage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!isProfileFormValid()) {
+      setError("All fields are required");
+      return;
+    }
+
     try {
       await updateProfile({
         variables: {
           userId: parseInt(user.userId, 10),
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email
+          firstName: formData.firstName.trim(),
+          lastName: formData.lastName.trim(),
+          email: formData.email.trim()
         }
       });
     } catch (err) {
@@ -124,10 +149,23 @@ const ProfilePage: React.FC = () => {
     }));
   };
 
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPasswordData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordError(null);
     setPasswordSuccess(null);
+
+    if (!isPasswordFormValid()) {
+      setPasswordError("All password fields are required");
+      return;
+    }
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setPasswordError("New passwords don't match");
@@ -189,6 +227,7 @@ const ProfilePage: React.FC = () => {
                 value={formData.firstName}
                 onChange={handleInputChange}
                 disabled={!isEditing}
+                required
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   isEditing ? 'bg-white' : 'bg-gray-100'
                 }`}
@@ -204,6 +243,7 @@ const ProfilePage: React.FC = () => {
                 value={formData.lastName}
                 onChange={handleInputChange}
                 disabled={!isEditing}
+                required
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   isEditing ? 'bg-white' : 'bg-gray-100'
                 }`}
@@ -221,6 +261,7 @@ const ProfilePage: React.FC = () => {
               value={formData.email}
               onChange={handleInputChange}
               disabled={!isEditing}
+              required
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 isEditing ? 'bg-white' : 'bg-gray-100'
               }`}
@@ -248,7 +289,12 @@ const ProfilePage: React.FC = () => {
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                disabled={!isProfileFormValid()}
+                className={`px-4 py-2 rounded-lg text-white ${
+                  isProfileFormValid()
+                    ? 'bg-blue-600 hover:bg-blue-700'
+                    : 'bg-gray-400 cursor-not-allowed'
+                }`}
               >
                 Save Changes
               </button>
@@ -256,65 +302,82 @@ const ProfilePage: React.FC = () => {
           )}
         </form>
 
-        <div className="mt-8 pt-6 border-t">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Account Information</h2>
-          <div className="text-gray-600">
-            <p>Member since: {new Date(data?.users_by_pk?.created_at).toLocaleDateString()}</p>
+        <div className="mt-12 pt-8 border-t">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-gray-800">Change Password</h2>
             {!isChangingPassword && (
-              <div className="mt-4">
-                <button
-                  onClick={() => setIsChangingPassword(true)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Change Password
-                </button>
-              </div>
+              <button
+                onClick={() => setIsChangingPassword(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Change Password
+              </button>
             )}
           </div>
-        </div>
 
-        {isChangingPassword && (
-          <div className="mt-6 pt-6 border-t">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Change Password</h2>
-            {passwordError && (
-              <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
-                {passwordError}
-              </div>
-            )}
-            {passwordSuccess && (
-              <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
-                {passwordSuccess}
-              </div>
-            )}
-            <form onSubmit={handlePasswordSubmit} className="space-y-4">
+          {passwordError && (
+            <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+              {passwordError}
+            </div>
+          )}
+
+          {passwordSuccess && (
+            <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
+              {passwordSuccess}
+            </div>
+          )}
+
+          {isChangingPassword && (
+            <form onSubmit={handlePasswordSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">New Password</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Current Password
+                </label>
                 <input
                   type="password"
+                  name="currentPassword"
+                  value={passwordData.currentPassword}
+                  onChange={handlePasswordChange}
+                  required
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  name="newPassword"
                   value={passwordData.newPassword}
-                  onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  onChange={handlePasswordChange}
                   required
-                  minLength={8}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Confirm New Password
+                </label>
                 <input
                   type="password"
+                  name="confirmPassword"
                   value={passwordData.confirmPassword}
-                  onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  onChange={handlePasswordChange}
                   required
-                  minLength={8}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+
               <div className="flex justify-end gap-4">
                 <button
                   type="button"
                   onClick={() => {
                     setIsChangingPassword(false);
                     setPasswordError(null);
+                    setPasswordSuccess(null);
                     setPasswordData({
                       currentPassword: '',
                       newPassword: '',
@@ -327,14 +390,19 @@ const ProfilePage: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  disabled={!isPasswordFormValid()}
+                  className={`px-4 py-2 rounded-lg text-white ${
+                    isPasswordFormValid()
+                      ? 'bg-blue-600 hover:bg-blue-700'
+                      : 'bg-gray-400 cursor-not-allowed'
+                  }`}
                 >
                   Update Password
                 </button>
               </div>
             </form>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

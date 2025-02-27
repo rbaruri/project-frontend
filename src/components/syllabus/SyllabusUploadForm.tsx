@@ -1,9 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import Calendar from "../ui/Calendar";
-import AuthModal from "../ui/AuthModal";
-import { selectIsAuthenticated } from "../../containers/Login/loginSelectors";
 
 // Temporary type definitions until we create the proper types file
 interface FormData {
@@ -13,7 +10,6 @@ interface FormData {
 }
 
 interface SyllabusUploadFormProps {
-  isAuthenticated?: boolean;
   loading?: boolean;
   error?: string;
   uploadedData?: any;
@@ -29,7 +25,6 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
   onReset
 }) => {
   const navigate = useNavigate();
-  const isAuthenticated = useSelector(selectIsAuthenticated);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState<FormData>({
@@ -39,7 +34,6 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
   });
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
-  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
     // Reset form state when component unmounts
@@ -95,32 +89,12 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
     e.preventDefault();
     setError("");
 
-    if (!isAuthenticated) {
-      console.log("Authentication check failed");
-      setShowAuthModal(true);
-      return;
-    }
-
     if (!file || !formData.courseName || !formData.startDate || !formData.endDate) {
-      console.log("Form validation failed:", {
-        file: !!file,
-        courseName: !!formData.courseName,
-        startDate: !!formData.startDate,
-        endDate: !!formData.endDate
-      });
       setError("Please fill in all required fields");
       return;
     }
 
     try {
-      console.log("Submitting form with data:", {
-        courseName: formData.courseName,
-        startDate: formData.startDate,
-        endDate: formData.endDate,
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type
-      });
       onSubmit(formData, file);
     } catch (error) {
       console.error("Form submission error:", error);
@@ -304,19 +278,9 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
           <div className="flex flex-col items-center pt-4">
             <button
               type="submit"
-              disabled={
-                loading ||
-                !file ||
-                !formData.courseName ||
-                !formData.startDate ||
-                !formData.endDate
-              }
+              disabled={loading || !file || !formData.courseName || !formData.startDate || !formData.endDate}
               className={`w-full md:w-auto px-8 py-3 border border-transparent text-base font-medium rounded-md text-white shadow-sm ${
-                loading ||
-                !file ||
-                !formData.courseName ||
-                !formData.startDate ||
-                !formData.endDate
+                loading || !file || !formData.courseName || !formData.startDate || !formData.endDate
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               }`}
@@ -352,12 +316,6 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
           </div>
         </form>
       </div>
-
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-      />
     </div>
   );
 };

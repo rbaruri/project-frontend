@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 export const GET_QUIZ_WITH_QUESTIONS = gql`
-  query GetQuizWithQuestions($quizId: String!) {
+  query GetQuizWithQuestions($quizId: uuid!) {
     quizzes_by_pk(id: $quizId) {
       id
       cutoff_score
@@ -24,7 +24,7 @@ export const GET_QUIZ_WITH_QUESTIONS = gql`
 `;
 
 export const GET_NEXT_MODULE = gql`
-  query GetNextModule($courseId: String!, $currentModuleId: String!) {
+  query GetNextModule($courseId: uuid!, $currentModuleId: uuid!) {
     modules(
       where: {
         course_id: { _eq: $courseId },

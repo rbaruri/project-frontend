@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import SyllabusUploadForm from '../components/syllabus/SyllabusUploadForm';
 import { uploadSyllabusRequest } from '../containers/SyllabusUpload/syllabusActions';
@@ -7,6 +7,8 @@ import {
   selectSyllabusError,
   selectSyllabusData
 } from '../containers/SyllabusUpload/syllabusSelectors';
+import { useAuth } from '../context/AuthContext';
+import AuthModal from '../components/ui/AuthModal';
 
 interface FormData {
   courseName: string;
@@ -16,14 +18,19 @@ interface FormData {
 
 const SyllabusUploadPage: React.FC = () => {
   const dispatch = useDispatch();
+  const { isAuthenticated } = useAuth();
   const loading = useSelector(selectSyllabusLoading);
   const error = useSelector(selectSyllabusError) || undefined;
   const uploadedData = useSelector(selectSyllabusData);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleSubmit = (formData: FormData, file: File) => {
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      return;
+    }
+
     const form = new FormData();
-    
-    // Append all form data to FormData object
     form.append('file', file);
     form.append('courseName', formData.courseName);
     form.append('startDate', formData.startDate);
@@ -31,7 +38,7 @@ const SyllabusUploadPage: React.FC = () => {
     
     dispatch(uploadSyllabusRequest({ 
       formData: form,
-      courseId: formData.courseName // Using courseName as courseId since we don't have a separate courseId
+      courseId: formData.courseName
     }));
   };
 
@@ -52,6 +59,11 @@ const SyllabusUploadPage: React.FC = () => {
           />
         </div>
       </div>
+
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+      />
     </div>
   );
 };
