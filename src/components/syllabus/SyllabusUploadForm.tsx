@@ -1,11 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import { useAuth } from "../../context/AuthContext";
-import { api } from "../../api/axios";
 import Calendar from "../ui/Calendar";
-import { useApolloClient } from "@apollo/client";
-import { GET_COURSES_WITH_LEARNING_PATHS } from "../../graphql/queries/courses";
 import AuthModal from "../ui/AuthModal";
 
 // Temporary type definitions until we create the proper types file
@@ -25,7 +21,6 @@ interface SyllabusUploadFormProps {
 }
 
 const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
-  isAuthenticated,
   loading,
   error: serverError,
   uploadedData,
@@ -33,9 +28,7 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
   onReset
 }) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { isAuthenticated: authIsAuthenticated } = useAuth();
-  const client = useApolloClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState<FormData>({
