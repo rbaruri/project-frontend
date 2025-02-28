@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchModulesRequest } from "./moduleActions";
 import { AppDispatch } from "../../redux/store";
-import Modules from "../ui/Modules";
+import Modules from "../common/Modules";
 import { selectModules, selectModulesLoading, selectModulesError } from "./moduleSelectors";
 
 const Module: React.FC = () => {

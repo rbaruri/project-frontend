@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { selectLearningPath, selectLearningPathLoading, selectLearningPathError } from "./learningPathSelectors";
-import LearningPathComponent from "../ui/LearningPath";
+import LearningPathComponent from "../common/LearningPath";
 import { useNavigate } from "react-router-dom";
 
 const LearningPath = () => {

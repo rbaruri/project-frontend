@@ -2,7 +2,7 @@ import { Suspense, lazy } from "react";
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import ProtectedRoute from "@/routes/ProtectedRoute";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/common/Navbar";
 
 // Lazy load components
 const LandingPage = lazy(() => import("@/pages/Landing"));

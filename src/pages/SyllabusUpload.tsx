@@ -8,7 +8,7 @@ import {
   selectSyllabusData
 } from '../containers/SyllabusUpload/syllabusSelectors';
 import { useAuth } from '../context/AuthContext';
-import AuthModal from '../components/ui/AuthModal';
+import AuthModal from '../components/common/AuthModal';
 
 interface FormData {
   courseName: string;

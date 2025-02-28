@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Calendar from "../ui/Calendar";
+import Calendar from "../common/Calendar";
 
 // Temporary type definitions until we create the proper types file
 interface FormData {

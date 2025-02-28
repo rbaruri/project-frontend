@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 
 const Navbar = () => {
   const location = useLocation();
@@ -24,11 +24,6 @@ const Navbar = () => {
   const handleUnauthenticatedClick = (e: React.MouseEvent) => {
     e.preventDefault();
     navigate('/authentication/login');
-  };
-
-  const handleHomeClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    navigate(isAuthenticated ? '/dashboard' : '/');
   };
 
   return (

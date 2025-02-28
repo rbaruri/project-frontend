@@ -10,7 +10,7 @@ import {
   selectSignupSuccess
 } from '../containers/SignUp/signupIndex';
 import { SignUpFormData, SignUpPageProps } from '../types/signupTypes';
-import LoadingOverlay from '../components/ui/LoadingOverlay';
+import LoadingOverlay from '../components/common/LoadingOverlay';
 
 const SignUpPage: React.FC<SignUpPageProps> = () => {
   const dispatch = useDispatch();
