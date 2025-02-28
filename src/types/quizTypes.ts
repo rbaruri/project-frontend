@@ -27,6 +27,10 @@ export interface AnswerStatus {
 }
 
 export interface QuizState {
+  loading: boolean;
+  error: string | null;
+  data: QuizData | null;
+  nextModule: NextModule | null;
   currentQuestionIndex: number;
   userAnswers: UserAnswers;
   score: number;

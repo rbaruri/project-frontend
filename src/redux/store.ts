@@ -7,11 +7,10 @@ import rootSaga from "./rootSaga";
 const sagaMiddleware = createSagaMiddleware();
 
 // Create Store with Middleware
-export const store = createStore(
+export const store = createStore(   //configureStore 
   rootReducer,
   compose(
     applyMiddleware(sagaMiddleware),
-    // Enable Redux DevTools if available
     (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ? 
     (window as any).__REDUX_DEVTOOLS_EXTENSION__() : 
     (f: any) => f

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Quiz from "@/components/common/Quiz";
 
 interface QuizQuestion {
@@ -31,6 +31,33 @@ interface ModuleProps {
 }
 
 const Module: React.FC<ModuleProps> = ({ module, showQuiz, hasQuiz, onQuizToggle }) => {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
+
+  const handleAnswerSelect = (answer: string) => {
+    const newAnswers = [...selectedAnswers];
+    newAnswers[currentQuestion] = answer;
+    setSelectedAnswers(newAnswers);
+  };
+
+  const handleNext = () => {
+    if (currentQuestion < (module.quiz?.length || 0) - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(currentQuestion - 1);
+    }
+  };
+
+  const handleFinish = () => {
+    // Handle quiz completion here
+    console.log('Quiz completed', selectedAnswers);
+    onQuizToggle();
+  };
+
   return (
     <div className="module-detail">
       <div className="module-header">
@@ -89,8 +116,16 @@ const Module: React.FC<ModuleProps> = ({ module, showQuiz, hasQuiz, onQuizToggle
           </button>
         </div>
 
-        {showQuiz && hasQuiz ? (
-          <Quiz quiz={module.quiz!} />
+        {showQuiz && hasQuiz && module.quiz ? (
+          <Quiz
+            quiz={module.quiz}
+            currentQuestion={currentQuestion}
+            selectedAnswers={selectedAnswers}
+            onAnswerSelect={handleAnswerSelect}
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+            onFinish={handleFinish}
+          />
         ) : (
           <p className="quiz-prompt">
             {hasQuiz ? "Click 'Take Quiz' to test your knowledge." : "No quiz available."}

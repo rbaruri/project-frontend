@@ -5,8 +5,8 @@ import {
   GET_MODULES_BY_COURSE,
   UPDATE_MODULE_STATUS,
   ModuleStatus,
-  type ModuleStatusType,
 } from "@/graphql/queries/modules";
+
 
 // Define quiz status values to match database constraints
 const QuizStatus = {
@@ -16,7 +16,6 @@ const QuizStatus = {
   FAILED: "failed",
 } as const;
 
-type QuizStatusType = (typeof QuizStatus)[keyof typeof QuizStatus];
 
 interface Resource {
   id: string;
