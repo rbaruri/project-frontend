@@ -13,7 +13,7 @@ import {
 import { QuizData, UpdateQuizStatusPayload } from '@/types/quizTypes';
 import { GET_QUIZ_WITH_QUESTIONS, GET_NEXT_MODULE } from '@/graphql/queries/quiz';
 import { UPDATE_QUIZ_STATUS, UPDATE_MODULE_STATUS } from '@/graphql/mutations/quiz';
-import { client } from '@/graphql/client';
+import { client } from '@/api/apolloClient';
 
 function* fetchQuizSaga(action: { type: string; payload: string }) {
   try {

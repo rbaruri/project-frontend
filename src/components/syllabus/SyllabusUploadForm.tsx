@@ -102,6 +102,16 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
     }
   };
 
+  const handleSampleDownload = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const link = document.createElement('a');
+    link.href = '/assets/sample-syllabus.pdf';
+    link.download = 'sample-syllabus.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const displayError = error || serverError;
 
   return (
@@ -139,17 +149,9 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
             <p className="text-s text-blue-600">
               Check out our{" "}
               <a
-                href="/sample-syllabus.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/assets/sample-syllabus.pdf"
                 className="font-medium underline hover:text-blue-800 transition-colors"
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.open(
-                    "https://drive.google.com/file/d/1QgtxhzR_Kk1B6Qf9x4PL4xh5RqfOGHEw/view?usp=sharing",
-                    "_blank"
-                  );
-                }}
+                onClick={handleSampleDownload}
               >
                 sample syllabus
               </a>{" "}

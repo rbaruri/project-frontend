@@ -5,14 +5,8 @@ import { GET_USER_PROFILE, UPDATE_USER_PROFILE } from '@/graphql/queries/user';
 import { UPDATE_PASSWORD } from '@/graphql/mutations/updatePassword';
 import { Navigate } from 'react-router-dom';
 import bcrypt from 'bcryptjs';
+import PasswordValidation from '@/components/common/PasswordValidation';
 
-interface UserProfile {
-  id: number;
-  email: string;
-  first_name: string;
-  last_name: string;
-  created_at: string;
-}
 
 const ProfilePage: React.FC = () => {
   const { user, login } = useAuth();
@@ -108,6 +102,15 @@ const ProfilePage: React.FC = () => {
            passwordData.confirmPassword.trim() !== '';
   };
 
+  const validatePassword = (password: string): boolean => {
+    const hasMinLength = password.length >= 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    return hasMinLength && hasUpperCase && hasNumber && hasSpecialChar;
+  };
+
   useEffect(() => {
     if (data?.users_by_pk) {
       const newFormData = {
@@ -195,8 +198,8 @@ const ProfilePage: React.FC = () => {
       return;
     }
 
-    if (passwordData.newPassword.length < 8) {
-      setPasswordError("New password must be at least 8 characters long");
+    if (!validatePassword(passwordData.newPassword)) {
+      setPasswordError("Password does not meet the requirements");
       return;
     }
 
@@ -365,6 +368,7 @@ const ProfilePage: React.FC = () => {
                   required
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+                <PasswordValidation password={passwordData.newPassword} />
               </div>
 
               <div>
@@ -379,6 +383,9 @@ const ProfilePage: React.FC = () => {
                   required
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+                {passwordData.confirmPassword && passwordData.newPassword !== passwordData.confirmPassword && (
+                  <p className="mt-2 text-sm text-red-600">Passwords do not match</p>
+                )}
               </div>
 
               <div className="flex justify-end gap-4">
@@ -399,9 +406,9 @@ const ProfilePage: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={!isPasswordFormValid()}
+                  disabled={!isPasswordFormValid() || !validatePassword(passwordData.newPassword)}
                   className={`px-4 py-2 rounded-lg text-white ${
-                    isPasswordFormValid()
+                    isPasswordFormValid() && validatePassword(passwordData.newPassword)
                       ? 'bg-blue-600 hover:bg-blue-700'
                       : 'bg-gray-400 cursor-not-allowed'
                   }`}
