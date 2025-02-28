@@ -23,7 +23,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, loading, error }) => {
 
   return (
     <div className="w-full max-w-md px-4">
-      <div className="bg-white shadow-md rounded-lg p-6 space-y-4">
+      <div className="bg-white shadow-xl rounded-lg p-8 space-y-4 border border-gray-100">
         <h2 className="text-center text-2xl font-extrabold text-gray-900">
           Welcome back!
         </h2>

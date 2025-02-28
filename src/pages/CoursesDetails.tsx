@@ -87,23 +87,6 @@ const CourseDetails: React.FC = () => {
   }
 
   const course = data.courses_by_pk;
-  const modules = data.modules || [];
-  const allResources = data.resources || [];
-  const allQuestions = data.similar_questions || [];
-
-  // Function to get status badge color
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'in_progress':
-        return 'bg-blue-100 text-blue-800';
-      case 'not_started':
-        return 'bg-gray-100 text-gray-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   return (
     <div className="container mx-auto px-4 py-8">

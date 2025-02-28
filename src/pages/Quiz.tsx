@@ -1,8 +1,8 @@
 import React, { useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { GET_QUIZ_WITH_QUESTIONS, GET_NEXT_MODULE } from '@/graphql/queries/quiz';
-import { UPDATE_QUIZ_STATUS, UPDATE_MODULE_STATUS } from '@/graphql/mutations/quiz';
+// import { UPDATE_QUIZ_STATUS, UPDATE_MODULE_STATUS } from '@/graphql/mutations/quiz';
 import { QuizData, NextModuleData } from '@/types/quizTypes';
 import QuizQuestion from '@/components/quiz/QuizQuestion';
 import QuizResults from '@/components/quiz/QuizResults';
@@ -21,8 +21,8 @@ const Quiz: React.FC = () => {
     skip: !quizId,
   });
 
-  const [updateQuizStatus] = useMutation(UPDATE_QUIZ_STATUS);
-  const [updateModuleStatus] = useMutation(UPDATE_MODULE_STATUS);
+  // const [updateQuizStatus] = useMutation(UPDATE_QUIZ_STATUS);
+  // const [updateModuleStatus] = useMutation(UPDATE_MODULE_STATUS);
 
   const { state, actions } = useQuizState({
     quizId: quizId || '',
@@ -80,70 +80,7 @@ const Quiz: React.FC = () => {
     }
   }, [state.isSubmitted, state.showResults, storage]);
 
-  const handleSubmit = async () => {
-    if (!data?.quizzes_by_pk.quiz_questions) return;
-    
-    const calculatedScore = actions.calculateScore(data.quizzes_by_pk.quiz_questions, state.userAnswers);
-    
-    try {
-      const newStatus = calculatedScore >= data.quizzes_by_pk.cutoff_score ? 'passed' : 'failed';
 
-      const result = await updateQuizStatus({
-        variables: {
-          quizId,
-          status: newStatus,
-          score: calculatedScore
-        }
-      });
-
-      if (result.data) {
-        actions.setScore(calculatedScore);
-        actions.setIsSubmitted(true);
-        actions.setShowResults(true);
-
-        if (newStatus === 'passed' && data.quizzes_by_pk.module.id) {
-          await updateModuleStatus({
-            variables: {
-              moduleId: data.quizzes_by_pk.module.id,
-              status: 'completed'
-            }
-          });
-        }
-
-        await refetch();
-      }
-    } catch (error) {
-      console.error('Error updating quiz status and score:', error);
-    }
-  };
-
-  const handleRetake = async () => {
-    try {
-      const result = await updateQuizStatus({
-        variables: {
-          quizId,
-          status: 'not_attempted',
-          score: 0
-        }
-      });
-
-      if (result.data) {
-        if (data?.quizzes_by_pk.module.id) {
-          await updateModuleStatus({
-            variables: {
-              moduleId: data.quizzes_by_pk.module.id,
-              status: 'in_progress'
-            }
-          });
-        }
-
-        actions.resetQuiz();
-        await refetch();
-      }
-    } catch (error) {
-      console.error('Error resetting quiz:', error);
-    }
-  };
 
   if (!quizId) return <div className="p-4">Quiz ID not provided</div>;
   if (loading) return <div className="flex justify-center items-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>;

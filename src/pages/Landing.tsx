@@ -6,8 +6,8 @@ const LandingPage: React.FC = () => {
     <div className="fixed inset-0 top-16 flex items-center justify-center bg-white p-4">
       <div className="bg-gradient-to-br from-indigo-600 to-indigo-900 w-[90%] h-[80vh] rounded-xl shadow-2xl p-6 flex flex-col justify-between">
         <div>
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white">NerdNest</h1>
+          <div className="text-center mb-8 pt-8">
+            <h1 className="text-4xl font-bold text-white mb-2">NerdNest</h1>
             <p className="text-xl text-indigo-200">Your Personalized Learning Journey Starts Here</p>
           </div>
 
