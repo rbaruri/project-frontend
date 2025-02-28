@@ -1,5 +1,5 @@
-import { RootState } from '../../redux/rootReducer';
-import { SignUpState } from '../../types/signupTypes';
+import { RootState } from '@/redux/rootReducer';
+import { SignUpState } from '@/types/signupTypes';
 
 const initialState: SignUpState = {
   loading: false,

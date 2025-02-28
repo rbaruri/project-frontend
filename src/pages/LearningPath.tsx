@@ -1,5 +1,5 @@
 import React from "react";
-import LearningPath from "../components/common/LearningPath";
+import LearningPath from "@/components/common/LearningPath";
 
 const LearningPathPage: React.FC = () => {
   return (

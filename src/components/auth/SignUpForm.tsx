@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { SignUpFormData, SignUpFormProps, ValidationState } from '../types/signupTypes';
+import { SignUpFormData, SignUpFormProps, ValidationState } from '../../types/signupTypes';
 
 const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit, loading, error }) => {
   const [formData, setFormData] = useState<SignUpFormData & { confirmPassword: string }>({

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { LoginFormData, LoginFormProps } from '../types/loginTypes';
+import { LoginFormData, LoginFormProps } from '../../types/loginTypes';
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, loading, error }) => {
   const [formData, setFormData] = useState<LoginFormData>({

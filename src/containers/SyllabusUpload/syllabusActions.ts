@@ -4,12 +4,12 @@ import {
   UPLOAD_SYLLABUS_FAILURE,
   UPDATE_UPLOAD_PROGRESS,
   RESET_SYLLABUS_STATE,
-} from './syllabusConstants';
+} from '@/containers/SyllabusUpload/syllabusConstants';
 
 import {
   SyllabusResponse,
   UploadSyllabusPayload,
-} from '../../types/syllabusTypes';
+} from '@/types/syllabusTypes';
 
 // Action Interfaces
 interface UploadSyllabusRequestAction {

@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import SignUpForm from '../components/SignUpForm';
+import SignUpForm from '@/components/auth/SignUpForm';
 import {
   signupRequest,
   signupReset,
   selectSignupLoading,
   selectSignupError,
   selectSignupSuccess
-} from '../containers/SignUp/signupIndex';
-import { SignUpFormData, SignUpPageProps } from '../types/signupTypes';
-import LoadingOverlay from '../components/common/LoadingOverlay';
+} from '@/containers/SignUp/signupIndex';
+import { SignUpFormData, SignUpPageProps } from '@/types/signupTypes';
+import LoadingOverlay from '@/components/common/LoadingOverlay';
 
 const SignUpPage: React.FC<SignUpPageProps> = () => {
   const dispatch = useDispatch();

@@ -1,5 +1,5 @@
 import React from 'react';
-import CoursesContainer from '../components/courses/Courses';
+import CoursesContainer from '@/components/courses/Courses';
 
 const CoursesPage: React.FC = () => {
   return (

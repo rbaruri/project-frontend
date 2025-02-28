@@ -1,6 +1,4 @@
 import React from "react";
-import Card from "./Card";
-import ProgressBar from "./ProgressBar";
 
 interface Module {
   id: string;

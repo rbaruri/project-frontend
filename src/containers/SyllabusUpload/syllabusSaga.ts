@@ -1,13 +1,13 @@
 import { takeLatest, call, put } from 'redux-saga/effects';
 import axios, { AxiosResponse, AxiosProgressEvent } from 'axios';
 import { get } from 'lodash';
-import { UPLOAD_SYLLABUS_REQUEST } from './syllabusConstants';
+import { UPLOAD_SYLLABUS_REQUEST } from '@/containers/SyllabusUpload/syllabusConstants';
 import {
   uploadSyllabusSuccess,
   uploadSyllabusFailure,
   updateUploadProgress,
-} from './syllabusActions';
-import { UploadSyllabusPayload, SyllabusResponse } from '../../types/syllabusTypes';
+} from '@/containers/SyllabusUpload/syllabusActions';
+import { UploadSyllabusPayload, SyllabusResponse } from '@/types/syllabusTypes';
 
 export function* uploadSyllabusSaga(action: { type: string; payload: UploadSyllabusPayload }): Generator<any, void, AxiosResponse<SyllabusResponse>> {
   try {

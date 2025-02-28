@@ -1,10 +1,10 @@
-import { SignUpFormData, SignUpResponse } from '../../types/signupTypes';
+import { SignUpFormData, SignUpResponse } from '@/types/signupTypes';
 import {
   SIGNUP_REQUEST,
   SIGNUP_SUCCESS,
   SIGNUP_FAILURE,
   SIGNUP_RESET,
-} from './signupConstants';
+} from '@/containers/SignUp/signupConstants';
 
 export const signupRequest = (formData: SignUpFormData) => ({
   type: SIGNUP_REQUEST,

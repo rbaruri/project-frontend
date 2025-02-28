@@ -1,11 +1,5 @@
 import { createStore, applyMiddleware, compose } from "redux";
 import createSagaMiddleware from "redux-saga";
-import { learningPathReducer } from "../containers/LearningPath/learningPathReducer";
-import { syllabusReducer } from "../containers/SyllabusUpload/syllabusReducer";
-import moduleReducer from "../containers/Modules/moduleReducer";
-import quizReducer from "../containers/Quiz/quizReducer";
-import loginReducer from "../containers/Login/loginReducer";
-import { signupReducer } from "../containers/SignUp/signupIndex";
 import rootReducer from "./rootReducer";
 import rootSaga from "./rootSaga";
 

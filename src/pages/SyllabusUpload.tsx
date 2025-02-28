@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import SyllabusUploadForm from '../components/syllabus/SyllabusUploadForm';
-import { uploadSyllabusRequest } from '../containers/SyllabusUpload/syllabusActions';
+import SyllabusUploadForm from '@/components/syllabus/SyllabusUploadForm';
+import { uploadSyllabusRequest } from '@/containers/SyllabusUpload/syllabusActions';
 import { 
   selectSyllabusLoading, 
   selectSyllabusError,
   selectSyllabusData
-} from '../containers/SyllabusUpload/syllabusSelectors';
-import { useAuth } from '../context/AuthContext';
-import AuthModal from '../components/common/AuthModal';
+} from '@/containers/SyllabusUpload/syllabusSelectors';
+import { useAuth } from '@/context/AuthContext';
+import AuthModal from '@/components/common/AuthModal';
 
 interface FormData {
   courseName: string;

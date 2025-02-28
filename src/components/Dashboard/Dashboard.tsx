@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
-import { GET_COURSES_WITH_LEARNING_PATHS } from '../../graphql/queries/courses';
+import { GET_COURSES_WITH_LEARNING_PATHS } from '@/graphql/queries/courses';
 
 interface Module {
   id: string;

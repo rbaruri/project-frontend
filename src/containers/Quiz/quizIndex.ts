@@ -1,6 +1,6 @@
-export * from './quizActions';
-export * from './quizConstants';
-export * from '../../types/quizTypes';
-export * from './quizSelector';
-export { default as quizReducer } from './quizReducer';
-export { watchQuizSaga } from './quizSaga';
+export * from '@/containers/Quiz/quizActions';
+export * from '@/containers/Quiz/quizConstants';
+export * from '@/types/quizTypes';
+export * from '@/containers/Quiz/quizSelector';
+export { default as quizReducer } from '@/containers/Quiz/quizReducer';
+export { watchQuizSaga } from '@/containers/Quiz/quizSaga';

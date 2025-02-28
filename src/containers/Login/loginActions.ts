@@ -1,11 +1,11 @@
-import { LoginFormData, LoginResponse } from '../../types/loginTypes';
+import { LoginFormData, LoginResponse } from '@/types/loginTypes';
 import {
   LOGIN_REQUEST,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
   LOGIN_RESET,
   LOGOUT,
-} from './loginConstants';
+} from '@/containers/Login/loginConstants';
 
 export const loginRequest = (formData: LoginFormData) => ({
   type: LOGIN_REQUEST,

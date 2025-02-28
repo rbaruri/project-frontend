@@ -1,9 +1,9 @@
 import React from 'react';
 import { useQuery } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
-import CourseCard from "../common/CourseCard";
-import { GET_COURSES_WITH_LEARNING_PATHS } from '../../graphql/queries/courses';
-import { useAuth } from '../../context/AuthContext';
+import CourseCard from "@/components/common/CourseCard";
+import { GET_COURSES_WITH_LEARNING_PATHS } from '@/graphql/queries/courses';
+import { useAuth } from '@/context/AuthContext';
 
 interface Course {
   id: string;

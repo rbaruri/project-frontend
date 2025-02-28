@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect, Dispatch, SetStateAction } from 'react';
 import { useMutation } from '@apollo/client';
-import { QuizData } from '../types/quizTypes';
-import { UPDATE_QUIZ_STATUS, UPDATE_MODULE_STATUS } from '../graphql/mutations/quiz';
-import { QUIZ_TIME_LIMIT } from '../helper/quizHelper';
+import { QuizData } from '@/types/quizTypes';
+import { UPDATE_QUIZ_STATUS, UPDATE_MODULE_STATUS } from '@/graphql/mutations/quiz';
+import { QUIZ_TIME_LIMIT } from '@/helper/quizHelper';
 
 interface UserAnswers {
   [questionId: string]: string;

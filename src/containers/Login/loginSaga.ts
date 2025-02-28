@@ -1,9 +1,9 @@
 import { takeLatest, call, put, delay } from 'redux-saga/effects';
-import { api } from '../../api/axios';
+import { api } from '@/api/axios';
 import { get } from 'lodash';
-import { LOGIN_REQUEST, LOGOUT } from './loginConstants';
-import { loginSuccess, loginFailure } from './loginActions';
-import { LoginFormData, LoginResponse, User } from '../../types/loginTypes';
+import { LOGIN_REQUEST, LOGOUT } from '@/containers/Login/loginConstants';
+import { loginSuccess, loginFailure } from '@/containers/Login/loginActions';
+import { LoginFormData, LoginResponse, User } from '@/types/loginTypes';
 import { AxiosResponse } from 'axios';
 
 function* loginSaga(action: { type: string; payload: LoginFormData }) {

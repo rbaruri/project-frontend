@@ -1,12 +1,12 @@
 import { produce } from 'immer';
-import { LoginState } from '../../types/loginTypes';
+import { LoginState } from '@/types/loginTypes';
 import {
   LOGIN_REQUEST,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
   LOGIN_RESET,
   LOGOUT,
-} from './loginConstants';
+} from '@/containers/Login/loginConstants';
 
 const initialState: LoginState = {
   loading: false,

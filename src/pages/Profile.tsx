@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
-import { useAuth } from '../context/AuthContext';
-import { GET_USER_PROFILE, UPDATE_USER_PROFILE } from '../graphql/queries/user';
-import { UPDATE_PASSWORD } from '../graphql/mutations/updatePassword';
+import { useAuth } from '@/context/AuthContext';
+import { GET_USER_PROFILE, UPDATE_USER_PROFILE } from '@/graphql/queries/user';
+import { UPDATE_PASSWORD } from '@/graphql/mutations/updatePassword';
 import { Navigate } from 'react-router-dom';
 import bcrypt from 'bcryptjs';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import LoginForm from '@/components/LoginForm';
+import LoginForm from '@/components/auth/LoginForm';
 import { selectLoginLoading, selectLoginError } from '@/containers/Login/loginSelectors';
 import { loginRequest } from '@/containers/Login/loginActions';
 import { LoginFormData, LoginPageProps } from '@/types/loginTypes';

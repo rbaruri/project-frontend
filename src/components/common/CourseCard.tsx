@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useMutation } from "@apollo/client";
-import { UPDATE_COURSE_NAME, DELETE_COURSE, GET_COURSES_WITH_LEARNING_PATHS } from "../../graphql/queries/courses";
+import { UPDATE_COURSE_NAME, DELETE_COURSE, GET_COURSES_WITH_LEARNING_PATHS } from "@/graphql/queries/courses";
 
 interface Course {
   id: string;

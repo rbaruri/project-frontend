@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { QuizState } from '../../types/quizTypes';
+import { QuizState } from '@/types/quizTypes';
 import {
   FETCH_QUIZ_REQUEST,
   FETCH_QUIZ_SUCCESS,
@@ -11,7 +11,7 @@ import {
   SET_QUIZ_SCORE,
   UPDATE_TIME_LEFT,
   RESET_QUIZ,
-} from './quizConstants';
+} from '@/containers/Quiz/quizConstants';
 
 const initialState: QuizState = {
   loading: false,

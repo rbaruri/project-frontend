@@ -1,5 +1,5 @@
 import React from "react";
-import Quiz from "../../containers/Quiz/Quiz";
+import Quiz from "@/components/common/Quiz";
 
 interface QuizQuestion {
   question: string;

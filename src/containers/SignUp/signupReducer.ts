@@ -1,11 +1,11 @@
 import { produce } from 'immer';
-import { SignUpState } from '../../types/signupTypes';
+import { SignUpState } from '@/types/signupTypes';
 import {
   SIGNUP_REQUEST,
   SIGNUP_SUCCESS,
   SIGNUP_FAILURE,
   SIGNUP_RESET,
-} from './signupConstants';
+} from '@/containers/SignUp/signupConstants';
 
 const initialState: SignUpState = {
   loading: false,

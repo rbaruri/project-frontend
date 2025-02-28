@@ -1,7 +1,7 @@
 import { call, put, takeLatest } from "redux-saga/effects";
-import { FETCH_LEARNING_PATH_REQUEST } from "./learningPathConstants";
-import { fetchLearningPathSuccess, fetchLearningPathFailure } from "./learningPathActions";
-import { api } from "../../api/axios";
+import { FETCH_LEARNING_PATH_REQUEST } from "@/containers/LearningPath/learningPathConstants";
+import { fetchLearningPathSuccess, fetchLearningPathFailure } from "@/containers/LearningPath/learningPathActions";
+import { api } from "@/api/axios";
 
 function* fetchLearningPathSaga(action: any): Generator<any, void, any> {
   try {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatTime } from '../../helper/quizHelper';
+import { formatTime } from '@/helper/quizHelper';
 
 interface QuizHeaderProps {
   moduleTitle: string;

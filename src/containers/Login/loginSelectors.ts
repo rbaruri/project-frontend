@@ -1,5 +1,5 @@
 import { get } from 'lodash';
-import { LoginState } from '../../types/loginTypes';
+import { LoginState } from '@/types/loginTypes';
 
 interface RootState {
   login: LoginState;

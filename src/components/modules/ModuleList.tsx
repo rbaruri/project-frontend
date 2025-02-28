@@ -6,7 +6,7 @@ import {
   UPDATE_MODULE_STATUS,
   ModuleStatus,
   type ModuleStatusType,
-} from "../../graphql/queries/modules";
+} from "@/graphql/queries/modules";
 
 // Define quiz status values to match database constraints
 const QuizStatus = {

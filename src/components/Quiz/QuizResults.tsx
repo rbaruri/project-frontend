@@ -1,5 +1,5 @@
 import React from 'react';
-import { QuizQuestion, UserAnswers, QuizResultsProps, AnswerStatus } from '../../types/quizTypes';
+import { QuizQuestion, QuizResultsProps, AnswerStatus } from '@/types/quizTypes';
 
 const getAnswerStatus = (question: QuizQuestion, userAnswer: string | undefined): AnswerStatus => {
   if (!userAnswer) {

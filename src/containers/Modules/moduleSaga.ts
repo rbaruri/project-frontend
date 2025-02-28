@@ -2,9 +2,9 @@ import { call, put, takeLatest } from "redux-saga/effects";
 import {
   fetchModulesSuccess,
   fetchModulesFailure,
-} from "./moduleActions";
-import { FETCH_MODULES_REQUEST, Module } from "../../types/moduleTypes";
-import { api } from "../../api/axios";
+} from "@/containers/Modules/moduleActions";
+import { FETCH_MODULES_REQUEST, Module } from "@/types/moduleTypes";
+import { api } from "@/api/axios";
 
 function* fetchModulesSaga() {
   try {

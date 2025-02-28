@@ -1,9 +1,9 @@
 import { takeLatest, call, put } from 'redux-saga/effects';
-import { api } from '../../api/axios';
+import { api } from '@/api/axios';
 import { get } from 'lodash';
-import { SIGNUP_REQUEST } from './signupConstants';
-import { signupSuccess, signupFailure } from './signupActions';
-import { SignUpFormData, SignUpResponse } from '../../types/signupTypes';
+import { SIGNUP_REQUEST } from '@/containers/SignUp/signupConstants';
+import { signupSuccess, signupFailure } from '@/containers/SignUp/signupActions';
+import { SignUpFormData, SignUpResponse } from '@/types/signupTypes';
 import { AxiosResponse } from 'axios';
 
 function* signupSaga(action: { type: string; payload: SignUpFormData }) {

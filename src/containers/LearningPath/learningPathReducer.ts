@@ -1,4 +1,4 @@
-import { FETCH_LEARNING_PATH_REQUEST, FETCH_LEARNING_PATH_SUCCESS, FETCH_LEARNING_PATH_FAILURE } from "./learningPathConstants";
+import { FETCH_LEARNING_PATH_REQUEST, FETCH_LEARNING_PATH_SUCCESS, FETCH_LEARNING_PATH_FAILURE } from "@/containers/LearningPath/learningPathConstants";
 
 const initialState = {
   learningPath: null,
