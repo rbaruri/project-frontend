@@ -26,6 +26,7 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
 }) => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropZoneRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState<FormData>({
     courseName: "",
@@ -34,6 +35,7 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
   });
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     // Reset form state when component unmounts
@@ -57,17 +59,6 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
     }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-      // Validate file size and type
-      if (validateFile(selectedFile)) {
-        setFile(selectedFile);
-        setError("");
-      }
-    }
-  };
-
   const validateFile = (file: File): boolean => {
     const maxSize = 10 * 1024 * 1024; // 10MB
     const allowedTypes = ["application/pdf"];
@@ -83,6 +74,49 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
     }
 
     return true;
+  };
+
+  const handleFileSelect = (selectedFile: File) => {
+    if (validateFile(selectedFile)) {
+      setFile(selectedFile);
+      setError("");
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFileSelect(e.target.files[0]);
+    }
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.currentTarget === dropZoneRef.current) {
+      setIsDragging(false);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    if (droppedFiles.length > 0) {
+      handleFileSelect(droppedFiles[0]);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -171,48 +205,83 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
               Upload Syllabus
             </label>
             <div
-              className="mt-1 flex justify-center px-6 pt-8 pb-8 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-500 transition-colors cursor-pointer"
+              ref={dropZoneRef}
+              className={`mt-1 flex justify-center px-6 pt-8 pb-8 border-2 ${
+                isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 border-dashed'
+              } rounded-lg hover:border-blue-500 transition-colors cursor-pointer`}
               onClick={() => fileInputRef.current?.click()}
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
             >
               <div className="space-y-2 text-center">
-                <svg
-                  className="mx-auto h-12 w-12 text-gray-400"
-                  stroke="currentColor"
-                  fill="none"
-                  viewBox="0 0 48 48"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <div className="flex text-sm text-gray-600 justify-center">
-                  <label
-                    htmlFor="file-upload"
-                    className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500"
-                  >
-                    <span>Upload a file</span>
-                    <input
-                      id="file-upload"
-                      name="file-upload"
-                      type="file"
-                      className="sr-only"
-                      ref={fileInputRef}
-                      onChange={handleFileChange}
-                      accept=".pdf"
-                      disabled={loading}
-                    />
-                  </label>
-                  <p className="pl-1">or drag and drop</p>
-                </div>
-                <p className="text-xs text-gray-500">PDF up to 10MB</p>
-                {file && (
-                  <p className="text-sm text-green-600 mt-2">
-                    Selected: {file.name}
-                  </p>
+                {!file ? (
+                  <>
+                    <svg
+                      className="mx-auto h-12 w-12 text-gray-400"
+                      stroke="currentColor"
+                      fill="none"
+                      viewBox="0 0 48 48"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    <div className="flex text-sm text-gray-600 justify-center">
+                      <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
+                        <span>Upload a file</span>
+                        <input
+                          type="file"
+                          className="sr-only"
+                          ref={fileInputRef}
+                          onChange={handleFileChange}
+                          accept=".pdf"
+                          disabled={loading}
+                        />
+                      </label>
+                      <p className="pl-1">or drag and drop</p>
+                    </div>
+                    <p className="text-xs text-gray-500">PDF up to 10MB</p>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center space-x-3">
+                    <span className="text-sm text-gray-600">Selected file: {file.name}</span>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const fileUrl = URL.createObjectURL(file);
+                          window.open(fileUrl, '_blank');
+                        }}
+                        className="text-blue-600 hover:text-blue-800"
+                        title="Preview file"
+                      >
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFile(null);
+                        }}
+                        className="text-red-500 hover:text-red-700"
+                        title="Remove file"
+                      >
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
