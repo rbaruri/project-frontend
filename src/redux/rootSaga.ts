@@ -9,7 +9,7 @@ import { watchSignupSaga } from "@/containers/SignUp/signupSaga";
 export default function* rootSaga() {
   yield all([
     watchLearningPathSaga(),
-    watchSyllabusSaga(),
+    syllabusSaga(),
     moduleSaga(),
     watchQuizSaga(),
     watchLoginSaga(),

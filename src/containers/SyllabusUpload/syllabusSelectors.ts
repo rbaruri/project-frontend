@@ -1,23 +1,6 @@
 import { get } from 'lodash';
 import { SyllabusState } from '@/types/syllabusTypes';
 
-interface RootState {
-  syllabus: SyllabusState;
-}
-
-export const selectSyllabusState = (state: RootState) => get(state, 'syllabus', {});
-
-export const selectSyllabusLoading = (state: RootState) =>
-  get(state, 'syllabus.loading', false);
-
-export const selectSyllabusError = (state: RootState) =>
-  get(state, 'syllabus.error', null);
-
-export const selectSyllabusSuccess = (state: RootState) =>
-  get(state, 'syllabus.success', false);
-
-export const selectSyllabusData = (state: RootState) =>
-  get(state, 'syllabus.data', null);
-
-export const selectUploadProgress = (state: RootState) =>
-  get(state, 'syllabus.uploadProgress', 0); 
+export const selectSyllabusState = (state: RootState) => state.syllabus;
+export const selectSyllabusStatus = (state: RootState) => selectSyllabusState(state).status;
+export const selectSyllabusMessage = (state: RootState) => selectSyllabusState(state).message; 

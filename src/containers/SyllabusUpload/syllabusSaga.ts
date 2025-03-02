@@ -3,13 +3,15 @@ import axios, { AxiosResponse, AxiosProgressEvent } from 'axios';
 import { get } from 'lodash';
 import { UPLOAD_SYLLABUS_REQUEST } from '@/containers/SyllabusUpload/syllabusConstants';
 import {
+  UPLOAD_SYLLABUS_REQUEST,
   uploadSyllabusSuccess,
   uploadSyllabusFailure,
   updateUploadProgress,
 } from '@/containers/SyllabusUpload/syllabusActions';
 import { UploadSyllabusPayload, SyllabusResponse } from '@/types/syllabusTypes';
 
-export function* uploadSyllabusSaga(action: { type: string; payload: UploadSyllabusPayload }): Generator<any, void, AxiosResponse<SyllabusResponse>> {
+// API call function
+const uploadSyllabusAPI = async (formData: FormData) => {
   try {
     const { formData } = action.payload;
 
@@ -37,13 +39,30 @@ export function* uploadSyllabusSaga(action: { type: string; payload: UploadSylla
       )
     );
 
-    yield put(uploadSyllabusSuccess(response.data));
+    if (!learningPathResponse.data.learningPath) {
+      throw new Error('No learning path generated');
+    }
+
+    return {
+      syllabusId: learningPathResponse.data.courseId,
+      message: 'Syllabus processed and learning path created successfully'
+    };
   } catch (error: any) {
-    const errorMessage = get(error, 'response.data.message', 'Failed to upload syllabus');
-    yield put(uploadSyllabusFailure(errorMessage));
+    throw new Error(error.response?.data?.error || error.response?.data?.details || 'Upload failed');
+  }
+};
+
+// Worker Saga
+function* handleSyllabusUpload(action: { type: string; payload: FormData }): Generator<any, void, any> {
+  try {
+    const response = yield call(uploadSyllabusAPI, action.payload);
+    yield put(uploadSyllabusSuccess(response));
+  } catch (error) {
+    yield put(uploadSyllabusFailure(error instanceof Error ? error.message : 'Upload failed'));
   }
 }
 
-export function* watchSyllabusSaga(): Generator {
-  yield takeLatest(UPLOAD_SYLLABUS_REQUEST, uploadSyllabusSaga);
+// Watcher Saga
+export function* syllabusSaga() {
+  yield takeLatest(UPLOAD_SYLLABUS_REQUEST, handleSyllabusUpload);
 }
