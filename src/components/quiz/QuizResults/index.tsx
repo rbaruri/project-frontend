@@ -12,13 +12,21 @@ const QuizResults: React.FC<QuizResultsProps> = ({
   onBackToModule,
   onNextModule,
   hasNextModule,
-  timeExpired = false
+  timeExpired = false,
+  onReview,
+  timeTaken
 }) => {
   if (timeExpired) {
     return <TimeExpired onRetake={onRetake} />;
   }
 
   const { correctAnswers, totalQuestions } = calculateResults(questions, userAnswers);
+  
+  const formatTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
 
   return (
     <div className="space-y-8">
@@ -36,22 +44,27 @@ const QuizResults: React.FC<QuizResultsProps> = ({
           <h2 className={`text-2xl font-bold ${score >= cutoffScore ? 'text-green-600' : 'text-red-600'}`}>
             Final Score: {correctAnswers}/{totalQuestions} ({score}%)
           </h2>
-          <p className="mt-2 text-lg">
-            {score >= cutoffScore ? (
-              <>
-                Congratulations! You've passed the quiz.
-                {hasNextModule && (
-                  <span className="block mt-1 text-gray-600">
-                    You can now proceed to the next module.
-                  </span>
-                )}
-              </>
-            ) : (
-              <span className="text-red-600">
-                You need {cutoffScore}% to pass. Please try again.
-              </span>
-            )}
-          </p>
+          <div className="mt-2">
+            <p className="text-lg">
+              {score >= cutoffScore ? (
+                <>
+                  Congratulations! You've passed the quiz.
+                  {hasNextModule && (
+                    <span className="block mt-1 text-gray-600">
+                      You can now proceed to the next module.
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span className="text-red-600">
+                  You need {cutoffScore}% to pass. Please try again.
+                </span>
+              )}
+            </p>
+            <p className="text-gray-600 mt-2">
+              Time taken: {formatTime(timeTaken)}
+            </p>
+          </div>
         </div>
 
         <div className="flex justify-center space-x-4">
@@ -72,6 +85,14 @@ const QuizResults: React.FC<QuizResultsProps> = ({
             </>
           ) : (
             <>
+              {onReview && !timeExpired && !window.location.search.includes('mode=review') && (
+                <button
+                  onClick={onReview}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300"
+                >
+                  Review Quiz
+                </button>
+              )}
               {hasNextModule ? (
                 <button
                   onClick={onNextModule}

@@ -94,11 +94,14 @@ const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
   const handleQuizClick = (
     e: React.MouseEvent,
     quizId: string,
-    isLocked: boolean
+    isLocked: boolean,
+    quizStatus: string
   ) => {
     e.stopPropagation();
     if (isLocked) return;
-    navigate(`/quiz/${quizId}`);
+    
+    const isReview = quizStatus === 'passed';
+    navigate(`/quiz/${quizId}${isReview ? '?mode=review&showResults=true' : ''}`);
   };
 
   if (loading) {
@@ -171,7 +174,7 @@ const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
                   </div>
                   {quiz && (
                     <button
-                      onClick={(e) => handleQuizClick(e, quiz.id, isLocked)}
+                      onClick={(e) => handleQuizClick(e, quiz.id, isLocked, quiz.status)}
                       className={`px-4 py-2 rounded-md text-white font-medium ${getQuizStatusColor(
                         quiz.status
                       )}`}

@@ -9,9 +9,7 @@ export const getProgressBarWidth = (progress: number): string => {
 };
 
 export const getProgressBarColor = (progress: number): string => {
-  if (progress < 30) return 'bg-red-500';
-  if (progress < 70) return 'bg-yellow-500';
-  return 'bg-green-500';
+  return 'bg-blue-500';
 };
 
 export const getScoreColor = (score: number, cutoffScore: number): string => {

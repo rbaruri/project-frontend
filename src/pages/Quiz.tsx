@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { GET_QUIZ_WITH_QUESTIONS, GET_NEXT_MODULE } from '@/graphql/queries/quiz';
 // import { UPDATE_QUIZ_STATUS, UPDATE_MODULE_STATUS } from '@/graphql/mutations/quiz';
@@ -9,12 +9,15 @@ import QuizResults from '@/components/quiz/QuizResults';
 import QuizHeader from '@/components/quiz/QuizHeader';
 import QuizNavigation from '@/components/quiz/QuizNavigation';
 import TimeoutModal from '@/components/quiz/TimeoutModal';
-import { useQuizState } from '@/hooks/useQuizState';
+import useQuizState from '@/hooks/useQuizState';
 import { useQuizStorage } from '@/hooks/useQuizStorage';
 
 const Quiz: React.FC = () => {
   const { quizId } = useParams<{ quizId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isReviewMode = new URLSearchParams(location.search).get('mode') === 'review';
+  const shouldShowResults = new URLSearchParams(location.search).get('showResults') === 'true';
 
   const { loading, error, data, refetch } = useQuery<QuizData>(GET_QUIZ_WITH_QUESTIONS, {
     variables: { quizId },
@@ -26,7 +29,9 @@ const Quiz: React.FC = () => {
 
   const { state, actions } = useQuizState({
     quizId: quizId || '',
-    refetch
+    refetch,
+    initialReviewMode: isReviewMode,
+    initialShowResults: shouldShowResults
   });
 
   const storage = useQuizStorage(quizId);
@@ -48,12 +53,23 @@ const Quiz: React.FC = () => {
   }, [actions.handleAnswerSelect, storage.saveAnswersToLocalStorage, state.userAnswers]);
 
   const handleBackToModule = useCallback(() => {
+    // Clear only timer data from localStorage, preserve answers and attempts
+    if (quizId) {
+      localStorage.removeItem(`quiz_${quizId}_time`);
+      localStorage.removeItem(`quiz_${quizId}_timestamp`);
+      localStorage.removeItem(`quiz_${quizId}_start_time`);
+      // Save answers before navigating away if they're not already saved
+      if (Object.keys(state.userAnswers).length > 0) {
+        localStorage.setItem(`quiz_${quizId}_answers`, JSON.stringify(state.userAnswers));
+      }
+    }
+    
     if (data?.quizzes_by_pk?.module?.course_id) {
       navigate(`/courses/${data.quizzes_by_pk.module.course_id}`);
     } else {
       navigate('/courses');
     }
-  }, [data?.quizzes_by_pk?.module?.course_id, navigate]);
+  }, [data?.quizzes_by_pk?.module?.course_id, navigate, quizId, state.userAnswers]);
 
   const handleNextModule = useCallback(() => {
     if (nextModuleData?.modules?.[0]?.id) {
@@ -100,6 +116,25 @@ const Quiz: React.FC = () => {
       />
 
       <div className="max-w-3xl mx-auto">
+        <button
+          onClick={handleBackToModule}
+          className="flex items-center text-gray-600 hover:text-gray-800 mb-4 transition-colors"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 mr-1"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+              clipRule="evenodd"
+            />
+          </svg>
+          Back to Module
+        </button>
+
         <QuizHeader
           moduleTitle={quiz.module.title}
           timeLeft={state.timeLeft}
@@ -110,15 +145,40 @@ const Quiz: React.FC = () => {
           isSubmitted={state.isSubmitted}
           score={state.score}
           progress={progress}
+          isReviewMode={state.isReviewMode}
         />
 
-        {!state.showResults ? (
+        {state.isReviewMode ? (
+          <div className="space-y-8">
+            {quiz.quiz_questions.map((question, index) => (
+              <QuizQuestion
+                key={question.id}
+                question={question}
+                questionNumber={index + 1}
+                selectedAnswer={state.userAnswers[question.id]}
+                onAnswerSelect={handleAnswerSelect}
+                isReviewMode={true}
+                correctOption={question.correct_option}
+              />
+            ))}
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={handleBackToModule}
+                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300"
+              >
+                Complete Module
+              </button>
+            </div>
+          </div>
+        ) : !state.showResults ? (
           <>
             <QuizQuestion
               question={currentQuestion}
               questionNumber={state.currentQuestionIndex + 1}
               selectedAnswer={state.userAnswers[currentQuestion.id]}
               onAnswerSelect={handleAnswerSelect}
+              isReviewMode={state.isReviewMode}
+              correctOption={state.isReviewMode ? currentQuestion.correct_option : undefined}
             />
 
             <QuizNavigation
@@ -128,6 +188,7 @@ const Quiz: React.FC = () => {
               onPrevious={() => actions.setCurrentQuestionIndex(prev => prev - 1)}
               onNext={() => actions.setCurrentQuestionIndex(prev => prev + 1)}
               onSubmit={() => actions.handleSubmit(quiz.quiz_questions, quiz.module.id, quiz.cutoff_score)}
+              isReviewMode={state.isReviewMode}
             />
           </>
         ) : (
@@ -140,6 +201,8 @@ const Quiz: React.FC = () => {
             onBackToModule={handleBackToModule}
             onNextModule={handleNextModule}
             hasNextModule={!!nextModuleData?.modules?.[0]}
+            onReview={state.score >= quiz.cutoff_score ? () => actions.handleRetake(quiz.module.id, true) : undefined}
+            timeTaken={state.timeTaken}
           />
         )}
       </div>

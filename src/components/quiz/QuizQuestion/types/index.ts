@@ -6,8 +6,15 @@ export interface QuizQuestion {
 }
 
 export interface QuizQuestionProps {
-  question: QuizQuestion;
+  question: {
+    id: string;
+    question: string;
+    options: string[];
+    correct_option: string;
+  };
   questionNumber: number;
-  selectedAnswer?: string;
-  onAnswerSelect: (questionId: string, answer: string) => void;
+  selectedAnswer: string;
+  onAnswerSelect: (questionId: string, selectedOption: string) => void;
+  isReviewMode?: boolean;
+  correctOption?: string;
 } 

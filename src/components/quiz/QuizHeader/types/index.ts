@@ -8,4 +8,5 @@ export interface QuizHeaderProps {
   isSubmitted: boolean;
   score: number;
   progress: number;
+  isReviewMode?: boolean;
 } 

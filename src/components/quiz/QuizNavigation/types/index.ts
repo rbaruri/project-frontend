@@ -5,6 +5,7 @@ export interface QuizNavigationProps {
   onPrevious: () => void;
   onNext: () => void;
   onSubmit: () => void;
+  isReviewMode?: boolean;
 }
 
 export interface ButtonClassesProps {

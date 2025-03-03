@@ -11,7 +11,12 @@ export interface AnswerStatus {
 }
 
 export interface QuizResultsProps {
-  questions: QuizQuestion[];
+  questions: {
+    id: string;
+    question: string;
+    options: string[];
+    correct_option: string;
+  }[];
   userAnswers: Record<string, string>;
   score: number;
   cutoffScore: number;
@@ -20,4 +25,6 @@ export interface QuizResultsProps {
   onNextModule: () => void;
   hasNextModule: boolean;
   timeExpired?: boolean;
+  onReview?: () => void;
+  timeTaken: number;
 } 

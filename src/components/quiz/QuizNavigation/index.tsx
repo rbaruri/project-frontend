@@ -9,7 +9,8 @@ const QuizNavigation: React.FC<QuizNavigationProps> = ({
   answeredQuestions,
   onPrevious,
   onNext,
-  onSubmit
+  onSubmit,
+  isReviewMode = false
 }) => {
   const isFirst = currentQuestionIndex === 0;
   const isLast = isLastQuestion(currentQuestionIndex, totalQuestions);
@@ -39,10 +40,10 @@ const QuizNavigation: React.FC<QuizNavigationProps> = ({
         {isLast ? (
           <NavigationButton
             onClick={onSubmit}
-            disabled={!canSubmit}
+            disabled={!canSubmit && !isReviewMode}
             className={buttonClasses.submitButton}
           >
-            Submit Quiz
+            {isReviewMode ? 'Done' : 'Submit Quiz'}
           </NavigationButton>
         ) : (
           <NavigationButton

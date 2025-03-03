@@ -118,9 +118,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, userId, onClick, onView
           <p className="text-sm text-gray-500">
             Duration: {getDurationText(course.total_duration)}
           </p>
-          <p className="text-sm text-gray-500">
-            {course.hours_per_week} hours/week
-          </p>
           <div className="mt-4">
             <p className="text-sm text-gray-600 mb-1">
               Start: {formatDate(course.start_date)}
