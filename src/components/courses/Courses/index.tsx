@@ -49,6 +49,10 @@ const CoursesContainer: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
         {coursesWithLearningPaths.map((course) => {
           const duration = calculateDurationBetweenDates(new Date(course.start_date), new Date(course.end_date));
+          const totalHours = calculateTotalHours(course.learning_paths[0]?.generated_path);
+          const hoursPerWeek = calculateHoursPerWeek(totalHours, duration);
+          const progress = calculateCourseProgress(course.modules);
+          
           return (
             <CourseCard
               key={course.id}
@@ -58,15 +62,13 @@ const CoursesContainer: React.FC = () => {
                 start_date: course.start_date,
                 end_date: course.end_date,
                 total_duration: duration,
-                total_hours: calculateTotalHours(course.learning_paths[0]?.generated_path),
-                hours_per_week: calculateHoursPerWeek(
-                  calculateTotalHours(course.learning_paths[0]?.generated_path),
-                  duration
-                ),
-                progress: calculateCourseProgress(course.modules),
-                onClick: () => navigate(`/courses/${course.id}`),
+                total_hours: totalHours,
+                hours_per_week: hoursPerWeek,
+                progress: progress
               }}
               userId={parseInt(user?.userId || '0', 10)}
+              onClick={() => navigate(`/courses/${course.id}`)}
+              onViewModules={() => navigate(`/courses/${course.id}`)}
             />
           );
         })}

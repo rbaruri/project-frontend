@@ -7,7 +7,7 @@ import {
   uploadSyllabusFailure,
   updateUploadProgress,
 } from '@/containers/SyllabusUpload/syllabusActions';
-import { UploadSyllabusPayload, SyllabusResponse } from '@/types/syllabusTypes';
+import { UploadSyllabusPayload, SyllabusResponse } from '@/components/syllabus/types';
 
 export function* uploadSyllabusSaga(action: { type: string; payload: UploadSyllabusPayload }): Generator<any, void, AxiosResponse<SyllabusResponse>> {
   try {

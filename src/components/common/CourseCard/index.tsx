@@ -4,7 +4,7 @@ import { UPDATE_COURSE_NAME, DELETE_COURSE, GET_COURSES_WITH_LEARNING_PATHS } fr
 import { CourseCardProps } from './types';
 import { formatDate, getProgressBarWidth, validateCourseName } from './helper';
 
-const CourseCard: React.FC<CourseCardProps> = ({ course, userId }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ course, userId, onClick, onViewModules }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(course.course_name);
 
@@ -33,7 +33,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, userId }) => {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (window.confirm('Are you sure you want to delete this course?')) {
       try {
         await deleteCourse({
@@ -47,12 +48,26 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, userId }) => {
     }
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (!isEditing) {
+      onClick();
+    }
+  };
+
+  const handleViewModules = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onViewModules();
+  };
+
   const getDurationText = (duration: { value: number; unit: 'days' | 'weeks' }) => {
     return `${duration.value} ${duration.unit}`;
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+    <div 
+      className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+      onClick={handleCardClick}
+    >
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
           {isEditing ? (
@@ -73,7 +88,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, userId }) => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setIsEditing(false);
                     setNewName(course.course_name);
                   }}
@@ -87,7 +103,10 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, userId }) => {
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
               {course.course_name}
               <button
-                onClick={() => setIsEditing(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsEditing(true);
+                }}
                 className="ml-2 text-gray-400 hover:text-gray-600"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,14 +130,16 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, userId }) => {
             </p>
           </div>
         </div>
-        <button
-          onClick={handleDelete}
-          className="text-red-500 hover:text-red-700"
-        >
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
-        </button>
+        <div className="flex flex-col space-y-2">
+          <button
+            onClick={handleDelete}
+            className="text-red-500 hover:text-red-700"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
       </div>
       <div className="mt-4">
         <div className="flex justify-between text-sm text-gray-600 mb-1">
@@ -131,6 +152,17 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, userId }) => {
             style={{ width: getProgressBarWidth(course.progress) }}
           ></div>
         </div>
+      </div>
+      <div className="mt-4 flex justify-center">
+        <button
+          onClick={handleViewModules}
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center space-x-2"
+        >
+          <span>View Modules</span>
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
     </div>
   );

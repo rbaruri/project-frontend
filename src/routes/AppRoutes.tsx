@@ -137,6 +137,14 @@ export const router = createBrowserRouter([
             ),
           },
           {
+            path: "courses/:courseId/modules",
+            element: (
+              <Suspense fallback={<LoadingSpinner />}>
+                <ModuleDetailsPage />
+              </Suspense>
+            ),
+          },
+          {
             path: "modules/:moduleId",
             element: (
               <Suspense fallback={<LoadingSpinner />}>

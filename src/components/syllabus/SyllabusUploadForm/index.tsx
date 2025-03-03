@@ -175,8 +175,8 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
               ref={dropZoneRef}
               className={`mt-1 flex justify-center px-6 pt-8 pb-8 border-2 ${
                 isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 border-dashed'
-              } rounded-lg hover:border-blue-500 transition-colors cursor-pointer`}
-              onClick={() => fileInputRef.current?.click()}
+              } rounded-lg hover:border-blue-500 transition-colors ${!file ? 'cursor-pointer' : ''}`}
+              onClick={() => !file && fileInputRef.current?.click()}
               onDragEnter={handleDragEnter}
               onDragLeave={handleDragLeave}
               onDragOver={handleDragOver}

@@ -17,7 +17,7 @@ import {
 import { 
   QuizData, 
   UpdateQuizStatusPayload
-} from '@/types/quizTypes';
+} from '@/components/quiz/types';
 
 // Quiz Data Loading Actions
 export const fetchQuizRequest = (quizId: string) => ({

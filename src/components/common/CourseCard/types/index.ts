@@ -10,10 +10,11 @@ export interface Course {
   start_date: string;
   end_date: string;
   progress: number;
-  onClick: () => void;
 }
 
 export interface CourseCardProps {
   course: Course;
   userId: number;
+  onClick: () => void;
+  onViewModules: () => void;
 } 
