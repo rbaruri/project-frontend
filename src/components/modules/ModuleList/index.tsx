@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/redux/store";
 import {
   GET_MODULES_BY_COURSE,
   UPDATE_MODULE_STATUS,
   ModuleStatus,
 } from "@/graphql/queries/modules";
 import { ModuleListProps, Module, QuizStatus } from "./types";
+import { QuizSummaryReport } from "@/summary/types";
 import {
   getStatusColor,
   getQuizStatusColor,
@@ -16,10 +19,12 @@ import {
   isModuleLocked,
   getQuizButtonText,
 } from "./helper";
+import { generateModuleSummary } from "@/redux/actions/summary";
 
 const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
 
   const { loading, error, data, refetch } = useQuery(GET_MODULES_BY_COURSE, {
     variables: { courseId },
@@ -61,6 +66,34 @@ const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
     });
   };
 
+  const handleQuizClick = (
+    e: React.MouseEvent,
+    quizId: string,
+    isLocked: boolean,
+    quizStatus: string
+  ) => {
+    e.stopPropagation();
+    if (isLocked) return;
+    
+    const isReview = quizStatus === 'passed';
+    navigate(`/quiz/${quizId}${isReview ? '?mode=review&showResults=true' : ''}`);
+  };
+
+  const handleViewSummary = (
+    e: React.MouseEvent,
+    moduleId: string,
+    moduleReports: QuizSummaryReport[] | undefined
+  ) => {
+    e.stopPropagation();
+    console.log('View Summary clicked:', { moduleId, moduleReports });
+    if (moduleReports) {
+      console.log('Dispatching generateModuleSummary action');
+      dispatch(generateModuleSummary(moduleId, moduleReports));
+    } else {
+      console.log('No module reports available');
+    }
+  };
+
   useEffect(() => {
     const updateModuleStatuses = async () => {
       if (data?.modules) {
@@ -90,19 +123,6 @@ const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
 
     updateModuleStatuses();
   }, [data?.modules, updateModuleStatus]);
-
-  const handleQuizClick = (
-    e: React.MouseEvent,
-    quizId: string,
-    isLocked: boolean,
-    quizStatus: string
-  ) => {
-    e.stopPropagation();
-    if (isLocked) return;
-    
-    const isReview = quizStatus === 'passed';
-    navigate(`/quiz/${quizId}${isReview ? '?mode=review&showResults=true' : ''}`);
-  };
 
   if (loading) {
     return (
@@ -147,6 +167,7 @@ const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
           const isLocked = isModuleLocked(index, modules);
           const isExpanded = expandedModules.has(module.id);
           const quiz = module.quizzes[0];
+          const isPassed = quiz?.status === 'passed';
 
           return (
             <div
@@ -172,17 +193,27 @@ const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
                       {module.title}
                     </h3>
                   </div>
-                  {quiz && (
-                    <button
-                      onClick={(e) => handleQuizClick(e, quiz.id, isLocked, quiz.status)}
-                      className={`px-4 py-2 rounded-md text-white font-medium ${getQuizStatusColor(
-                        quiz.status
-                      )}`}
-                      disabled={isLocked}
-                    >
-                      {getQuizButtonText(quiz, isLocked)}
-                    </button>
-                  )}
+                  <div className="flex space-x-2">
+                    {isPassed && (
+                      <button
+                        onClick={(e) => handleViewSummary(e, module.id, module.quiz_reports)}
+                        className="px-4 py-2 rounded-md text-white font-medium bg-green-600 hover:bg-green-700 transition-colors"
+                      >
+                        View Summary
+                      </button>
+                    )}
+                    {quiz && (
+                      <button
+                        onClick={(e) => handleQuizClick(e, quiz.id, isLocked, quiz.status)}
+                        className={`px-4 py-2 rounded-md text-white font-medium ${getQuizStatusColor(
+                          quiz.status
+                        )}`}
+                        disabled={isLocked}
+                      >
+                        {getQuizButtonText(quiz, isLocked)}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 

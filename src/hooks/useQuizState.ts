@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, Dispatch, SetStateAction } from 'react';
 import { useMutation } from '@apollo/client';
 import { UPDATE_QUIZ_STATUS, UPDATE_MODULE_STATUS } from '@/graphql/mutations/quiz';
+import { useSummary } from '@/summary';
 
 const QUIZ_TIME_LIMIT = 300; // 5 minutes in seconds
 
@@ -165,6 +166,8 @@ const useQuizState = ({ quizId, refetch, initialReviewMode = false, initialShowR
   const [updateQuizStatus] = useMutation(UPDATE_QUIZ_STATUS);
   const [updateModuleStatus] = useMutation(UPDATE_MODULE_STATUS);
 
+  const { generateAnalysis } = useSummary();
+
   const calculateScore = useCallback((questions: QuizData['quiz_questions'], answers: UserAnswers): number => {
     if (!questions.length) return 0;
     const correctAnswers = questions.filter((q: { id: string; correct_option: string }) => 
@@ -264,43 +267,11 @@ const useQuizState = ({ quizId, refetch, initialReviewMode = false, initialShowR
       console.log('All answers were correct!');
     }
 
-    // Log all reports for this module
-    console.group('All Quiz Reports for Module');
-    console.log('Module Name:', moduleName);
-    console.log('Total Quizzes:', updatedModuleReports[moduleId].length);
-    updatedModuleReports[moduleId].forEach((report, index) => {
-      console.group(`Quiz ${index + 1} - ${report.quizId}`);
-      console.log('Total Attempts:', report.attempts.length);
-      console.log('Latest Score:', report.attempts[report.attempts.length - 1].score + '%');
-      console.log('Best Score:', Math.max(...report.attempts.map(a => a.score)) + '%');
-      
-      // Add detailed wrong answers history for each attempt
-      console.group('Attempts History');
-      report.attempts.forEach((attempt, attemptIndex) => {
-        console.group(`Attempt ${attempt.attemptNumber} - Score: ${attempt.score}% - Time: ${attempt.timeTaken}s`);
-        if (attempt.wrongAnswers.length > 0) {
-          console.group('Wrong Answers');
-          attempt.wrongAnswers.forEach((wrong, wrongIndex) => {
-            console.group(`Question ${wrongIndex + 1}`);
-            console.log('Question:', wrong.question);
-            console.log('Your Answer:', wrong.userAnswer);
-            console.log('Correct Answer:', wrong.correctAnswer);
-            console.groupEnd();
-          });
-          console.groupEnd();
-        } else {
-          console.log('All answers were correct in this attempt!');
-        }
-        console.groupEnd();
-      });
-      console.groupEnd();
-      
-      console.groupEnd();
-    });
-    console.groupEnd();
+    // Generate AI analysis for the module reports
+    generateAnalysis(updatedModuleReports[moduleId]);
 
     console.groupEnd();
-  }, [quizId, quizSummary, userAnswers, allModuleReports]);
+  }, [quizId, quizSummary, userAnswers, allModuleReports, generateAnalysis]);
 
   // Add cleanup function for quiz data
   const cleanupQuizData = useCallback((moduleId: string) => {

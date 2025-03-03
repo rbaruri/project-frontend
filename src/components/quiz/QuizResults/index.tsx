@@ -1,7 +1,9 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
 import { QuizResultsProps } from './types';
 import { calculateResults } from './helper';
 import { TimeExpired, QuestionResult } from './components';
+import { generateModuleSummary } from '@/redux/actions/summary';
 
 const QuizResults: React.FC<QuizResultsProps> = ({
   questions,
@@ -14,8 +16,13 @@ const QuizResults: React.FC<QuizResultsProps> = ({
   hasNextModule,
   timeExpired = false,
   onReview,
-  timeTaken
+  timeTaken,
+  moduleId,
+  moduleName,
+  moduleReports
 }) => {
+  const dispatch = useDispatch();
+
   if (timeExpired) {
     return <TimeExpired onRetake={onRetake} />;
   }
@@ -27,6 +34,14 @@ const QuizResults: React.FC<QuizResultsProps> = ({
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
+
+  const handleViewSummary = () => {
+    if (moduleId && moduleReports) {
+      dispatch(generateModuleSummary(moduleId, moduleReports));
+    }
+  };
+
+  const isReviewMode = window.location.search.includes('mode=review');
 
   return (
     <div className="space-y-8">
@@ -49,7 +64,7 @@ const QuizResults: React.FC<QuizResultsProps> = ({
               {score >= cutoffScore ? (
                 <>
                   Congratulations! You've passed the quiz.
-                  {hasNextModule && (
+                  {hasNextModule && !isReviewMode && (
                     <span className="block mt-1 text-gray-600">
                       You can now proceed to the next module.
                     </span>
@@ -67,8 +82,19 @@ const QuizResults: React.FC<QuizResultsProps> = ({
           </div>
         </div>
 
-        <div className="flex justify-center space-x-4">
-          {score < cutoffScore ? (
+        <div className="flex flex-wrap justify-center gap-4">
+          {/* View Summary button - always show if data is available */}
+          {moduleId && moduleReports && (
+            <button
+              onClick={handleViewSummary}
+              className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-300"
+            >
+              View Summary
+            </button>
+          )}
+
+          {/* Failed quiz buttons */}
+          {score < cutoffScore && !isReviewMode && (
             <>
               <button
                 onClick={onRetake}
@@ -83,9 +109,12 @@ const QuizResults: React.FC<QuizResultsProps> = ({
                 Back to Course
               </button>
             </>
-          ) : (
+          )}
+
+          {/* Passed quiz buttons */}
+          {score >= cutoffScore && (
             <>
-              {onReview && !timeExpired && !window.location.search.includes('mode=review') && (
+              {onReview && !timeExpired && !isReviewMode && (
                 <button
                   onClick={onReview}
                   className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300"
@@ -93,7 +122,7 @@ const QuizResults: React.FC<QuizResultsProps> = ({
                   Review Quiz
                 </button>
               )}
-              {hasNextModule ? (
+              {hasNextModule && !isReviewMode ? (
                 <button
                   onClick={onNextModule}
                   className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-300"
@@ -105,7 +134,7 @@ const QuizResults: React.FC<QuizResultsProps> = ({
                   onClick={onBackToModule}
                   className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300"
                 >
-                  Complete Module
+                  {isReviewMode ? 'Back to Course' : 'Complete Module'}
                 </button>
               )}
             </>

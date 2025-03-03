@@ -1,3 +1,5 @@
+import { QuizSummaryReport } from '@/summary/types';
+
 export interface QuizQuestion {
   id: string;
   question: string;
@@ -27,4 +29,7 @@ export interface QuizResultsProps {
   timeExpired?: boolean;
   onReview?: () => void;
   timeTaken: number;
+  moduleId?: string;
+  moduleName?: string;
+  moduleReports?: QuizSummaryReport[];
 } 

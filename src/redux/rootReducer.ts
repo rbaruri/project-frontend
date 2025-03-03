@@ -5,6 +5,7 @@ import { loginReducer } from "@/containers/Login/loginIndex";
 import { learningPathReducer } from "@/containers/LearningPath/learningPathReducer";
 import moduleReducer from "@/containers/Modules/moduleReducer";
 import quizReducer from "@/containers/Quiz/quizReducer";
+import summaryReducer from "./reducers/summary";
 
 const rootReducer = combineReducers({
   syllabus: syllabusReducer,
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
   learningPath: learningPathReducer,
   modules: moduleReducer,
   quiz: quizReducer,
+  summary: summaryReducer,
   // Add more reducers here as needed
 });
 

@@ -1,9 +1,13 @@
-export const QuizStatus = {
-  NOT_STARTED: "not_started",
-  IN_PROGRESS: "in_progress",
-  COMPLETED: "completed",
-  FAILED: "failed",
-} as const;
+import { QuizSummaryReport } from '@/summary/types';
+
+export enum QuizStatus {
+  NOT_STARTED = 'not_started',
+  NOT_ATTEMPTED = 'not_attempted',
+  IN_PROGRESS = 'in_progress',
+  COMPLETED = 'completed',
+  PASSED = 'passed',
+  FAILED = 'failed'
+}
 
 export interface Resource {
   id: string;
@@ -35,6 +39,7 @@ export interface Module {
   resources: Resource[];
   quizzes: Quiz[];
   similar_questions: SimilarQuestion[];
+  quiz_reports?: QuizSummaryReport[];
 }
 
 export interface ModuleListProps {
@@ -45,4 +50,10 @@ export interface ProgressData {
   completedCount: number;
   totalCount: number;
   progressPercentage: number;
+}
+
+export enum ModuleStatus {
+  NOT_STARTED = 'not_started',
+  IN_PROGRESS = 'in_progress',
+  COMPLETED = 'completed'
 } 

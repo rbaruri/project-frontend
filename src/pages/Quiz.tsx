@@ -203,6 +203,9 @@ const Quiz: React.FC = () => {
             hasNextModule={!!nextModuleData?.modules?.[0]}
             onReview={state.score >= quiz.cutoff_score ? () => actions.handleRetake(quiz.module.id, true) : undefined}
             timeTaken={state.timeTaken}
+            moduleId={quiz.module.id}
+            moduleName={quiz.module.title}
+            moduleReports={state.allModuleReports[quiz.module.id]}
           />
         )}
       </div>
