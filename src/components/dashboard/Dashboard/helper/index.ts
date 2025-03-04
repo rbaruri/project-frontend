@@ -3,6 +3,10 @@ import { Course, Module } from '@/types/courseTypes';
 export const isInProgress = (course: Course): boolean => {
   if (!course.modules || course.modules.length === 0) return false;
 
+  // First check if all modules are completed - if so, return false
+  const allModulesCompleted = course.modules.every((m: Module) => m.status === 'completed');
+  if (allModulesCompleted) return false;
+
   const hasInProgressModules = course.modules.some((m: Module) => m.status === 'in_progress');
   const completedCount = course.modules.filter((m: Module) => m.status === 'completed').length;
   const notStartedCount = course.modules.filter((m: Module) => m.status === 'not_started').length;

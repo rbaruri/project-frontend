@@ -32,19 +32,6 @@ const LandingPage: React.FC = () => {
                   Create New Account
                 </Link>
               </div>
-
-              <div className="text-center">
-                <p className="text-sm text-gray-500">
-                  By continuing, you agree to our{' '}
-                  <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    Terms of Service
-                  </a>{' '}
-                  and{' '}
-                  <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    Privacy Policy
-                  </a>
-                </p>
-              </div>
             </div>
           </div>
         </div>

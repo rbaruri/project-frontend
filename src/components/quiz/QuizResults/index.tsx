@@ -1,9 +1,15 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { QuizResultsProps } from './types';
 import { calculateResults } from './helper';
 import { TimeExpired, QuestionResult } from './components';
-import { generateModuleSummary } from '@/redux/actions/summary';
+import {
+  generateSummary,
+  selectSummaryLoading,
+  selectSummaryAnalysis,
+  selectSummaryError
+} from '@/containers/SummaryReport/summaryIndex';
+import { SummaryDisplay, formatElapsedTime } from '@/components/quiz/SummaryReport';
 
 const QuizResults: React.FC<QuizResultsProps> = ({
   questions,
@@ -22,6 +28,9 @@ const QuizResults: React.FC<QuizResultsProps> = ({
   moduleReports
 }) => {
   const dispatch = useDispatch();
+  const isLoading = useSelector(state => moduleId ? selectSummaryLoading(state, moduleId) : false);
+  const analysis = useSelector(state => moduleId ? selectSummaryAnalysis(state, moduleId) : '');
+  const error = useSelector(state => moduleId ? selectSummaryError(state, moduleId) : '');
 
   if (timeExpired) {
     return <TimeExpired onRetake={onRetake} />;
@@ -29,15 +38,9 @@ const QuizResults: React.FC<QuizResultsProps> = ({
 
   const { correctAnswers, totalQuestions } = calculateResults(questions, userAnswers);
   
-  const formatTime = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
   const handleViewSummary = () => {
     if (moduleId && moduleReports) {
-      dispatch(generateModuleSummary(moduleId, moduleReports));
+      dispatch(generateSummary(moduleId, moduleReports));
     }
   };
 
@@ -77,19 +80,36 @@ const QuizResults: React.FC<QuizResultsProps> = ({
               )}
             </p>
             <p className="text-gray-600 mt-2">
-              Time taken: {formatTime(timeTaken)}
+              Time taken to complete: {formatElapsedTime(timeTaken)}
             </p>
           </div>
         </div>
+
+        {/* Summary Analysis Section */}
+        <SummaryDisplay
+          analysis={analysis}
+          isLoading={isLoading}
+          error={error}
+          moduleName={moduleName}
+          score={score}
+          timeTaken={timeTaken}
+          totalQuestions={totalQuestions}
+          correctAnswers={correctAnswers}
+        />
 
         <div className="flex flex-wrap justify-center gap-4">
           {/* View Summary button - always show if data is available */}
           {moduleId && moduleReports && (
             <button
               onClick={handleViewSummary}
-              className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-300"
+              disabled={isLoading}
+              className={`px-6 py-2 rounded-md transition-colors duration-300 ${
+                isLoading
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-green-600 hover:bg-green-700 text-white'
+              }`}
             >
-              View Summary
+              {isLoading ? 'Generating...' : 'View Summary'}
             </button>
           )}
 

@@ -5,7 +5,7 @@ import { loginReducer } from "@/containers/Login/loginIndex";
 import { learningPathReducer } from "@/containers/LearningPath/learningPathReducer";
 import moduleReducer from "@/containers/Modules/moduleReducer";
 import quizReducer from "@/containers/Quiz/quizReducer";
-import summaryReducer from "./reducers/summary";
+import { summaryReducer } from "@/containers/SummaryReport/summaryIndex";
 
 const rootReducer = combineReducers({
   syllabus: syllabusReducer,

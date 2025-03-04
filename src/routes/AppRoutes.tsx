@@ -16,6 +16,7 @@ const SyllabusUploadPage = lazy(() => import("@/pages/SyllabusUpload"));
 const CoursesPage = lazy(() => import('@/pages/Courses'));
 const QuizPage = lazy(() => import('@/pages/Quiz'));
 const ProfilePage = lazy(() => import('@/pages/Profile'));
+const TermsAndPrivacy = lazy(() => import('@/pages/TermsAndPrivacy'));
 
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center min-h-screen">
@@ -73,6 +74,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <SyllabusUploadPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "terms-and-privacy",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <TermsAndPrivacy />
           </Suspense>
         ),
       },

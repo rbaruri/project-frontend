@@ -1,15 +1,13 @@
 import { takeLatest, put, call } from 'redux-saga/effects';
+import { GENERATE_SUMMARY } from './summaryConstants';
+import { GenerateSummaryAction } from './summaryActions';
 import {
-  GENERATE_MODULE_SUMMARY,
-  GenerateModuleSummaryAction
-} from '../types/summary';
-import {
-  generateModuleSummarySuccess,
-  generateModuleSummaryFailure
-} from '../actions/summary';
+  generateSummarySuccess,
+  generateSummaryFailure
+} from './summaryActions';
 import SummaryService from '@/summary/service';
 
-function* generateModuleSummarySaga(action: GenerateModuleSummaryAction) {
+function* generateSummarySaga(action: GenerateSummaryAction) {
   try {
     const summaryService = SummaryService.getInstance();
     const response = yield call(
@@ -18,20 +16,20 @@ function* generateModuleSummarySaga(action: GenerateModuleSummaryAction) {
     );
 
     if (response.error) {
-      yield put(generateModuleSummaryFailure(action.payload.moduleId, response.error));
+      yield put(generateSummaryFailure(action.payload.moduleId, response.error));
       return;
     }
 
-    yield put(generateModuleSummarySuccess(action.payload.moduleId, response.analysis));
+    yield put(generateSummarySuccess(action.payload.moduleId, response.analysis));
 
     // Log the analysis in the console
-    console.group('Module Summary Analysis');
+    console.group('Summary Analysis');
     console.log('Module ID:', action.payload.moduleId);
     console.log('Analysis:', response.analysis);
     console.groupEnd();
   } catch (error) {
     yield put(
-      generateModuleSummaryFailure(
+      generateSummaryFailure(
         action.payload.moduleId,
         error instanceof Error ? error.message : 'Failed to generate summary'
       )
@@ -40,5 +38,5 @@ function* generateModuleSummarySaga(action: GenerateModuleSummaryAction) {
 }
 
 export function* watchSummary() {
-  yield takeLatest(GENERATE_MODULE_SUMMARY, generateModuleSummarySaga);
+  yield takeLatest(GENERATE_SUMMARY, generateSummarySaga);
 } 

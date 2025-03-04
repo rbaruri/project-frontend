@@ -1,11 +1,12 @@
 import {
-  GENERATE_MODULE_SUMMARY,
-  GENERATE_MODULE_SUMMARY_SUCCESS,
-  GENERATE_MODULE_SUMMARY_FAILURE,
-  SummaryActionTypes
-} from '../types/summary';
+  GENERATE_SUMMARY,
+  GENERATE_SUMMARY_SUCCESS,
+  GENERATE_SUMMARY_FAILURE,
+  CLEAR_SUMMARY
+} from './summaryConstants';
+import { SummaryActionTypes } from './summaryActions';
 
-interface SummaryState {
+export interface SummaryState {
   loading: { [moduleId: string]: boolean };
   analyses: { [moduleId: string]: string };
   errors: { [moduleId: string]: string };
@@ -22,7 +23,7 @@ const summaryReducer = (
   action: SummaryActionTypes
 ): SummaryState => {
   switch (action.type) {
-    case GENERATE_MODULE_SUMMARY:
+    case GENERATE_SUMMARY:
       return {
         ...state,
         loading: {
@@ -35,7 +36,7 @@ const summaryReducer = (
         }
       };
 
-    case GENERATE_MODULE_SUMMARY_SUCCESS:
+    case GENERATE_SUMMARY_SUCCESS:
       return {
         ...state,
         loading: {
@@ -48,7 +49,7 @@ const summaryReducer = (
         }
       };
 
-    case GENERATE_MODULE_SUMMARY_FAILURE:
+    case GENERATE_SUMMARY_FAILURE:
       return {
         ...state,
         loading: {
@@ -61,9 +62,12 @@ const summaryReducer = (
         }
       };
 
+    case CLEAR_SUMMARY:
+      return initialState;
+
     default:
       return state;
   }
 };
 
-export default summaryReducer; 
+export default summaryReducer;

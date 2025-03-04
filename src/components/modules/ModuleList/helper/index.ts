@@ -1,14 +1,28 @@
 import { Module, Quiz, ProgressData } from '../types';
 
-export const getStatusColor = (status: string): string => {
-  switch (status) {
-    case "completed":
-      return "bg-green-100 text-green-800";
-    case "in_progress":
-      return "bg-yellow-100 text-yellow-800";
-    case "not_started":
+export const formatModuleStatus = (status: string): string => {
+  switch (status.toLowerCase()) {
+    case 'not_started':
+      return 'Not Started';
+    case 'in_progress':
+      return 'In Progress';
+    case 'completed':
+      return 'Completed';
     default:
-      return "bg-gray-100 text-gray-800";
+      return status;
+  }
+};
+
+export const getStatusColor = (status: string): string => {
+  switch (status.toLowerCase()) {
+    case 'not_started':
+      return 'bg-gray-100 text-gray-600';
+    case 'in_progress':
+      return 'bg-yellow-100 text-yellow-600';
+    case 'completed':
+      return 'bg-green-100 text-green-600';
+    default:
+      return 'bg-gray-100 text-gray-600';
   }
 };
 
