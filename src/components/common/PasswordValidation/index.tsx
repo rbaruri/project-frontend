@@ -1,10 +1,10 @@
 import React from 'react';
-import { PasswordValidationProps } from './PasswordValidation.types';
+import { PasswordValidationProps } from './types/index';
 import { 
   validationRules, 
   getValidationItemClass, 
   getValidationIcon 
-} from './PasswordValidation.helper';
+} from './helper/index';
 
 const PasswordValidation: React.FC<PasswordValidationProps> = ({ password }) => {
   return (

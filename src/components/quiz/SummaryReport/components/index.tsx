@@ -5,8 +5,8 @@ import { StructuredAnalysis } from '@/summary/types';
 export interface SummaryDisplayProps {
   analysis: StructuredAnalysis | null;
   isLoading: boolean;
-  error?: string;
-  moduleName?: string;
+  error: string | null;
+  moduleName: string;
   score?: number;
   timeTaken?: number;
   totalQuestions?: number;
@@ -45,11 +45,7 @@ export const SummaryDisplay: React.FC<SummaryDisplayProps> = ({
   }
 
   if (!analysis) {
-    return (
-      <div className="p-4 bg-gray-50 text-gray-600 rounded-lg">
-        Click in view summary to generate analysis
-      </div>
-    );
+    return null;
   }
 
   return (

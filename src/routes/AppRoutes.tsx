@@ -17,6 +17,7 @@ const CoursesPage = lazy(() => import('@/pages/Courses'));
 const QuizPage = lazy(() => import('@/pages/Quiz'));
 const ProfilePage = lazy(() => import('@/pages/Profile'));
 const TermsAndPrivacy = lazy(() => import('@/pages/TermsAndPrivacy'));
+const QuizSummaryPage = lazy(() => import('@/pages/QuizSummary'));
 
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center min-h-screen">
@@ -174,6 +175,14 @@ export const router = createBrowserRouter([
             element: (
               <Suspense fallback={<LoadingSpinner />}>
                 <QuizPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: "quiz-summary/:moduleId",
+            element: (
+              <Suspense fallback={<LoadingSpinner />}>
+                <QuizSummaryPage />
               </Suspense>
             ),
           },

@@ -1,3 +1,9 @@
+export interface Module {
+  id: string;
+  title: string;
+  status: 'not_started' | 'in_progress' | 'completed';
+}
+
 export interface Course {
   id: string;
   course_name: string;
@@ -10,6 +16,7 @@ export interface Course {
   start_date: string;
   end_date: string;
   progress: number;
+  modules: Module[];
 }
 
 export interface CourseCardProps {

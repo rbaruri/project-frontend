@@ -53,31 +53,57 @@ const Quiz: React.FC = () => {
   }, [actions.handleAnswerSelect, storage.saveAnswersToLocalStorage, state.userAnswers]);
 
   const handleBackToModule = useCallback(() => {
-    // Clear only timer data from localStorage, preserve answers and attempts
-    if (quizId) {
-      localStorage.removeItem(`quiz_${quizId}_time`);
-      localStorage.removeItem(`quiz_${quizId}_timestamp`);
-      localStorage.removeItem(`quiz_${quizId}_start_time`);
-      // Save answers before navigating away if they're not already saved
-      if (Object.keys(state.userAnswers).length > 0) {
-        localStorage.setItem(`quiz_${quizId}_answers`, JSON.stringify(state.userAnswers));
-      }
-    }
-    
     if (data?.quizzes_by_pk?.module?.course_id) {
       navigate(`/courses/${data.quizzes_by_pk.module.course_id}`);
     } else {
       navigate('/courses');
     }
-  }, [data?.quizzes_by_pk?.module?.course_id, navigate, quizId, state.userAnswers]);
+  }, [data?.quizzes_by_pk?.module?.course_id, navigate]);
 
   const handleNextModule = useCallback(() => {
+    // Only clear local storage if the quiz was passed
+    if (quizId && state.score >= (data?.quizzes_by_pk?.cutoff_score || 0)) {
+      // Clear timer data
+      localStorage.removeItem(`quiz_${quizId}_time`);
+      localStorage.removeItem(`quiz_${quizId}_timestamp`);
+      localStorage.removeItem(`quiz_${quizId}_start_time`);
+      localStorage.removeItem(`quiz_${quizId}_expired`);
+      
+      // Clear answers and submission data
+      localStorage.removeItem(`quiz_${quizId}_answers`);
+      localStorage.removeItem(`quiz_${quizId}_submitted`);
+      localStorage.removeItem(`quiz_${quizId}_score`);
+      localStorage.removeItem(`quiz_${quizId}_time_taken`);
+      localStorage.removeItem(`quiz_${quizId}_show_results`);
+      localStorage.removeItem(`quiz_${quizId}_attempts`);
+      
+      // Clear quiz summary
+      localStorage.removeItem(`quiz_${quizId}_summary`);
+      
+      // Clean up module reports
+      if (data?.quizzes_by_pk?.module?.id) {
+        const moduleId = data.quizzes_by_pk.module.id;
+        const savedReports = localStorage.getItem('all_module_quiz_reports');
+        if (savedReports) {
+          try {
+            const reports = JSON.parse(savedReports);
+            if (reports[moduleId]) {
+              delete reports[moduleId];
+              localStorage.setItem('all_module_quiz_reports', JSON.stringify(reports));
+            }
+          } catch (e) {
+            console.error('Error parsing module reports:', e);
+          }
+        }
+      }
+    }
+
     if (nextModuleData?.modules?.[0]?.id) {
       navigate(`/courses/${data?.quizzes_by_pk.module.course_id}`);
     } else {
       handleBackToModule();
     }
-  }, [nextModuleData?.modules, data?.quizzes_by_pk.module.course_id, navigate, handleBackToModule]);
+  }, [nextModuleData?.modules, data?.quizzes_by_pk, navigate, handleBackToModule, quizId, state.score]);
 
   // Load saved answers only once when component mounts
   useEffect(() => {
@@ -206,6 +232,7 @@ const Quiz: React.FC = () => {
             moduleId={quiz.module.id}
             moduleName={quiz.module.title}
             moduleReports={state.allModuleReports[quiz.module.id]}
+            quizId={quizId}
           />
         )}
       </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useQuery } from '@apollo/client';
+import { useNavigate } from 'react-router-dom';
 import { QuizResultsProps } from './types';
 import { calculateResults } from './helper';
 import { TimeExpired, QuestionResult } from './components';
@@ -11,11 +12,11 @@ import {
   selectSummaryError,
   SummaryActionTypes
 } from '@/containers/SummaryReport/summaryIndex';
-import { SummaryDisplay, formatElapsedTime } from '@/components/quiz/SummaryReport';
 import { GET_USER_MODULE_DATA } from '@/graphql/queries/summary';
 import { RootState } from '@/redux/store';
 import { StructuredAnalysis } from '@/summary/types';
 import { Dispatch } from 'redux';
+import { formatElapsedTime } from '@/components/quiz/SummaryReport/helper';
 
 const QuizResults: React.FC<QuizResultsProps> = ({
   questions,
@@ -31,12 +32,11 @@ const QuizResults: React.FC<QuizResultsProps> = ({
   timeTaken,
   moduleId,
   moduleName,
-  moduleReports
+  moduleReports,
+  quizId
 }) => {
   const dispatch = useDispatch<Dispatch<SummaryActionTypes>>();
-  const isLoading = useSelector((state: RootState) => moduleId ? selectSummaryLoading(state, moduleId) : false);
-  const analysis = useSelector((state: RootState) => moduleId ? selectSummaryAnalysis(state, moduleId) : null) as StructuredAnalysis | null;
-  const error = useSelector((state: RootState) => moduleId ? selectSummaryError(state, moduleId) : '');
+  const navigate = useNavigate();
 
   // Fetch user and module data
   const { data: moduleData, loading: moduleLoading, error: moduleError } = useQuery(GET_USER_MODULE_DATA, {
@@ -60,6 +60,8 @@ const QuizResults: React.FC<QuizResultsProps> = ({
           hasModuleReports: !!moduleReports
         });
         dispatch(generateSummary(moduleId, moduleReports, userId));
+        // Navigate to the summary page with quizId in the query params
+        navigate(`/quiz-summary/${moduleId}?quizId=${quizId}`);
       } else {
         console.error('User ID not found in module data');
       }
@@ -83,69 +85,31 @@ const QuizResults: React.FC<QuizResultsProps> = ({
   }
 
   return (
-    <div className="space-y-8">
-      {questions.map((question, index) => (
-        <QuestionResult
-          key={question.id}
-          question={question}
-          userAnswer={userAnswers[question.id]}
-          index={index}
-        />
-      ))}
-
-      <div className="mt-8">
-        <div className="text-center mb-6">
-          <h2 className={`text-2xl font-bold ${score >= cutoffScore ? 'text-green-600' : 'text-red-600'}`}>
-            Final Score: {correctAnswers}/{totalQuestions} ({score}%)
-          </h2>
-          <div className="mt-2">
-            <p className="text-lg">
-              {score >= cutoffScore ? (
-                <>
-                  Congratulations! You've passed the quiz.
-                  {hasNextModule && !isReviewMode && (
-                    <span className="block mt-1 text-gray-600">
-                      You can now proceed to the next module.
-                    </span>
-                  )}
-                </>
-              ) : (
-                <span className="text-red-600">
-                  You need {cutoffScore}% to pass. Please try again.
-                </span>
-              )}
+    <div className="space-y-6">
+      <div className="bg-white p-6 rounded-lg shadow-sm space-y-4">
+        <h2 className="text-2xl font-bold text-gray-800">Quiz Results</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="text-lg font-medium text-gray-600">Score</p>
+            <p className="text-3xl font-bold text-gray-800">{score}%</p>
+            <p className="text-sm text-gray-500">
+              {correctAnswers} out of {totalQuestions} correct
             </p>
-            <p className="text-gray-600 mt-2">
-              Time taken to complete: {formatElapsedTime(timeTaken)}
-            </p>
+          </div>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="text-lg font-medium text-gray-600">Time Taken</p>
+            <p className="text-3xl font-bold text-gray-800">{formatElapsedTime(timeTaken)}</p>
           </div>
         </div>
 
-        {/* Summary Analysis Section */}
-        <SummaryDisplay
-          analysis={analysis}
-          isLoading={isLoading}
-          error={error}
-          moduleName={moduleData?.modules_by_pk?.title || moduleName}
-          score={score}
-          timeTaken={timeTaken}
-          totalQuestions={totalQuestions}
-          correctAnswers={correctAnswers}
-        />
-
         <div className="flex flex-wrap justify-center gap-4">
-          {/* View Summary button - always show if data is available */}
-          {moduleId && moduleReports && (
+          {/* View Summary button - only show if data is available and score is below cutoff */}
+          {moduleId && moduleReports && score < cutoffScore && (
             <button
               onClick={handleViewSummary}
-              disabled={isLoading}
-              className={`px-6 py-2 rounded-md transition-colors duration-300 ${
-                isLoading
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-green-600 hover:bg-green-700 text-white'
-              }`}
+              className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors duration-300"
             >
-              {isLoading ? 'Generating...' : 'View Summary'}
+              View Summary
             </button>
           )}
 
@@ -168,34 +132,34 @@ const QuizResults: React.FC<QuizResultsProps> = ({
           )}
 
           {/* Passed quiz buttons */}
-          {score >= cutoffScore && (
+          {(score >= cutoffScore || isReviewMode) && (
             <>
-              {onReview && !timeExpired && !isReviewMode && (
-                <button
-                  onClick={onReview}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300"
-                >
-                  Review Quiz
-                </button>
-              )}
-              {hasNextModule && !isReviewMode ? (
-                <button
-                  onClick={onNextModule}
-                  className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-300"
-                >
-                  Next Module
-                </button>
-              ) : (
-                <button
-                  onClick={onBackToModule}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300"
-                >
-                  {isReviewMode ? 'Back to Course' : 'Complete Module'}
-                </button>
-              )}
+              <button
+                onClick={onReview}
+                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300"
+              >
+                Review Quiz
+              </button>
+              <button
+                onClick={hasNextModule ? onNextModule : onBackToModule}
+                className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-300"
+              >
+                {hasNextModule ? "Next Module" : "Complete Module"}
+              </button>
             </>
           )}
         </div>
+      </div>
+
+      <div className="space-y-4">
+        {questions.map((question, index) => (
+          <QuestionResult
+            key={question.id}
+            question={question}
+            userAnswer={userAnswers[question.id]}
+            questionNumber={index + 1}
+          />
+        ))}
       </div>
     </div>
   );

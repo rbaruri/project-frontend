@@ -108,4 +108,18 @@ export const getQuizButtonText = (quiz: Quiz, isLocked: boolean): string => {
     default:
       return "Take Quiz";
   }
+};
+
+export const formatDate = (dateString: string | null | undefined): string => {
+  if (!dateString) return 'Not set';
+  try {
+    return new Date(dateString).toLocaleDateString();
+  } catch (error) {
+    return 'Invalid Date';
+  }
+};
+
+export const formatHours = (hours: number | null | undefined): string => {
+  if (hours === null || hours === undefined) return 'Not set';
+  return `${hours} hours`;
 }; 

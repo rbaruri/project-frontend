@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,12 +19,16 @@ import {
   isModuleLocked,
   getQuizButtonText,
   formatModuleStatus,
+  formatDate,
+  formatHours,
 } from "./helper";
-import { generateSummary } from "@/containers/SummaryReport/summaryIndex";
-import { selectSummaryAnalysis } from "@/containers/SummaryReport/summaryIndex";
+import { SummaryDisplay } from "@/components/quiz/SummaryReport";
+import { useSummary } from "@/summary";
 
 const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
+  const [showSummary, setShowSummary] = useState(false);
+  const [selectedModule, setSelectedModule] = useState<{id: string, title: string} | null>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
@@ -35,6 +39,11 @@ const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
   });
 
   const [updateModuleStatus] = useMutation(UPDATE_MODULE_STATUS);
+
+  // Get all summaries for the modules
+  const modulesSummaries = useSelector((state: RootState) => state.summary.analyses);
+
+  const { isLoading, error: summaryError, analysis, generateAnalysis } = useSummary();
 
   const handleModuleExpand = async (
     moduleId: string,
@@ -81,24 +90,23 @@ const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
     navigate(`/quiz/${quizId}${isReview ? '?mode=review&showResults=true' : ''}`);
   };
 
-  const handleViewSummary = (
+  const handleViewSummary = async (
     e: React.MouseEvent,
     moduleId: string,
+    moduleTitle: string,
     moduleReports: QuizSummaryReport[] | undefined
   ) => {
     e.stopPropagation();
-    console.log('View Summary clicked:', { moduleId, moduleReports });
     if (moduleReports) {
-      const userId = localStorage.getItem('userId');
-      if (userId) {
-        console.log('Dispatching generateSummary action with userId:', userId);
-        dispatch(generateSummary(moduleId, moduleReports, userId));
-      } else {
-        console.error('User ID not found');
-      }
-    } else {
-      console.log('No module reports available');
+      setSelectedModule({ id: moduleId, title: moduleTitle });
+      setShowSummary(true);
+      await generateAnalysis(moduleReports);
     }
+  };
+
+  const handleCloseSummary = () => {
+    setShowSummary(false);
+    setSelectedModule(null);
   };
 
   useEffect(() => {
@@ -117,6 +125,36 @@ const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
                   status: ModuleStatus.COMPLETED,
                 },
               });
+
+              // Clean up local storage for the completed module's quiz
+              if (quiz.id) {
+                // Remove quiz-related data
+                localStorage.removeItem(`quiz_${quiz.id}_summary`);
+                localStorage.removeItem(`quiz_${quiz.id}_time`);
+                localStorage.removeItem(`quiz_${quiz.id}_timestamp`);
+                localStorage.removeItem(`quiz_${quiz.id}_start_time`);
+                localStorage.removeItem(`quiz_${quiz.id}_expired`);
+                localStorage.removeItem(`quiz_${quiz.id}_answers`);
+                localStorage.removeItem(`quiz_${quiz.id}_submitted`);
+                localStorage.removeItem(`quiz_${quiz.id}_score`);
+                localStorage.removeItem(`quiz_${quiz.id}_time_taken`);
+                localStorage.removeItem(`quiz_${quiz.id}_show_results`);
+                localStorage.removeItem(`quiz_${quiz.id}_attempts`);
+
+                // Clean up module reports
+                const savedReports = localStorage.getItem('all_module_quiz_reports');
+                if (savedReports) {
+                  try {
+                    const reports = JSON.parse(savedReports);
+                    if (reports[module.id]) {
+                      delete reports[module.id];
+                      localStorage.setItem('all_module_quiz_reports', JSON.stringify(reports));
+                    }
+                  } catch (e) {
+                    console.error('Error parsing module reports:', e);
+                  }
+                }
+              }
             } catch (error) {
               console.error(
                 "Error updating module status after quiz completion:",
@@ -194,12 +232,35 @@ const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
         </div>
       </div>
 
+      {showSummary && selectedModule && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
+            <button
+              onClick={handleCloseSummary}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <SummaryDisplay
+              analysis={analysis}
+              isLoading={isLoading}
+              error={summaryError}
+              moduleName={selectedModule.title}
+            />
+          </div>
+        </div>
+      )}
+
       <div className="space-y-4">
         {modules.map((module: Module, index: number) => {
           const isLocked = isModuleLocked(index, modules);
           const isExpanded = expandedModules.has(module.id);
           const quiz = module.quizzes[0];
           const isPassed = quiz?.status === 'passed';
+          const hasSummary = Boolean(modulesSummaries[module.id]);
+          const showSummaryButton = quiz?.score < quiz?.cutoff_score && !hasSummary;
 
           return (
             <div
@@ -230,9 +291,24 @@ const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
                           </h3>
                         </div>
                         <div className="flex space-x-4 text-sm text-gray-600">
-                          <span>Start: {new Date(module.created_at).toLocaleDateString()}</span>
-                          <span>•</span>
-                          <span>End: {new Date(module.created_at).toLocaleDateString()}</span>
+                          <div className="flex items-center">
+                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span>Start: {formatDate(module.start_date)}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span>End: {formatDate(module.end_date)}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>{formatHours(module.hours_allocated)}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -309,24 +385,38 @@ const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
                     )}
 
                     {quiz && (
-                      <div className="flex justify-center space-x-3">
-                        <button
-                          onClick={(e) => handleQuizClick(e, quiz.id, isLocked, quiz.status)}
-                          className={`px-5 py-2 rounded-md text-white font-medium transition-all duration-200 transform hover:scale-105 ${getQuizStatusColor(
-                            quiz.status
-                          )}`}
-                          disabled={isLocked}
-                        >
-                          {getQuizButtonText(quiz, isLocked)}
-                        </button>
-                        {isPassed && !useSelector((state: RootState) => selectSummaryAnalysis(state, module.id)) && (
+                      <div className="flex items-center justify-center space-x-3">
+                        <div className="flex items-center space-x-3">
                           <button
-                            onClick={(e) => handleViewSummary(e, module.id, module.quiz_reports)}
-                            className="px-5 py-2 rounded-md text-white font-medium bg-indigo-600 hover:bg-indigo-700 transition-all duration-200 transform hover:scale-105 shadow-sm"
+                            onClick={(e) => handleQuizClick(e, quiz.id, isLocked, quiz.status)}
+                            className={`px-5 py-2 rounded-md text-white font-medium transition-all duration-200 transform hover:scale-105 ${getQuizStatusColor(
+                              quiz.status
+                            )}`}
+                            disabled={isLocked}
                           >
-                            View Summary
+                            {getQuizButtonText(quiz, isLocked)}
                           </button>
-                        )}
+                          {quiz.status === 'passed' && (
+                            <span className="text-green-600 font-medium">
+                              Well done! You've completed this quiz
+                            </span>
+                          )}
+                          {quiz.status === 'failed' && (
+                            <span className="text-red-600 font-medium">
+                              Keep trying! You can do it
+                            </span>
+                          )}
+                          {(quiz.status === 'not_attempted' || !quiz.status) && !isLocked && (
+                            <span className="text-blue-600 font-medium">
+                              Ready to test your knowledge?
+                            </span>
+                          )}
+                          {isLocked && (
+                            <span className="text-gray-600 font-medium">
+                              Complete previous module to unlock
+                            </span>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>

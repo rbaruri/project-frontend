@@ -86,8 +86,7 @@ interface QuizData {
 
 const useQuizState = ({ quizId, refetch, initialReviewMode = false, initialShowResults = false }: UseQuizStateProps) => {
   const [userAnswers, setUserAnswers] = useState<UserAnswers>(() => {
-    // Initialize userAnswers from localStorage if in review mode
-    if (initialReviewMode && quizId) {
+    if (quizId) {
       const savedAnswers = localStorage.getItem(`quiz_${quizId}_answers`);
       if (savedAnswers) {
         try {
@@ -99,20 +98,54 @@ const useQuizState = ({ quizId, refetch, initialReviewMode = false, initialShowR
     }
     return {};
   });
-  const [isSubmitted, setIsSubmitted] = useState(initialReviewMode);
-  const [score, setScore] = useState<number>(0);
-  const [timeTaken, setTimeTaken] = useState<number>(0);
+
+  const [isSubmitted, setIsSubmitted] = useState(() => {
+    if (quizId) {
+      return localStorage.getItem(`quiz_${quizId}_submitted`) === 'true';
+    }
+    return initialReviewMode;
+  });
+
+  const [score, setScore] = useState<number>(() => {
+    if (quizId) {
+      const savedScore = localStorage.getItem(`quiz_${quizId}_score`);
+      return savedScore ? parseInt(savedScore) : 0;
+    }
+    return 0;
+  });
+
+  const [timeTaken, setTimeTaken] = useState<number>(() => {
+    if (quizId) {
+      const savedTimeTaken = localStorage.getItem(`quiz_${quizId}_time_taken`);
+      return savedTimeTaken ? parseInt(savedTimeTaken) : 0;
+    }
+    return 0;
+  });
+
   const [timeLeft, setTimeLeft] = useState(() => {
     if (!quizId || initialReviewMode) return 0;
     
     const savedTime = localStorage.getItem(`quiz_${quizId}_time`);
     const savedTimestamp = localStorage.getItem(`quiz_${quizId}_timestamp`);
     const startTime = localStorage.getItem(`quiz_${quizId}_start_time`);
+    const isExpired = localStorage.getItem(`quiz_${quizId}_expired`);
+    
+    // If the quiz has expired, don't allow renewal
+    if (isExpired === 'true') {
+      return 0;
+    }
     
     if (savedTime && savedTimestamp) {
       const elapsedSeconds = Math.floor((Date.now() - parseInt(savedTimestamp)) / 1000);
       const remainingTime = Math.max(parseInt(savedTime) - elapsedSeconds, 0);
-      return remainingTime > 0 ? remainingTime : QUIZ_TIME_LIMIT;
+      
+      // If time has run out, mark as expired
+      if (remainingTime <= 0) {
+        localStorage.setItem(`quiz_${quizId}_expired`, 'true');
+        return 0;
+      }
+      
+      return remainingTime;
     }
     
     // Store start time when starting a new quiz
@@ -122,8 +155,14 @@ const useQuizState = ({ quizId, refetch, initialReviewMode = false, initialShowR
     
     return QUIZ_TIME_LIMIT;
   });
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [showResults, setShowResults] = useState(initialShowResults);
+  const [showResults, setShowResults] = useState(() => {
+    if (quizId) {
+      return localStorage.getItem(`quiz_${quizId}_show_results`) === 'true' || initialShowResults;
+    }
+    return initialShowResults;
+  });
   const [attempts, setAttempts] = useState(() => {
     if (!quizId) return 0;
     const savedAttempts = localStorage.getItem(`quiz_${quizId}_attempts`);
@@ -278,6 +317,19 @@ const useQuizState = ({ quizId, refetch, initialReviewMode = false, initialShowR
     // Remove individual quiz summary
     localStorage.removeItem(`quiz_${quizId}_summary`);
     
+    // Remove timer and state data
+    localStorage.removeItem(`quiz_${quizId}_time`);
+    localStorage.removeItem(`quiz_${quizId}_timestamp`);
+    localStorage.removeItem(`quiz_${quizId}_start_time`);
+    localStorage.removeItem(`quiz_${quizId}_expired`);
+    
+    // Remove results data
+    localStorage.removeItem(`quiz_${quizId}_answers`);
+    localStorage.removeItem(`quiz_${quizId}_submitted`);
+    localStorage.removeItem(`quiz_${quizId}_score`);
+    localStorage.removeItem(`quiz_${quizId}_time_taken`);
+    localStorage.removeItem(`quiz_${quizId}_show_results`);
+    
     // Update module reports
     const updatedModuleReports = { ...allModuleReports };
     if (updatedModuleReports[moduleId]) {
@@ -370,6 +422,7 @@ const useQuizState = ({ quizId, refetch, initialReviewMode = false, initialShowR
         localStorage.removeItem(`quiz_${quizId}_time`);
         localStorage.removeItem(`quiz_${quizId}_timestamp`);
         localStorage.removeItem(`quiz_${quizId}_start_time`);
+        localStorage.removeItem(`quiz_${quizId}_expired`);
       }
       return;
     }
@@ -409,6 +462,7 @@ const useQuizState = ({ quizId, refetch, initialReviewMode = false, initialShowR
 
         // Initialize timer data in localStorage for new attempt
         if (quizId) {
+          localStorage.removeItem(`quiz_${quizId}_expired`);
           localStorage.setItem(`quiz_${quizId}_time`, QUIZ_TIME_LIMIT.toString());
           localStorage.setItem(`quiz_${quizId}_timestamp`, Date.now().toString());
           localStorage.setItem(`quiz_${quizId}_start_time`, Date.now().toString());
@@ -447,6 +501,8 @@ const useQuizState = ({ quizId, refetch, initialReviewMode = false, initialShowR
           }
 
           if (newTime <= 0) {
+            // Mark quiz as expired when time runs out
+            localStorage.setItem(`quiz_${quizId}_expired`, 'true');
             handleSubmit();
           }
 
@@ -472,6 +528,7 @@ const useQuizState = ({ quizId, refetch, initialReviewMode = false, initialShowR
     if (quizId && (isSubmitted || showResults)) {
       localStorage.removeItem(`quiz_${quizId}_time`);
       localStorage.removeItem(`quiz_${quizId}_timestamp`);
+      localStorage.removeItem(`quiz_${quizId}_expired`);
     }
   }, [quizId, isSubmitted, showResults]);
 
@@ -522,6 +579,17 @@ const useQuizState = ({ quizId, refetch, initialReviewMode = false, initialShowR
       localStorage.setItem(`quiz_${quizId}_attempts`, attempts.toString());
     }
   }, [attempts, quizId]);
+
+  // Add effect to persist quiz results data
+  useEffect(() => {
+    if (quizId) {
+      localStorage.setItem(`quiz_${quizId}_answers`, JSON.stringify(userAnswers));
+      localStorage.setItem(`quiz_${quizId}_submitted`, isSubmitted.toString());
+      localStorage.setItem(`quiz_${quizId}_score`, score.toString());
+      localStorage.setItem(`quiz_${quizId}_time_taken`, timeTaken.toString());
+      localStorage.setItem(`quiz_${quizId}_show_results`, showResults.toString());
+    }
+  }, [quizId, userAnswers, isSubmitted, score, timeTaken, showResults]);
 
   return {
     state: {

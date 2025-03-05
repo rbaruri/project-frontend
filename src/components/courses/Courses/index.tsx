@@ -64,7 +64,8 @@ const CoursesContainer: React.FC = () => {
                 total_duration: duration,
                 total_hours: totalHours,
                 hours_per_week: hoursPerWeek,
-                progress: progress
+                progress: progress,
+                modules: course.modules
               }}
               userId={parseInt(user?.userId || '0', 10)}
               onClick={() => navigate(`/courses/${course.id}`)}

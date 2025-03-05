@@ -1,87 +1,79 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Quiz from '..';
-import { QuizProps } from '../types';
-
-const mockQuiz = [
-  {
-    question: 'What is 2 + 2?',
-    options: ['3', '4', '5', '6'],
-    correctAnswer: '4'
-  },
-  {
-    question: 'What is the capital of France?',
-    options: ['London', 'Berlin', 'Paris', 'Madrid'],
-    correctAnswer: 'Paris'
-  }
-];
-
-const defaultProps: QuizProps = {
-  quiz: mockQuiz,
-  currentQuestion: 0,
-  selectedAnswers: [],
-  onAnswerSelect: jest.fn(),
-  onNext: jest.fn(),
-  onPrevious: jest.fn(),
-  onFinish: jest.fn()
-};
+import Quiz from './index';
+import { QuizQuestion } from './Quiz.types';
 
 describe('Quiz', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+  const mockQuiz: QuizQuestion[] = [
+    {
+      question: 'What is 2 + 2?',
+      options: ['3', '4', '5', '6'],
+      correctAnswer: '4'
+    },
+    {
+      question: 'What is the capital of France?',
+      options: ['London', 'Berlin', 'Paris', 'Madrid'],
+      correctAnswer: 'Paris'
+    }
+  ];
 
-  it('renders the current question and options', () => {
-    render(<Quiz {...defaultProps} />);
+  const mockProps = {
+    quiz: mockQuiz,
+    currentQuestion: 0,
+    selectedAnswers: ['4'],
+    onAnswerSelect: jest.fn(),
+    onNext: jest.fn(),
+    onPrevious: jest.fn(),
+    onFinish: jest.fn()
+  };
+
+  it('renders quiz question and options', () => {
+    render(<Quiz {...mockProps} />);
     
-    expect(screen.getByText('Question 1 of 2')).toBeInTheDocument();
     expect(screen.getByText('What is 2 + 2?')).toBeInTheDocument();
     mockQuiz[0].options.forEach(option => {
       expect(screen.getByText(option)).toBeInTheDocument();
     });
   });
 
-  it('shows selected answer state', () => {
-    render(
-      <Quiz
-        {...defaultProps}
-        selectedAnswers={['4']}
-      />
-    );
-
-    const selectedButton = screen.getByText('4');
-    expect(selectedButton).toHaveClass('border-blue-500', 'bg-blue-50');
+  it('shows correct progress indicator', () => {
+    render(<Quiz {...mockProps} />);
+    expect(screen.getByText('Question 1 of 2')).toBeInTheDocument();
   });
 
-  it('calls onAnswerSelect when an option is clicked', () => {
-    render(<Quiz {...defaultProps} />);
-    
-    fireEvent.click(screen.getByText('4'));
-    expect(defaultProps.onAnswerSelect).toHaveBeenCalledWith('4');
+  it('handles option selection', () => {
+    render(<Quiz {...mockProps} />);
+    fireEvent.click(screen.getByText('3'));
+    expect(mockProps.onAnswerSelect).toHaveBeenCalledWith('3');
   });
 
-  it('shows/hides Previous button appropriately', () => {
-    const { rerender } = render(<Quiz {...defaultProps} />);
-    
-    expect(screen.getByText('Previous')).toBeDisabled();
-
-    rerender(<Quiz {...defaultProps} currentQuestion={1} />);
-    expect(screen.getByText('Previous')).toBeEnabled();
+  it('shows selected option with correct styling', () => {
+    render(<Quiz {...mockProps} />);
+    const selectedOption = screen.getByText('4');
+    expect(selectedOption.className).toContain('selected');
   });
 
-  it('shows Finish button on last question', () => {
-    render(<Quiz {...defaultProps} currentQuestion={1} />);
+  it('handles navigation correctly', () => {
+    render(<Quiz {...mockProps} currentQuestion={1} selectedAnswers={['4', 'Paris']} />);
     
-    expect(screen.getByText('Finish')).toBeInTheDocument();
+    const previousButton = screen.getByText('Previous');
+    const finishButton = screen.getByText('Finish');
+    
+    fireEvent.click(previousButton);
+    expect(mockProps.onPrevious).toHaveBeenCalled();
+    
+    fireEvent.click(finishButton);
+    expect(mockProps.onFinish).toHaveBeenCalled();
   });
 
-  it('calls appropriate navigation function when buttons are clicked', () => {
-    render(<Quiz {...defaultProps} currentQuestion={1} />);
-    
-    fireEvent.click(screen.getByText('Previous'));
-    expect(defaultProps.onPrevious).toHaveBeenCalled();
+  it('disables navigation when no answer is selected', () => {
+    render(<Quiz {...mockProps} selectedAnswers={[]} />);
+    const nextButton = screen.getByText('Next');
+    expect(nextButton).toBeDisabled();
+  });
 
-    fireEvent.click(screen.getByText('Finish'));
-    expect(defaultProps.onFinish).toHaveBeenCalled();
+  it('hides previous button on first question', () => {
+    render(<Quiz {...mockProps} />);
+    expect(screen.queryByText('Previous')).not.toBeInTheDocument();
   });
 }); 

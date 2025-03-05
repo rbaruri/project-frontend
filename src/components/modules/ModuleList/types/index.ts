@@ -21,6 +21,7 @@ export interface Quiz {
   cutoff_score: number;
   status: string;
   created_at: string;
+  score: number;
 }
 
 export interface SimilarQuestion {
@@ -36,6 +37,9 @@ export interface Module {
   title: string;
   status: string;
   created_at: string;
+  start_date: string;
+  end_date: string;
+  hours_allocated: number;
   resources: Resource[];
   quizzes: Quiz[];
   similar_questions: SimilarQuestion[];

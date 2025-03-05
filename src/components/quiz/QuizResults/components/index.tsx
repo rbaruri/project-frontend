@@ -24,16 +24,16 @@ export const TimeExpired: React.FC<TimeExpiredProps> = ({ onRetake }) => (
 interface QuestionResultProps {
   question: QuizQuestion;
   userAnswer: string | undefined;
-  index: number;
+  questionNumber: number;
 }
 
-export const QuestionResult: React.FC<QuestionResultProps> = ({ question, userAnswer, index }) => {
+export const QuestionResult: React.FC<QuestionResultProps> = ({ question, userAnswer, questionNumber }) => {
   const answerStatus = getAnswerStatus(question, userAnswer);
 
   return (
     <div className={`bg-white rounded-lg shadow-md p-6 ${answerStatus.className}`}>
       <h3 className="text-xl font-semibold text-gray-800 mb-4">
-        Question {index + 1}
+        Question {questionNumber}
       </h3>
       <p className="text-gray-700 mb-4">{question.question}</p>
       
