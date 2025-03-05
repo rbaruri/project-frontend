@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useQuery } from '@apollo/client';
 import { QuizResultsProps } from './types';
 import { calculateResults } from './helper';
 import { TimeExpired, QuestionResult } from './components';
@@ -7,9 +8,14 @@ import {
   generateSummary,
   selectSummaryLoading,
   selectSummaryAnalysis,
-  selectSummaryError
+  selectSummaryError,
+  SummaryActionTypes
 } from '@/containers/SummaryReport/summaryIndex';
 import { SummaryDisplay, formatElapsedTime } from '@/components/quiz/SummaryReport';
+import { GET_USER_MODULE_DATA } from '@/graphql/queries/summary';
+import { RootState } from '@/redux/store';
+import { StructuredAnalysis } from '@/summary/types';
+import { Dispatch } from 'redux';
 
 const QuizResults: React.FC<QuizResultsProps> = ({
   questions,
@@ -27,10 +33,16 @@ const QuizResults: React.FC<QuizResultsProps> = ({
   moduleName,
   moduleReports
 }) => {
-  const dispatch = useDispatch();
-  const isLoading = useSelector(state => moduleId ? selectSummaryLoading(state, moduleId) : false);
-  const analysis = useSelector(state => moduleId ? selectSummaryAnalysis(state, moduleId) : '');
-  const error = useSelector(state => moduleId ? selectSummaryError(state, moduleId) : '');
+  const dispatch = useDispatch<Dispatch<SummaryActionTypes>>();
+  const isLoading = useSelector((state: RootState) => moduleId ? selectSummaryLoading(state, moduleId) : false);
+  const analysis = useSelector((state: RootState) => moduleId ? selectSummaryAnalysis(state, moduleId) : null) as StructuredAnalysis | null;
+  const error = useSelector((state: RootState) => moduleId ? selectSummaryError(state, moduleId) : '');
+
+  // Fetch user and module data
+  const { data: moduleData, loading: moduleLoading, error: moduleError } = useQuery(GET_USER_MODULE_DATA, {
+    variables: { moduleId },
+    skip: !moduleId
+  });
 
   if (timeExpired) {
     return <TimeExpired onRetake={onRetake} />;
@@ -39,12 +51,36 @@ const QuizResults: React.FC<QuizResultsProps> = ({
   const { correctAnswers, totalQuestions } = calculateResults(questions, userAnswers);
   
   const handleViewSummary = () => {
-    if (moduleId && moduleReports) {
-      dispatch(generateSummary(moduleId, moduleReports));
+    if (moduleId && moduleReports && moduleData?.modules_by_pk) {
+      const userId = moduleData.modules_by_pk.course.user_id;
+      if (userId) {
+        console.log('Generating summary with:', {
+          moduleId,
+          userId,
+          hasModuleReports: !!moduleReports
+        });
+        dispatch(generateSummary(moduleId, moduleReports, userId));
+      } else {
+        console.error('User ID not found in module data');
+      }
+    } else {
+      console.error('Missing required data:', {
+        hasModuleId: !!moduleId,
+        hasModuleReports: !!moduleReports,
+        hasModuleData: !!moduleData?.modules_by_pk
+      });
     }
   };
 
   const isReviewMode = window.location.search.includes('mode=review');
+
+  if (moduleLoading) {
+    return <div>Loading module data...</div>;
+  }
+
+  if (moduleError) {
+    return <div>Error loading module data: {moduleError.message}</div>;
+  }
 
   return (
     <div className="space-y-8">
@@ -90,7 +126,7 @@ const QuizResults: React.FC<QuizResultsProps> = ({
           analysis={analysis}
           isLoading={isLoading}
           error={error}
-          moduleName={moduleName}
+          moduleName={moduleData?.modules_by_pk?.title || moduleName}
           score={score}
           timeTaken={timeTaken}
           totalQuestions={totalQuestions}

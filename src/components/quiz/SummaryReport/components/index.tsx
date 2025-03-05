@@ -1,8 +1,9 @@
 import React from 'react';
-import { formatParagraphs, downloadReport } from '../helper';
+import { formatParagraphs, downloadReport, downloadPDFReport } from '../helper';
+import { StructuredAnalysis } from '@/summary/types';
 
 export interface SummaryDisplayProps {
-  analysis: string;
+  analysis: StructuredAnalysis | null;
   isLoading: boolean;
   error?: string;
   moduleName?: string;
@@ -16,89 +17,163 @@ export const SummaryDisplay: React.FC<SummaryDisplayProps> = ({
   analysis,
   isLoading,
   error,
-  moduleName,
+  moduleName = 'Unknown Module',
   score,
   timeTaken,
   totalQuestions,
   correctAnswers
 }) => {
-  const canDownload = !isLoading && !error && analysis && moduleName && 
-    score !== undefined && timeTaken !== undefined &&
-    totalQuestions !== undefined && correctAnswers !== undefined;
-
   const handleDownload = () => {
-    if (!canDownload) return;
-    
-    downloadReport(
-      moduleName!,
-      score!,
-      timeTaken!,
-      analysis,
-      totalQuestions!,
-      correctAnswers!
-    );
+    if (!analysis || isLoading || error) return;
+    downloadPDFReport(analysis, moduleName);
   };
 
   if (isLoading) {
     return (
-      <div className="mb-8 p-6 bg-white rounded-lg shadow-md">
-        <div className="flex items-center justify-center space-x-2">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-          <span className="text-gray-600">Generating analysis...</span>
-        </div>
+      <div className="flex justify-center items-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
-        <div className="flex items-start">
-          <svg className="w-5 h-5 text-red-600 mt-0.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span className="text-red-600">{error}</span>
-        </div>
+      <div className="p-4 bg-red-50 text-red-600 rounded-lg">
+        {error}
       </div>
     );
   }
 
   if (!analysis) {
-    return null;
+    return (
+      <div className="p-4 bg-gray-50 text-gray-600 rounded-lg">
+        Click in view summary to generate analysis
+      </div>
+    );
   }
 
-  const paragraphs = formatParagraphs(analysis);
-
   return (
-    <div className="mb-8 p-6 bg-white rounded-lg shadow-md">
-      <div className="flex justify-between items-start mb-4">
-        <h3 className="text-xl font-semibold text-gray-800">
-          <div className="flex items-center space-x-2">
-            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            <span>Performance Analysis</span>
+    <div className="bg-white shadow-lg rounded-lg p-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-gray-800">Performance Analysis</h2>
+        <button
+          onClick={handleDownload}
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+        >
+          Download Report
+        </button>
+      </div>
+
+      {/* Overall Performance */}
+      <section className="space-y-3">
+        <h3 className="text-xl font-semibold text-blue-600">Overall Performance</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <p className="text-sm text-blue-600">Average Score</p>
+            <p className="text-2xl font-bold">{analysis.overallPerformance.averageScore}%</p>
           </div>
-        </h3>
-        {canDownload && (
-          <button
-            onClick={handleDownload}
-            className="flex items-center space-x-1 px-3 py-1 text-sm bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span>Download Report</span>
-          </button>
-        )}
-      </div>
-      <div className="prose max-w-none">
-        {paragraphs.map((paragraph: string, index: number) => (
-          <p key={index} className="mb-3 text-gray-600 leading-relaxed">
-            {paragraph}
-          </p>
-        ))}
-      </div>
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <p className="text-sm text-blue-600">Trend</p>
+            <p className="font-medium">{analysis.overallPerformance.trend}</p>
+          </div>
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <p className="text-sm text-blue-600">Improvement</p>
+            <p className="font-medium">{analysis.overallPerformance.improvementRate}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Strengths */}
+      <section className="space-y-3">
+        <h3 className="text-xl font-semibold text-green-600">Strengths</h3>
+        <div className="bg-green-50 p-4 rounded-lg">
+          <ul className="list-disc list-inside space-y-2">
+            {analysis.strengths.topics.map((topic, index) => (
+              <li key={index} className="text-green-700">{topic}</li>
+            ))}
+          </ul>
+          <p className="mt-3 text-green-700">{analysis.strengths.details}</p>
+        </div>
+      </section>
+
+      {/* Weaknesses */}
+      <section className="space-y-3">
+        <h3 className="text-xl font-semibold text-red-600">Areas for Improvement</h3>
+        <div className="bg-red-50 p-4 rounded-lg">
+          <ul className="list-disc list-inside space-y-2">
+            {analysis.weaknesses.topics.map((topic, index) => (
+              <li key={index} className="text-red-700">{topic}</li>
+            ))}
+          </ul>
+          <p className="mt-3 text-red-700">{analysis.weaknesses.details}</p>
+        </div>
+      </section>
+
+      {/* Common Mistakes */}
+      <section className="space-y-3">
+        <h3 className="text-xl font-semibold text-orange-600">Common Mistakes</h3>
+        <div className="bg-orange-50 p-4 rounded-lg">
+          {analysis.commonMistakes.patterns.map((pattern, index) => (
+            <div key={index} className="mb-4">
+              <p className="font-medium text-orange-700">Pattern {index + 1}:</p>
+              <p className="ml-4 text-orange-600">{pattern}</p>
+              {analysis.commonMistakes.recommendations[index] && (
+                <p className="ml-4 mt-2 text-orange-700">
+                  Recommendation: {analysis.commonMistakes.recommendations[index]}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Time Management */}
+      <section className="space-y-3">
+        <h3 className="text-xl font-semibold text-purple-600">Time Management</h3>
+        <div className="bg-purple-50 p-4 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <p className="text-sm text-purple-600">Average Time</p>
+              <p className="text-lg font-bold">{analysis.timeManagement.averageTime} seconds</p>
+            </div>
+            <div>
+              <p className="text-sm text-purple-600">Efficiency</p>
+              <p className="text-lg font-medium">{analysis.timeManagement.efficiency}</p>
+            </div>
+          </div>
+          <div>
+            <p className="font-medium text-purple-700">Recommendations:</p>
+            <ul className="list-disc list-inside mt-2 space-y-2">
+              {analysis.timeManagement.recommendations.map((rec, index) => (
+                <li key={index} className="text-purple-600">{rec}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Action Plan */}
+      <section className="space-y-3">
+        <h3 className="text-xl font-semibold text-teal-600">Action Plan</h3>
+        <div className="space-y-4">
+          <div className="bg-teal-50 p-4 rounded-lg">
+            <h4 className="font-medium text-teal-700 mb-2">Immediate Actions:</h4>
+            <ul className="list-disc list-inside space-y-2">
+              {analysis.recommendations.immediate.map((rec, index) => (
+                <li key={index} className="text-teal-600">{rec}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="bg-teal-50 p-4 rounded-lg">
+            <h4 className="font-medium text-teal-700 mb-2">Long-term Goals:</h4>
+            <ul className="list-disc list-inside space-y-2">
+              {analysis.recommendations.longTerm.map((rec, index) => (
+                <li key={index} className="text-teal-600">{rec}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }; 

@@ -14,9 +14,17 @@ class SummaryService {
     return SummaryService.instance;
   }
 
-  public async generateSummary(moduleReports: QuizSummaryReport[]): Promise<SummaryAnalysisResponse> {
+  public async generateSummary(
+    moduleReports: QuizSummaryReport[],
+    userId?: string,
+    moduleId?: string
+  ): Promise<SummaryAnalysisResponse> {
     try {
-      console.log('Sending request to generate summary:', moduleReports);
+      console.log('Sending request to generate summary:', {
+        moduleReports,
+        userId,
+        moduleId
+      });
       
       const response = await fetch(this.API_URL, {
         method: 'POST',
@@ -24,7 +32,7 @@ class SummaryService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ moduleReports }),
-        credentials: 'include', // Include credentials for CORS
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -34,12 +42,40 @@ class SummaryService {
 
       const data = await response.json();
       console.log('Received summary response:', data);
-      
       return data;
+      
     } catch (error) {
       console.error('Error generating summary:', error);
       return {
-        analysis: '',
+        analysis: {
+          overallPerformance: {
+            trend: '',
+            averageScore: 0,
+            improvementRate: ''
+          },
+          strengths: {
+            topics: [],
+            details: ''
+          },
+          weaknesses: {
+            topics: [],
+            details: ''
+          },
+          commonMistakes: {
+            patterns: [],
+            recommendations: []
+          },
+          timeManagement: {
+            averageTime: 0,
+            efficiency: '',
+            recommendations: []
+          },
+          recommendations: {
+            immediate: [],
+            longTerm: [],
+            focusAreas: []
+          }
+        },
         error: error instanceof Error ? error.message : 'Unknown error occurred'
       };
     }

@@ -1,4 +1,4 @@
-import { QuizSummaryReport } from '@/summary/types';
+import { QuizSummaryReport, StructuredAnalysis } from '@/summary/types';
 import {
   GENERATE_SUMMARY,
   GENERATE_SUMMARY_SUCCESS,
@@ -6,26 +6,30 @@ import {
   CLEAR_SUMMARY
 } from './summaryConstants';
 
+// Define UUID type for clarity
+export type UUID = string;
+
 export interface GenerateSummaryAction {
   type: typeof GENERATE_SUMMARY;
   payload: {
-    moduleId: string;
+    moduleId: UUID;
     moduleReports: QuizSummaryReport[];
+    userId: UUID;
   };
 }
 
 export interface GenerateSummarySuccessAction {
   type: typeof GENERATE_SUMMARY_SUCCESS;
   payload: {
-    moduleId: string;
-    analysis: string;
+    moduleId: UUID;
+    analysis: StructuredAnalysis;
   };
 }
 
 export interface GenerateSummaryFailureAction {
   type: typeof GENERATE_SUMMARY_FAILURE;
   payload: {
-    moduleId: string;
+    moduleId: UUID;
     error: string;
   };
 }
@@ -41,19 +45,21 @@ export type SummaryActionTypes =
   | ClearSummaryAction;
 
 export const generateSummary = (
-  moduleId: string,
-  moduleReports: QuizSummaryReport[]
+  moduleId: UUID,
+  moduleReports: QuizSummaryReport[],
+  userId: UUID
 ): GenerateSummaryAction => ({
   type: GENERATE_SUMMARY,
   payload: {
     moduleId,
-    moduleReports
+    moduleReports,
+    userId
   }
 });
 
 export const generateSummarySuccess = (
-  moduleId: string,
-  analysis: string
+  moduleId: UUID,
+  analysis: StructuredAnalysis
 ): GenerateSummarySuccessAction => ({
   type: GENERATE_SUMMARY_SUCCESS,
   payload: {
@@ -63,7 +69,7 @@ export const generateSummarySuccess = (
 });
 
 export const generateSummaryFailure = (
-  moduleId: string,
+  moduleId: UUID,
   error: string
 ): GenerateSummaryFailureAction => ({
   type: GENERATE_SUMMARY_FAILURE,

@@ -4,7 +4,8 @@ export {
   generateSummary,
   generateSummarySuccess,
   generateSummaryFailure,
-  clearSummary
+  clearSummary,
+  type SummaryActionTypes
 } from './summaryActions';
 export {
   selectSummaryLoading,

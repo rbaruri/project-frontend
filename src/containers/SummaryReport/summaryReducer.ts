@@ -4,12 +4,13 @@ import {
   GENERATE_SUMMARY_FAILURE,
   CLEAR_SUMMARY
 } from './summaryConstants';
-import { SummaryActionTypes } from './summaryActions';
+import { SummaryActionTypes, UUID } from './summaryActions';
+import { StructuredAnalysis } from '@/summary/types';
 
 export interface SummaryState {
-  loading: { [moduleId: string]: boolean };
-  analyses: { [moduleId: string]: string };
-  errors: { [moduleId: string]: string };
+  loading: { [moduleId: UUID]: boolean };
+  analyses: { [moduleId: UUID]: StructuredAnalysis };
+  errors: { [moduleId: UUID]: string };
 }
 
 const initialState: SummaryState = {

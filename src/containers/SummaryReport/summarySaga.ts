@@ -1,39 +1,36 @@
-import { takeLatest, put, call } from 'redux-saga/effects';
+import { call, put, takeLatest } from 'redux-saga/effects';
 import { GENERATE_SUMMARY } from './summaryConstants';
-import { GenerateSummaryAction } from './summaryActions';
 import {
+  GenerateSummaryAction,
   generateSummarySuccess,
-  generateSummaryFailure
+  generateSummaryFailure,
+  UUID
 } from './summaryActions';
 import SummaryService from '@/summary/service';
+import { StructuredAnalysis } from '@/summary/types';
 
-function* generateSummarySaga(action: GenerateSummaryAction) {
+function* generateSummarySaga(action: GenerateSummaryAction): Generator<any, void, any> {
   try {
+    const { moduleId, moduleReports, userId } = action.payload;
     const summaryService = SummaryService.getInstance();
-    const response = yield call(
-      [summaryService, summaryService.generateSummary],
-      action.payload.moduleReports
+    
+    // Generate summary using AI
+    const { analysis, error } = yield call(
+      [summaryService, 'generateSummary'],
+      moduleReports,
+      userId,
+      moduleId
     );
 
-    if (response.error) {
-      yield put(generateSummaryFailure(action.payload.moduleId, response.error));
-      return;
+    if (error) {
+      throw new Error(error);
     }
-
-    yield put(generateSummarySuccess(action.payload.moduleId, response.analysis));
-
-    // Log the analysis in the console
-    console.group('Summary Analysis');
-    console.log('Module ID:', action.payload.moduleId);
-    console.log('Analysis:', response.analysis);
-    console.groupEnd();
+    
+    yield put(generateSummarySuccess(moduleId, analysis));
   } catch (error) {
-    yield put(
-      generateSummaryFailure(
-        action.payload.moduleId,
-        error instanceof Error ? error.message : 'Failed to generate summary'
-      )
-    );
+    console.error('Error generating summary:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to generate summary';
+    yield put(generateSummaryFailure(action.payload.moduleId, errorMessage));
   }
 }
 

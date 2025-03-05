@@ -9,9 +9,8 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
         `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
       );
       // If we get an authentication error, redirect to login
-      if (message.includes('JWT')) {
-        localStorage.removeItem('user');
-        window.location.href = '/login';
+      if (message.includes('JWT') || message.includes('x-hasura-admin-secret')) {
+        console.error('Authentication error:', message);
       }
     });
   }
@@ -22,15 +21,20 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 // Auth link to add headers
 const authLink = new ApolloLink((operation, forward) => {
-  // Always include admin secret
-  const headers: Record<string, string> = {
-    'x-hasura-admin-secret': import.meta.env.VITE_HASURA_ADMIN_SECRET
-  };
+  const adminSecret = import.meta.env.VITE_HASURA_ADMIN_SECRET;
+  
+  if (!adminSecret) {
+    console.error('VITE_HASURA_ADMIN_SECRET is not set in environment variables');
+  }
 
-  operation.setContext({
-    headers,
-    credentials: 'include' // This enables sending cookies with requests
-  });
+  // Add the admin secret to headers
+  operation.setContext(({ headers = {} }) => ({
+    headers: {
+      ...headers,
+      'x-hasura-admin-secret': adminSecret || '',
+      'x-hasura-role': 'admin'
+    }
+  }));
 
   return forward(operation);
 });
@@ -57,7 +61,7 @@ const cache = new InMemoryCache({
 });
 
 // Create the Apollo Client instance
-const client = new ApolloClient({
+export const client = new ApolloClient({
   link: from([errorLink, authLink, httpLink]),
   cache,
   defaultOptions: {
@@ -75,5 +79,3 @@ const client = new ApolloClient({
   },
   connectToDevTools: true
 });
-
-export { client };

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
 import {
   GET_MODULES_BY_COURSE,
   UPDATE_MODULE_STATUS,
@@ -21,6 +21,7 @@ import {
   formatModuleStatus,
 } from "./helper";
 import { generateSummary } from "@/containers/SummaryReport/summaryIndex";
+import { selectSummaryAnalysis } from "@/containers/SummaryReport/summaryIndex";
 
 const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
@@ -88,8 +89,13 @@ const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
     e.stopPropagation();
     console.log('View Summary clicked:', { moduleId, moduleReports });
     if (moduleReports) {
-      console.log('Dispatching generateSummary action');
-      dispatch(generateSummary(moduleId, moduleReports));
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        console.log('Dispatching generateSummary action with userId:', userId);
+        dispatch(generateSummary(moduleId, moduleReports, userId));
+      } else {
+        console.error('User ID not found');
+      }
     } else {
       console.log('No module reports available');
     }
@@ -313,7 +319,7 @@ const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
                         >
                           {getQuizButtonText(quiz, isLocked)}
                         </button>
-                        {isPassed && (
+                        {isPassed && !useSelector((state: RootState) => selectSummaryAnalysis(state, module.id)) && (
                           <button
                             onClick={(e) => handleViewSummary(e, module.id, module.quiz_reports)}
                             className="px-5 py-2 rounded-md text-white font-medium bg-indigo-600 hover:bg-indigo-700 transition-all duration-200 transform hover:scale-105 shadow-sm"
