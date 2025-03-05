@@ -96,24 +96,27 @@ export const isModuleLocked = (moduleIndex: number, modules: Module[]): boolean 
   return !previousQuiz || previousQuiz.status !== "passed";
 };
 
-export const getQuizButtonText = (quiz: Quiz, isLocked: boolean): string => {
+export const getQuizButtonText = (quiz: any, isLocked: boolean) => {
   if (isLocked) return "Locked";
-
-  switch (quiz.status) {
-    case "passed":
-      return "Review Quiz";
-    case "failed":
-      return "Retry Quiz";
-    case "not_attempted":
-    default:
-      return "Take Quiz";
+  if (quiz.status === 'passed') return "Review Quiz";
+  
+  // Check if there are saved answers for this quiz
+  const hasStartedQuiz = localStorage.getItem(`quiz_${quiz.id}_answers`) !== null;
+  if (hasStartedQuiz && quiz.status === 'not_attempted') {
+    return "Continue Quiz";
   }
+  
+  return "Take Quiz";
 };
 
 export const formatDate = (dateString: string | null | undefined): string => {
   if (!dateString) return 'Not set';
   try {
-    return new Date(dateString).toLocaleDateString();
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
   } catch (error) {
     return 'Invalid Date';
   }

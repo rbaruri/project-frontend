@@ -387,15 +387,6 @@ const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
                     {quiz && (
                       <div className="flex items-center justify-center space-x-3">
                         <div className="flex items-center space-x-3">
-                          <button
-                            onClick={(e) => handleQuizClick(e, quiz.id, isLocked, quiz.status)}
-                            className={`px-5 py-2 rounded-md text-white font-medium transition-all duration-200 transform hover:scale-105 ${getQuizStatusColor(
-                              quiz.status
-                            )}`}
-                            disabled={isLocked}
-                          >
-                            {getQuizButtonText(quiz, isLocked)}
-                          </button>
                           {quiz.status === 'passed' && (
                             <span className="text-green-600 font-medium">
                               Well done! You've completed this quiz
@@ -407,15 +398,32 @@ const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
                             </span>
                           )}
                           {(quiz.status === 'not_attempted' || !quiz.status) && !isLocked && (
-                            <span className="text-blue-600 font-medium">
-                              Ready to test your knowledge?
-                            </span>
+                            <>
+                              {localStorage.getItem(`quiz_${quiz.id}_answers`) ? (
+                                <span className="text-orange-600 font-medium">
+                                  You have an unfinished quiz. Continue where you left off!
+                                </span>
+                              ) : (
+                                <span className="text-blue-600 font-medium">
+                                  Ready to test your knowledge?
+                                </span>
+                              )}
+                            </>
                           )}
                           {isLocked && (
                             <span className="text-gray-600 font-medium">
                               Complete previous module to unlock
                             </span>
                           )}
+                          <button
+                            onClick={(e) => handleQuizClick(e, quiz.id, isLocked, quiz.status)}
+                            className={`px-5 py-2 rounded-md text-white font-medium transition-all duration-200 transform hover:scale-105 ${getQuizStatusColor(
+                              quiz.status
+                            )}`}
+                            disabled={isLocked}
+                          >
+                            {getQuizButtonText(quiz, isLocked)}
+                          </button>
                         </div>
                       </div>
                     )}

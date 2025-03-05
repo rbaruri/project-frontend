@@ -97,22 +97,20 @@ const QuizResults: React.FC<QuizResultsProps> = ({
         </div>
 
         <div className="flex flex-wrap justify-center gap-4">
-          {/* View Summary button - only show if data is available and score is below cutoff */}
-          {moduleId && moduleReports && score < cutoffScore && (
-            <button
-              onClick={handleViewSummary}
-              className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors duration-300"
-            >
-              Generate Summary
-            </button>
-          )}
-
           {/* Failed quiz buttons */}
           {score < cutoffScore && !isReviewMode && (
             <>
+              {moduleId && moduleReports && (
+                <button
+                  onClick={handleViewSummary}
+                  className="px-6 py-2 text-white rounded-md transition-all duration-300 bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 hover:shadow-lg transform hover:-translate-y-0.5"
+                >
+                  Generate Summary
+                </button>
+              )}
               <button
                 onClick={onRetake}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300"
+                className="px-6 py-2 text-white rounded-md transition-all duration-300 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 hover:shadow-lg transform hover:-translate-y-0.5"
               >
                 Retake Quiz
               </button>
@@ -121,24 +119,6 @@ const QuizResults: React.FC<QuizResultsProps> = ({
                 className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors duration-300"
               >
                 Back to Course
-              </button>
-            </>
-          )}
-
-          {/* Passed quiz buttons */}
-          {(score >= cutoffScore || isReviewMode) && (
-            <>
-              <button
-                onClick={onReview}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300"
-              >
-                Review Quiz
-              </button>
-              <button
-                onClick={hasNextModule ? onNextModule : onBackToModule}
-                className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-300"
-              >
-                {hasNextModule ? "Next Module" : "Complete Module"}
               </button>
             </>
           )}
@@ -155,6 +135,17 @@ const QuizResults: React.FC<QuizResultsProps> = ({
           />
         ))}
       </div>
+
+      {(score >= cutoffScore || isReviewMode) && (
+        <div className="flex justify-center mt-8">
+          <button
+            onClick={hasNextModule ? onNextModule : onBackToModule}
+            className="px-8 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-300 text-lg font-medium shadow-md hover:shadow-lg"
+          >
+            {hasNextModule ? "Next Module" : "Complete Module"}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
