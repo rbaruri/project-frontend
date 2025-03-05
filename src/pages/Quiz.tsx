@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { GET_QUIZ_WITH_QUESTIONS, GET_NEXT_MODULE } from '@/graphql/queries/quiz';
 // import { UPDATE_QUIZ_STATUS, UPDATE_MODULE_STATUS } from '@/graphql/mutations/quiz';
-import { QuizData, NextModuleData } from '@/types/quizTypes';
+import { QuizData, NextModuleData } from '@/components/quiz/types';
 import QuizQuestion from '@/components/quiz/QuizQuestion';
 import QuizResults from '@/components/quiz/QuizResults';
 import QuizHeader from '@/components/quiz/QuizHeader';
@@ -227,7 +227,9 @@ const Quiz: React.FC = () => {
             onBackToModule={handleBackToModule}
             onNextModule={handleNextModule}
             hasNextModule={!!nextModuleData?.modules?.[0]}
-            onReview={state.score >= quiz.cutoff_score ? () => actions.handleRetake(quiz.module.id, true) : undefined}
+            onReview={state.score >= quiz.cutoff_score 
+              ? () => actions.handleRetake(quiz.module.id, true) 
+              : () => {}}
             timeTaken={state.timeTaken}
             moduleId={quiz.module.id}
             moduleName={quiz.module.title}

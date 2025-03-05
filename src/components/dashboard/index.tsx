@@ -4,10 +4,10 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { GET_COURSES_WITH_LEARNING_PATHS } from '@/graphql/queries/courses';
 import { DashboardProps } from './types';
-import { calculateOverallProgress, getCompletedCoursesCount, getCoursesInProgressCount, isInProgress } from './helper';
-import { Course } from '@/types/courseTypes';
+import { calculateOverallProgress, getCompletedCoursesCount, getCoursesInProgressCount, isInProgress } from '@/components/dashboard/helper';
+import { Course } from '@/components/courses/Courses/types';
 
-const Dashboard: React.FC<DashboardProps> = ({ firstName, email, userId }) => {
+const Dashboard: React.FC<DashboardProps> = ({ firstName, userId }) => {
   const [coursesInProgress, setCoursesInProgress] = useState<number>(0);
   const [recentCourses, setRecentCourses] = useState<Course[]>([]);
   
@@ -25,7 +25,7 @@ const Dashboard: React.FC<DashboardProps> = ({ firstName, email, userId }) => {
       // Filter out completed courses and get only in-progress ones
       const inProgressCourses = data.courses
         .filter(course => isInProgress(course))
-        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        .sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
 
       setRecentCourses(inProgressCourses);
     }

@@ -1,3 +1,5 @@
+import sampleSyllabus from '@/assets/sample-syllabus.pdf';
+
 export const validateFile = (file: File): { isValid: boolean; error: string | null } => {
   const maxSize = 10 * 1024 * 1024; // 10MB
   const allowedTypes = ["application/pdf"];
@@ -46,11 +48,19 @@ export const validateFormData = (formData: { courseName: string; startDate: stri
   };
 };
 
-export const downloadSampleSyllabus = (): void => {
-  const link = document.createElement('a');
-  link.href = '/assets/sample-syllabus.pdf';
-  link.download = 'sample-syllabus.pdf';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+export const downloadSampleSyllabus = async (): Promise<void> => {
+  try {
+    const response = await fetch(sampleSyllabus);
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'sample-syllabus.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Error downloading sample syllabus:', error);
+  }
 }; 

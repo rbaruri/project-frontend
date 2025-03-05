@@ -6,17 +6,21 @@ export interface QuizQuestion {
 }
 
 export interface QuizData {
-  id: string;
-  moduleId: string;
-  module?: {
+  quizzes_by_pk: {
     id: string;
-    title: string;
+    module: {
+      id: string;
+      title: string;
+      course_id: string;
+    };
+    quiz_questions: {
+      id: string;
+      question: string;
+      options: string[];
+      correct_option: string;
+    }[];
+    cutoff_score: number;
   };
-  questions: QuizQuestion[];
-  timeLimit: number;
-  cutoffScore: number;
-  attempts: number;
-  status: 'not_started' | 'in_progress' | 'completed' | 'failed';
 }
 
 export interface QuizState {
@@ -41,4 +45,11 @@ export interface UpdateQuizStatusPayload {
   quizId: string;
   status: string;
   score?: number;
+}
+
+export interface NextModuleData {
+  modules: {
+    id: string;
+    course_id: string;
+  }[];
 } 

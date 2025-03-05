@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatParagraphs, downloadReport, downloadPDFReport } from '../helper';
+import { downloadPDFReport } from './helper';
 import { StructuredAnalysis } from '@/summary/types';
 
 export interface SummaryDisplayProps {
@@ -18,10 +18,7 @@ export const SummaryDisplay: React.FC<SummaryDisplayProps> = ({
   isLoading,
   error,
   moduleName = 'Unknown Module',
-  score,
-  timeTaken,
-  totalQuestions,
-  correctAnswers
+
 }) => {
   const handleDownload = () => {
     if (!analysis || isLoading || error) return;

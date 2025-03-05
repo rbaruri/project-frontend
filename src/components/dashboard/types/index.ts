@@ -1,4 +1,3 @@
-import { Course } from '@/types/courseTypes';
 
 export interface DashboardProps {
   firstName: string;

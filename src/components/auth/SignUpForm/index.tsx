@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { SignUpFormData, SignUpFormProps, ValidationState } from './types';
+import { SignUpFormData, SignUpFormProps, ValidationState } from '@/components/auth/SignUpForm/types';
 import { 
   validateEmail, 
   validatePassword, 

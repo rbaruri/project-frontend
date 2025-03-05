@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { LoginState } from '@/types/loginTypes';
+import { LoginState, LoginAction } from '@/types/loginTypes';
 import {
   LOGIN_REQUEST,
   LOGIN_SUCCESS,
@@ -13,10 +13,11 @@ const initialState: LoginState = {
   error: null,
   success: false,
   token: null,
-  user: null
+  user: null,
+  isAuthenticated: false
 };
 
-const loginReducer = (state = initialState, action: any) =>
+const loginReducer = (state = initialState, action: LoginAction) =>
   produce(state, (draft) => {
     switch (action.type) {
       case LOGIN_REQUEST:
@@ -31,6 +32,7 @@ const loginReducer = (state = initialState, action: any) =>
         draft.success = true;
         draft.token = action.payload.token;
         draft.user = action.payload.user;
+        draft.isAuthenticated = true;
         break;
 
       case LOGIN_FAILURE:
@@ -39,6 +41,7 @@ const loginReducer = (state = initialState, action: any) =>
         draft.success = false;
         draft.token = null;
         draft.user = null;
+        draft.isAuthenticated = false;
         break;
 
       case LOGIN_RESET:

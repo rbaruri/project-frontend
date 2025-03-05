@@ -17,11 +17,32 @@ export interface LoginResponse {
 export interface LoginState {
   isAuthenticated: boolean;
   user: LoginResponse['user'] | null;
+  token: string | null;
   loading: boolean;
   error: string | null;
+  success: boolean;
 }
 
 export interface LoginError {
   message: string;
   field?: string;
-} 
+}
+
+export interface LoginPageProps {
+  // Empty interface as the Login page doesn't require any props
+}
+
+export interface User {
+  id: string;
+  userId: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+}
+
+export type LoginAction =
+  | { type: 'login/LOGIN_REQUEST'; payload: LoginFormData }
+  | { type: 'login/LOGIN_SUCCESS'; payload: LoginResponse }
+  | { type: 'login/LOGIN_FAILURE'; payload: string }
+  | { type: 'login/LOGIN_RESET' }
+  | { type: 'login/LOGOUT' }; 

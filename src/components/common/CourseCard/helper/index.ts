@@ -11,7 +11,20 @@ export const validateCourseName = (name: string): boolean => {
 };
 
 export const isCourseStarted = (startDate: string): boolean => {
+  // Parse dates in local timezone
   const courseStartDate = new Date(startDate);
-  const currentDate = new Date();
-  return currentDate >= courseStartDate;
+  courseStartDate.setHours(0, 0, 0, 0);  // Set to start of day in local time
+  
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);  // Set to start of day in local time
+
+  // Debug logging
+  console.log('Date Comparison:', {
+    startDate,
+    courseStartDate: courseStartDate.toLocaleString(),
+    currentDate: now.toLocaleString(),
+    isAccessible: now >= courseStartDate
+  });
+
+  return now >= courseStartDate;
 }; 

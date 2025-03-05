@@ -3,7 +3,7 @@ import { api } from '@/api/axios';
 import { get } from 'lodash';
 import { LOGIN_REQUEST, LOGOUT } from '@/containers/Login/loginConstants';
 import { loginSuccess, loginFailure } from '@/containers/Login/loginActions';
-import { LoginFormData, LoginResponse, User } from '@/types/loginTypes';
+import { LoginFormData, LoginResponse } from '@/types/loginTypes';
 import { AxiosResponse } from 'axios';
 
 function* loginSaga(action: { type: string; payload: LoginFormData }) {
@@ -46,18 +46,17 @@ function* loginSaga(action: { type: string; payload: LoginFormData }) {
     }
 
     // Transform the user data
-    const user: User = {
+    const user = {
       id: rawUser.id,
-      userId: rawUser.id,
+      firstName: rawUser.first_name,
+      lastName: rawUser.last_name,
       email: rawUser.email,
-      first_name: rawUser.first_name,
-      last_name: rawUser.last_name
+      role: rawUser.role || 'user'
     };
 
     const responseData: LoginResponse = {
-      message: response.data.message || 'Login successful',
-      user,
-      token: response.data.token
+      token: response.data.token,
+      user
     };
 
     console.log('Transformed response data:', responseData);

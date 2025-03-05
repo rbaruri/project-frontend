@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useQuery } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
 import { QuizResultsProps } from './types';
@@ -7,14 +7,9 @@ import { calculateResults } from './helper';
 import { TimeExpired, QuestionResult } from './components';
 import {
   generateSummary,
-  selectSummaryLoading,
-  selectSummaryAnalysis,
-  selectSummaryError,
   SummaryActionTypes
 } from '@/containers/SummaryReport/summaryIndex';
 import { GET_USER_MODULE_DATA } from '@/graphql/queries/summary';
-import { RootState } from '@/redux/store';
-import { StructuredAnalysis } from '@/summary/types';
 import { Dispatch } from 'redux';
 import { formatElapsedTime } from '@/components/quiz/SummaryReport/helper';
 
@@ -31,7 +26,6 @@ const QuizResults: React.FC<QuizResultsProps> = ({
   onReview,
   timeTaken,
   moduleId,
-  moduleName,
   moduleReports,
   quizId
 }) => {

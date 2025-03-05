@@ -220,185 +220,92 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-md p-8">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">Profile Settings</h1>
-            {data?.users_by_pk?.created_at && (
-              <p className="text-sm text-gray-600 mt-1">
-                Member since {formatDate(data.users_by_pk.created_at)}
-              </p>
-            )}
-          </div>
-          {!isEditing && (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Edit Profile
-            </button>
-          )}
-        </div>
-
-        {error && (
-          <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                First Name
-              </label>
-              <input
-                type="text"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                required
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  isEditing ? 'bg-white' : 'bg-gray-100'
-                }`}
-              />
+              <h1 className="text-2xl font-bold text-gray-800">Profile Settings</h1>
+              {data?.users_by_pk?.created_at && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Member since {formatDate(data.users_by_pk.created_at)}
+                </p>
+              )}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Last Name
-              </label>
-              <input
-                type="text"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                required
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  isEditing ? 'bg-white' : 'bg-gray-100'
-                }`}
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              disabled={!isEditing}
-              required
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                isEditing ? 'bg-white' : 'bg-gray-100'
-              }`}
-            />
-          </div>
-
-          {isEditing && (
-            <div className="flex justify-end gap-4">
+            {!isEditing && (
               <button
-                type="button"
-                onClick={() => {
-                  setIsEditing(false);
-                  setError(null);
-                  setFormData(initialFormData);
-                  setHasChanges(false);
-                }}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                onClick={() => setIsEditing(true)}
+                className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={!isProfileFormValid()}
-                className={`px-4 py-2 rounded-lg text-white ${
-                  isProfileFormValid()
-                    ? 'bg-blue-600 hover:bg-blue-700'
-                    : 'bg-gray-400 cursor-not-allowed'
-                }`}
-              >
-                Save Changes
-              </button>
-            </div>
-          )}
-        </form>
-
-        <div className="mt-12 pt-8 border-t">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-gray-800">Change Password</h2>
-            {!isChangingPassword && (
-              <button
-                onClick={() => setIsChangingPassword(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Change Password
+                Edit Profile
               </button>
             )}
           </div>
 
-          {passwordError && (
+          {error && (
             <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
-              {passwordError}
+              {error}
             </div>
           )}
 
-          {passwordSuccess && (
-            <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
-              {passwordSuccess}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                />
+              </div>
+              <div>
+                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                />
+              </div>
             </div>
-          )}
 
-          {isChangingPassword && (
-            <form onSubmit={handlePasswordSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  New Password
-                </label>
-                <input
-                  type="password"
-                  name="newPassword"
-                  value={passwordData.newPassword}
-                  onChange={handlePasswordChange}
-                  required
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <PasswordValidation password={passwordData.newPassword} />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                required
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  isEditing ? 'bg-white' : 'bg-gray-100'
+                }`}
+              />
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm New Password
-                </label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={passwordData.confirmPassword}
-                  onChange={handlePasswordChange}
-                  required
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                {passwordData.confirmPassword && passwordData.newPassword !== passwordData.confirmPassword && (
-                  <p className="mt-2 text-sm text-red-600">Passwords do not match</p>
-                )}
-              </div>
-
+            {isEditing && (
               <div className="flex justify-end gap-4">
                 <button
                   type="button"
                   onClick={() => {
-                    setIsChangingPassword(false);
-                    setPasswordError(null);
-                    setPasswordSuccess(null);
-                    setPasswordData({
-                      newPassword: '',
-                      confirmPassword: ''
-                    });
+                    setIsEditing(false);
+                    setError(null);
+                    setFormData(initialFormData);
+                    setHasChanges(false);
                   }}
                   className="px-4 py-2 text-gray-600 hover:text-gray-800"
                 >
@@ -406,18 +313,109 @@ const ProfilePage: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={!isPasswordFormValid() || !validatePassword(passwordData.newPassword)}
+                  disabled={!isProfileFormValid()}
                   className={`px-4 py-2 rounded-lg text-white ${
-                    isPasswordFormValid() && validatePassword(passwordData.newPassword)
+                    isProfileFormValid()
                       ? 'bg-blue-600 hover:bg-blue-700'
                       : 'bg-gray-400 cursor-not-allowed'
                   }`}
                 >
-                  Update Password
+                  Save Changes
                 </button>
               </div>
-            </form>
-          )}
+            )}
+          </form>
+
+          <div className="mt-12 pt-8 border-t">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-gray-800">Change Password</h2>
+              {!isChangingPassword && (
+                <button
+                  onClick={() => setIsChangingPassword(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Change Password
+                </button>
+              )}
+            </div>
+
+            {passwordError && (
+              <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+                {passwordError}
+              </div>
+            )}
+
+            {passwordSuccess && (
+              <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
+                {passwordSuccess}
+              </div>
+            )}
+
+            {isChangingPassword && (
+              <form onSubmit={handlePasswordSubmit} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    name="newPassword"
+                    value={passwordData.newPassword}
+                    onChange={handlePasswordChange}
+                    required
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <PasswordValidation password={passwordData.newPassword} />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Confirm New Password
+                  </label>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={passwordData.confirmPassword}
+                    onChange={handlePasswordChange}
+                    required
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  {passwordData.confirmPassword && passwordData.newPassword !== passwordData.confirmPassword && (
+                    <p className="mt-2 text-sm text-red-600">Passwords do not match</p>
+                  )}
+                </div>
+
+                <div className="flex justify-end gap-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsChangingPassword(false);
+                      setPasswordError(null);
+                      setPasswordSuccess(null);
+                      setPasswordData({
+                        newPassword: '',
+                        confirmPassword: ''
+                      });
+                    }}
+                    className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={!isPasswordFormValid() || !validatePassword(passwordData.newPassword)}
+                    className={`px-4 py-2 rounded-lg text-white ${
+                      isPasswordFormValid() && validatePassword(passwordData.newPassword)
+                        ? 'bg-blue-600 hover:bg-blue-700'
+                        : 'bg-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    Update Password
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -3,13 +3,29 @@ import { useMutation } from "@apollo/client";
 import { UPDATE_COURSE_NAME, DELETE_COURSE, GET_COURSES_WITH_LEARNING_PATHS } from "@/graphql/queries/courses";
 import { CourseCardProps } from './types';
 import { formatDate, getProgressBarWidth, validateCourseName, isCourseStarted } from './helper';
-import { calculateProgressStatus, getProgressStatusColor, getProgressStatusText } from '@/components/dashboard/Dashboard/helper';
+import { calculateProgressStatus, getProgressStatusColor, getProgressStatusText } from '@/components/dashboard/helper';
+import { Course as DashboardCourse } from '@/components/courses/Courses/types';
 
 const CourseCard: React.FC<CourseCardProps> = ({ course, userId, onClick, onViewModules }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(course.course_name);
 
+  // Add debug logging
+  console.log('Course:', {
+    name: course.course_name,
+    startDate: course.start_date,
+    parsedStartDate: new Date(course.start_date),
+    currentDate: new Date(),
+  });
+
   const hasStarted = isCourseStarted(course.start_date);
+
+  // Helper function to adapt Course type for calculateProgressStatus
+  const adaptCourseForProgress = (course: CourseCardProps['course']): DashboardCourse => ({
+    ...course,
+    name: course.course_name,
+    learning_paths: []
+  });
 
   const [updateCourseName] = useMutation(UPDATE_COURSE_NAME, {
     refetchQueries: [{ query: GET_COURSES_WITH_LEARNING_PATHS, variables: { userId } }],
@@ -51,7 +67,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, userId, onClick, onView
     }
   };
 
-  const handleCardClick = (e: React.MouseEvent) => {
+  const handleCardClick = () => {
     if (!isEditing) {
       onClick();
     }
@@ -66,7 +82,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, userId, onClick, onView
     return `${duration.value} ${duration.unit}`;
   };
 
-  const progressStatus = hasStarted ? calculateProgressStatus(course) : null;
+  const progressStatus = hasStarted ? calculateProgressStatus(adaptCourseForProgress(course)) : null;
   const statusColor = progressStatus ? getProgressStatusColor(progressStatus.status) : '';
   const statusText = progressStatus ? getProgressStatusText(progressStatus) : '';
 
@@ -166,7 +182,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, userId, onClick, onView
                   {progressStatus?.completedModules} of {course.modules.length} modules completed
                 </span>
                 {progressStatus && (
-                  <span className={`text-sm font-medium ${progressStatus.status === 'behind' ? 'text-red-600' : statusColor}`}>
+                  <span className={`text-sm font-medium ml-2 text-right ${progressStatus.status === 'behind' ? 'text-red-600' : statusColor}`}>
                     {statusText}
                   </span>
                 )}

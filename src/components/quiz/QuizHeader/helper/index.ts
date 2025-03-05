@@ -8,7 +8,7 @@ export const getProgressBarWidth = (progress: number): string => {
   return `${Math.min(Math.max(progress, 0), 100)}%`;
 };
 
-export const getProgressBarColor = (progress: number): string => {
+export const getProgressBarColor = (): string => {
   return 'bg-blue-500';
 };
 

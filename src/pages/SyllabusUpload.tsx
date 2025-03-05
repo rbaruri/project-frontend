@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import SyllabusUploadForm from '@/components/syllabus/SyllabusUploadForm';
+import SyllabusUploadForm from '@/components/syllabus';
 import { uploadSyllabusRequest } from '@/containers/SyllabusUpload/syllabusActions';
 import { 
   selectSyllabusLoading, 

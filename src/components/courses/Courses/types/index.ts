@@ -1,7 +1,7 @@
 export interface Module {
   id: string;
   title: string;
-  status: string;
+  status: 'not_started' | 'in_progress' | 'completed';
 }
 
 export interface Course {

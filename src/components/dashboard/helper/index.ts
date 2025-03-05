@@ -1,4 +1,4 @@
-import { Course, Module } from '@/types/courseTypes';
+import { Course, Module } from '@/components/courses/Courses/types';
 
 export interface ProgressStatus {
   status: 'ahead' | 'on_track' | 'behind';
@@ -68,21 +68,28 @@ export const calculateProgressStatus = (course: Course): ProgressStatus => {
   const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
   const daysPassed = Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 
-  // Calculate expected progress based on time elapsed
-  const progressRatio = Math.min(Math.max(daysPassed / totalDays, 0), 1);
-  const expectedModules = Math.ceil(course.modules.length * progressRatio);
+  // Simple ratio calculation
+  // If 15 days = 3 modules
+  // Then X days = 1 module completed
+  // X = (15 * 1) / 3 = 5 days per module
+  const daysPerModule = totalDays / course.modules.length;
   
   // Count completed modules
   const completedModules = course.modules.filter(
     (module: Module) => module.status === 'completed'
   ).length;
 
-  // Calculate days ahead/behind
-  const expectedCompletionDate = new Date(startDate);
-  expectedCompletionDate.setDate(startDate.getDate() + Math.ceil(completedModules * totalDays / course.modules.length));
-  const daysOffset = Math.ceil((expectedCompletionDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  // Expected days to complete current progress
+  const expectedDays = daysPerModule * completedModules;
+  
+  // If you took less days than expected, you're ahead
+  // If you took more days than expected, you're behind
+  const daysOffset = Math.ceil(expectedDays - daysPassed);
 
-  // Determine status
+  // Calculate expected modules at this point in time
+  const expectedModules = Math.ceil((daysPassed / totalDays) * course.modules.length);
+
+  // Determine status based on completed vs expected
   let status: 'ahead' | 'on_track' | 'behind';
   if (completedModules > expectedModules) {
     status = 'ahead';
@@ -113,14 +120,14 @@ export const getProgressStatusColor = (status: ProgressStatus['status']): string
 };
 
 export const getProgressStatusText = (status: ProgressStatus): string => {
-  const { status: progressStatus, daysOffset } = status;
+  const { status: progressStatus } = status;
   switch (progressStatus) {
     case 'ahead':
-      return `${daysOffset} day${daysOffset !== 1 ? 's' : ''} ahead of schedule`;
+      return 'ahead of schedule';
     case 'behind':
-      return `${daysOffset} day${daysOffset !== 1 ? 's' : ''} behind schedule`;
+      return 'behind schedule';
     case 'on_track':
     default:
-      return 'On track';
+      return 'on track';
   }
 };

@@ -1,2 +1,2 @@
-export { SummaryDisplay } from './components';
+export * from './index.tsx';
 export * from './helper'; 

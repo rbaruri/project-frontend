@@ -1,4 +1,4 @@
-import { QuizQuestion, AnswerStatus } from '../types';
+import { QuizQuestion, AnswerStatus } from '../types/index';
 
 export const getAnswerStatus = (question: QuizQuestion, userAnswer: string | undefined): AnswerStatus => {
   if (!userAnswer) {

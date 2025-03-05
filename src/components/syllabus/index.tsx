@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Calendar from "@/components/common/Calendar";
-import { FormData, SyllabusUploadFormProps } from "./types";
-import { validateFile, validateFormData, downloadSampleSyllabus } from "./helper";
+import { FormData, SyllabusUploadFormProps } from "@/components/syllabus/types/index";
+import { validateFile, validateFormData, downloadSampleSyllabus } from "@/components/syllabus/helper";
 
 const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
   loading,
