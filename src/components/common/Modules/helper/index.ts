@@ -1,4 +1,4 @@
-import { Module } from './Modules.types';
+import { Module } from '../types';
 
 export const formatDate = (dateString: string): string => {
   return new Date(dateString).toLocaleDateString();

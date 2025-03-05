@@ -62,33 +62,17 @@ export const router = createBrowserRouter([
     element: <LandingLayout />,
     children: [
       {
-        path: "/",
-        index: true,
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <LandingPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: "syllabus-upload",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <SyllabusUploadPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: "terms-and-privacy",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <TermsAndPrivacy />
-          </Suspense>
-        ),
-      },
-      {
         element: <AuthGuard />,
         children: [
+          {
+            path: "/",
+            index: true,
+            element: (
+              <Suspense fallback={<LoadingSpinner />}>
+                <LandingPage />
+              </Suspense>
+            ),
+          },
           {
             path: "authentication",
             children: [
@@ -111,6 +95,22 @@ export const router = createBrowserRouter([
             ],
           },
         ],
+      },
+      {
+        path: "syllabus-upload",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <SyllabusUploadPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "terms-and-privacy",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <TermsAndPrivacy />
+          </Suspense>
+        ),
       },
     ],
   },

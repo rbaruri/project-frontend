@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Module from './index';
-import { Module as ModuleType } from './Modules.types';
+import Module from '../index';
+import { Module as ModuleType } from '../types';
 
 // Mock the Quiz component
 jest.mock('@/components/common/Quiz', () => {

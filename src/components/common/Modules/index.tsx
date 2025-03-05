@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Quiz from "@/components/common/Quiz";
-import { ModuleProps } from './Modules.types';
-import { formatDate, hasResources, hasQuizContent } from './Modules.helper';
+import { ModuleProps } from './types';
+import { formatDate, hasResources, hasQuizContent } from './helper';
 
 const Module: React.FC<ModuleProps> = ({ module, showQuiz, hasQuiz, onQuizToggle }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
