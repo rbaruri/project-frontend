@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { LoginState, LoginAction } from '@/types/loginTypes';
+import { LoginState, LoginAction } from './loginConstants';
 import {
   LOGIN_REQUEST,
   LOGIN_SUCCESS,

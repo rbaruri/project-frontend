@@ -3,19 +3,21 @@ import {
     FETCH_MODULES_SUCCESS,
     FETCH_MODULES_FAILURE,
     Module,
-    ModuleActionTypes,
-  } from "../../types/moduleTypes";
+    FetchModulesRequestAction,
+    FetchModulesSuccessAction,
+    FetchModulesFailureAction
+} from "./modulesConstants";
   
-  export const fetchModulesRequest = (): ModuleActionTypes => ({
+  export const fetchModulesRequest = (): FetchModulesRequestAction => ({
     type: FETCH_MODULES_REQUEST,
   });
   
-  export const fetchModulesSuccess = (modules: Module[]): ModuleActionTypes => ({
+  export const fetchModulesSuccess = (modules: Module[]): FetchModulesSuccessAction => ({
     type: FETCH_MODULES_SUCCESS,
     payload: modules,
   });
   
-  export const fetchModulesFailure = (error: string): ModuleActionTypes => ({
+  export const fetchModulesFailure = (error: string): FetchModulesFailureAction => ({
     type: FETCH_MODULES_FAILURE,
     payload: error,
   });

@@ -9,7 +9,7 @@ import {
   selectSignupError,
   selectSignupSuccess
 } from '@/containers/SignUp/signupIndex';
-import { SignUpFormData } from '@/types/signupTypes';
+import { SignUpFormData } from '@/containers/SignUp/signupConstants';
 import LoadingOverlay from '@/components/common/LoadingOverlay';
 
 const SignUpPage: React.FC = () => {

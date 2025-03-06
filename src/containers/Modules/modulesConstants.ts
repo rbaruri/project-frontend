@@ -20,7 +20,7 @@ export interface Module {
 }
 
 export interface ModuleState {
-  data: Module | null;
+  modules: Module[];
   loading: boolean;
   error: string | null;
   currentModuleIndex: number;
@@ -73,4 +73,4 @@ export type ModuleActionTypes =
   | FetchModulesSuccessAction
   | FetchModulesFailureAction
   | SetCurrentModuleAction
-  | UpdateModuleStatusAction; 
+  | UpdateModuleStatusAction;

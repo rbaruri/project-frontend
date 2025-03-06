@@ -3,9 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import LoginForm from '@/components/auth/LoginForm';
 import { selectLoginLoading, selectLoginError } from '@/containers/Login/loginSelectors';
 import { loginRequest } from '@/containers/Login/loginActions';
-import { LoginFormData, LoginPageProps } from '@/types/loginTypes';
+import { LoginFormData } from '@/containers/Login/loginConstants';
 
-const LoginPage: React.FC<LoginPageProps> = () => {
+const LoginPage: React.FC = () => {
   const dispatch = useDispatch();
   const loading = useSelector(selectLoginLoading);
   const error = useSelector(selectLoginError);

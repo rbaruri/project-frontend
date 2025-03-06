@@ -3,7 +3,7 @@ import { api } from '@/api/axios';
 import { get } from 'lodash';
 import { LOGIN_REQUEST, LOGOUT } from '@/containers/Login/loginConstants';
 import { loginSuccess, loginFailure } from '@/containers/Login/loginActions';
-import { LoginFormData, LoginResponse } from '@/types/loginTypes';
+import { LoginFormData, LoginResponse } from './loginConstants';
 import { AxiosResponse } from 'axios';
 
 function* loginSaga(action: { type: string; payload: LoginFormData }) {

@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import { QuizSummaryReport, StructuredAnalysis } from '../types';
-import SummaryService from '../service';
+import { QuizSummaryReport, StructuredAnalysis } from '../summary/types';
+import SummaryService from '../summary/services';
 
 const useSummary = () => {
   const [isLoading, setIsLoading] = useState(false);

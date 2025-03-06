@@ -6,7 +6,7 @@ import {
   generateSummaryFailure,
   UUID
 } from './summaryActions';
-import SummaryService from '@/summary/service';
+import SummaryService from '@/summary/services';
 import { StructuredAnalysis } from '@/summary/types';
 
 function* generateSummarySaga(action: GenerateSummaryAction): Generator<any, void, any> {

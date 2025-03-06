@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { SignUpState } from '@/types/signupTypes';
+import { SignUpState } from './signupConstants';
 import {
   SIGNUP_REQUEST,
   SIGNUP_SUCCESS,

@@ -3,7 +3,7 @@ import { api } from '@/api/axios';
 import { get } from 'lodash';
 import { SIGNUP_REQUEST } from '@/containers/SignUp/signupConstants';
 import { signupSuccess, signupFailure } from '@/containers/SignUp/signupActions';
-import { SignUpFormData, SignUpResponse } from '@/types/signupTypes';
+import { SignUpFormData, SignUpResponse } from './signupConstants';
 import { AxiosResponse } from 'axios';
 
 function* signupSaga(action: { type: string; payload: SignUpFormData }) {

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { api } from '@/api/axios';
-import { User } from '@/types/loginTypes';
+import { User } from '@/containers/Login/loginConstants';
 
 interface AuthContextType {
   user: User | null;
