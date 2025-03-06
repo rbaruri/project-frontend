@@ -1,13 +1,12 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
-import { GENERATE_SUMMARY } from './summaryConstants';
+import { GENERATE_SUMMARY, StructuredAnalysis } from './summaryConstants';
 import {
   GenerateSummaryAction,
   generateSummarySuccess,
   generateSummaryFailure,
   UUID
 } from './summaryActions';
-import SummaryService from '@/summary/services';
-import { StructuredAnalysis } from '@/summary/types';
+import SummaryService from './services';
 
 function* generateSummarySaga(action: GenerateSummaryAction): Generator<any, void, any> {
   try {

@@ -9,7 +9,7 @@ import {
   ModuleStatus,
 } from "@/graphql/queries/modules";
 import { ModuleListProps, Module, QuizStatus } from "./types";
-import { QuizSummaryReport } from "@/summary/types";
+import { QuizSummaryReport } from "@/containers/SummaryReport/summaryConstants";
 import {
   getStatusColor,
   getQuizStatusColor,
@@ -23,7 +23,7 @@ import {
   formatHours,
 } from "./helper";
 import { SummaryDisplay } from "@/components/quiz/SummaryReport";
-import { useSummary } from "@/summary";
+import { useSummary } from "@/hooks/useSummary";
 
 const ModuleList: React.FC<ModuleListProps> = ({ courseId }) => {
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());

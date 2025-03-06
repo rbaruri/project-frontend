@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, Dispatch, SetStateAction } from 'react';
 import { useMutation } from '@apollo/client';
 import { UPDATE_QUIZ_STATUS, UPDATE_MODULE_STATUS } from '@/graphql/mutations/quiz';
-import { useSummary } from '@/summary';
+import { useSummary } from '@/hooks/useSummary';
 
 const QUIZ_TIME_LIMIT = 300; // 5 minutes in seconds
 

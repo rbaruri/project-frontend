@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
-import { QuizSummaryReport, StructuredAnalysis } from '../summary/types';
-import SummaryService from '../summary/services';
+import { QuizSummaryReport, StructuredAnalysis } from '@/containers/SummaryReport/summaryConstants';
+import SummaryService from '@/containers/SummaryReport/services';
 
-const useSummary = () => {
+export const useSummary = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<StructuredAnalysis | null>(null);
@@ -35,6 +35,4 @@ const useSummary = () => {
     analysis,
     generateAnalysis
   };
-};
-
-export default useSummary; 
+}; 

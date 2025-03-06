@@ -67,12 +67,7 @@ function* loginSaga(action: { type: string; payload: LoginFormData }) {
     }
 
     yield put(loginSuccess(responseData));
-
-    // Add a small delay for smooth transition
-    yield delay(800);
-
-    // Redirect to dashboard
-    window.location.href = '/dashboard';
+    
   } catch (error: any) {
     // Enhanced error logging
     console.error('Login error details:', {
@@ -99,9 +94,8 @@ function* logoutSaga() {
     yield call(api.post, '/api/auth/logout');
     localStorage.removeItem('token');
     
-    // Add a small delay for logout as well
-    yield delay(800);
-    window.location.href = '/login';
+    // Navigation will be handled by the component
+    yield put({ type: 'LOGOUT_SUCCESS' });
   } catch (error) {
     console.error('Error during logout:', error);
   }

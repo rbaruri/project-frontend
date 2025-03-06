@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { GET_QUIZ_WITH_QUESTIONS, GET_NEXT_MODULE } from '@/graphql/queries/quiz';
@@ -11,6 +11,7 @@ import QuizNavigation from '@/components/quiz/QuizNavigation';
 import TimeoutModal from '@/components/quiz/TimeoutModal';
 import useQuizState from '@/hooks/useQuizState';
 import { useQuizStorage } from '@/hooks/useQuizStorage';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 
 const Quiz: React.FC = () => {
   const { quizId } = useParams<{ quizId: string }>();
@@ -43,6 +44,8 @@ const Quiz: React.FC = () => {
     },
     skip: !data?.quizzes_by_pk?.module?.course_id || !data?.quizzes_by_pk?.module?.id
   });
+
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
 
   const handleAnswerSelect = useCallback((questionId: string, selectedOption: string) => {
     actions.handleAnswerSelect(questionId, selectedOption);
@@ -105,6 +108,15 @@ const Quiz: React.FC = () => {
     }
   }, [nextModuleData?.modules, data?.quizzes_by_pk, navigate, handleBackToModule, quizId, state.score]);
 
+  const handleSubmitClick = useCallback(() => {
+    setShowSubmitConfirm(true);
+  }, []);
+
+  const handleConfirmSubmit = useCallback(() => {
+    setShowSubmitConfirm(false);
+    actions.handleSubmit(data?.quizzes_by_pk.quiz_questions, data?.quizzes_by_pk.module.id, data?.quizzes_by_pk.cutoff_score);
+  }, [actions, data]);
+
   // Load saved answers only once when component mounts
   useEffect(() => {
     if (!state.isSubmitted && !state.showResults) {
@@ -122,8 +134,6 @@ const Quiz: React.FC = () => {
     }
   }, [state.isSubmitted, state.showResults, storage]);
 
-
-
   if (!quizId) return <div className="p-4">Quiz ID not provided</div>;
   if (loading) return <div className="flex justify-center items-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>;
   if (error) return <div className="text-center p-8 text-red-600"><h3 className="text-xl font-semibold mb-2">Error Loading Quiz</h3><p>{error.message}</p></div>;
@@ -136,6 +146,16 @@ const Quiz: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <ConfirmDialog
+        isOpen={showSubmitConfirm}
+        onClose={() => setShowSubmitConfirm(false)}
+        onConfirm={handleConfirmSubmit}
+        title="Submit Quiz"
+        message="Are you sure you want to submit this quiz? You won't be able to change your answers after submission."
+        confirmText="Submit"
+        cancelText="Cancel"
+        type="warning"
+      />
       <TimeoutModal 
         isOpen={state.timeLeft === 0 && !state.showResults} 
         onRetake={() => actions.handleRetake(quiz.module.id)}
@@ -213,7 +233,7 @@ const Quiz: React.FC = () => {
               answeredQuestions={Object.keys(state.userAnswers).length}
               onPrevious={() => actions.setCurrentQuestionIndex(prev => prev - 1)}
               onNext={() => actions.setCurrentQuestionIndex(prev => prev + 1)}
-              onSubmit={() => actions.handleSubmit(quiz.quiz_questions, quiz.module.id, quiz.cutoff_score)}
+              onSubmit={handleSubmitClick}
               isReviewMode={state.isReviewMode}
             />
           </>

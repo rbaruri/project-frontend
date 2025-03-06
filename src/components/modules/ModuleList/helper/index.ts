@@ -99,6 +99,7 @@ export const isModuleLocked = (moduleIndex: number, modules: Module[]): boolean 
 export const getQuizButtonText = (quiz: any, isLocked: boolean) => {
   if (isLocked) return "Locked";
   if (quiz.status === 'passed') return "Review Quiz";
+  if (quiz.status === 'failed') return "Retry Quiz";
   
   // Check if there are saved answers for this quiz
   const hasStartedQuiz = localStorage.getItem(`quiz_${quiz.id}_answers`) !== null;

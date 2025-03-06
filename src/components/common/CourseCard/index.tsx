@@ -5,10 +5,12 @@ import { CourseCardProps } from './types';
 import { formatDate, getProgressBarWidth, validateCourseName, isCourseStarted } from './helper';
 import { calculateProgressStatus, getProgressStatusColor, getProgressStatusText } from '@/components/dashboard/helper';
 import { Course as DashboardCourse } from '@/components/courses/Courses/types';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 
 const CourseCard: React.FC<CourseCardProps> = ({ course, userId, onClick, onViewModules }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(course.course_name);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Add debug logging
   console.log('Course:', {
@@ -54,16 +56,19 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, userId, onClick, onView
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (window.confirm('Are you sure you want to delete this course?')) {
-      try {
-        await deleteCourse({
-          variables: {
-            courseId: course.id,
-          },
-        });
-      } catch (error) {
-        console.error('Error deleting course:', error);
-      }
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteCourse({
+        variables: {
+          id: course.id,
+        },
+      });
+      setShowDeleteConfirm(false);
+    } catch (error) {
+      console.error('Error deleting course:', error);
     }
   };
 
@@ -88,6 +93,17 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, userId, onClick, onView
 
   return (
     <div className="relative h-full">
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+        title="Delete Course"
+        message="Are you sure you want to delete this course? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+      />
       <div 
         className={`bg-white rounded-lg shadow-md p-6 transition-shadow duration-300 h-full flex flex-col ${
           hasStarted ? 'hover:shadow-lg cursor-pointer' : 'opacity-75'

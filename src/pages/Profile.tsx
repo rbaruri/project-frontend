@@ -23,12 +23,16 @@ const ProfilePage: React.FC = () => {
   });
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }).format(date);
+    if (!dateString) return 'Not set';
+    try {
+      const date = new Date(dateString);
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    } catch (error) {
+      return 'Invalid Date';
+    }
   };
 
   const [updateProfile] = useMutation(UPDATE_USER_PROFILE, {
