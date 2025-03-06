@@ -6,6 +6,7 @@ import {
   LOGIN_FAILURE,
   LOGIN_RESET,
   LOGOUT,
+  UPDATE_AUTH_CONTEXT,
 } from '@/containers/Login/loginConstants';
 
 const initialState: LoginState = {
@@ -14,7 +15,8 @@ const initialState: LoginState = {
   success: false,
   token: null,
   user: null,
-  isAuthenticated: false
+  isAuthenticated: false,
+  authUpdateAction: null
 };
 
 const loginReducer = (state = initialState, action: LoginAction) =>
@@ -44,8 +46,20 @@ const loginReducer = (state = initialState, action: LoginAction) =>
         draft.isAuthenticated = false;
         break;
 
-      case LOGIN_RESET:
+      case UPDATE_AUTH_CONTEXT:
+        draft.authUpdateAction = {
+          type: UPDATE_AUTH_CONTEXT,
+          payload: action.payload
+        };
+        break;
+
       case LOGOUT:
+        draft.authUpdateAction = {
+          type: LOGOUT
+        };
+        return initialState;
+
+      case LOGIN_RESET:
         return initialState;
 
       default:

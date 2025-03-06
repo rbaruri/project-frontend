@@ -1,30 +1,20 @@
+import React from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { router } from '@/routes/AppRoutes';
-import { FC } from 'react';
-import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from '@/context/AuthContext';
+import { Provider } from 'react-redux';
+import { store } from '@/redux/store';
+import AuthContextUpdater from '@/components/auth/AuthContextUpdater';
+import './App.css';
 
-const App: FC = () => {
+const App: React.FC = () => {
   return (
-    <>
-      <RouterProvider router={router} />
-      <Toaster position="top-right" toastOptions={{
-        duration: 3000,
-        style: {
-          background: '#333',
-          color: '#fff',
-        },
-        success: {
-          style: {
-            background: '#22c55e',
-          },
-        },
-        error: {
-          style: {
-            background: '#ef4444',
-          },
-        },
-      }} />
-    </>
+    <Provider store={store}>
+      <AuthProvider>
+        <AuthContextUpdater />
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </Provider>
   );
 };
 

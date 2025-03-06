@@ -1,10 +1,11 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
-export default {
+const config = {
   preset: 'ts-jest',
   testEnvironment: "jsdom", 
   transform: {
     "^.+\\.tsx?$": ["ts-jest", {
-      tsconfig: "tsconfig.json"
+      tsconfig: "tsconfig.json",
+      useESM: true
     }]
   },
   moduleNameMapper: {
@@ -15,3 +16,5 @@ export default {
   testMatch: ["**/__tests__/**/*.test.[jt]s?(x)"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"]
 };
+
+export default config;

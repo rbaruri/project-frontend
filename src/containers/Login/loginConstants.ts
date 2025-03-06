@@ -3,6 +3,7 @@ export const LOGIN_SUCCESS = 'login/LOGIN_SUCCESS';
 export const LOGIN_FAILURE = 'login/LOGIN_FAILURE';
 export const LOGIN_RESET = 'login/LOGIN_RESET';
 export const LOGOUT = 'login/LOGOUT';
+export const UPDATE_AUTH_CONTEXT = 'login/UPDATE_AUTH_CONTEXT';
 
 export interface LoginFormData {
   email: string;
@@ -27,6 +28,7 @@ export interface LoginState {
   loading: boolean;
   error: string | null;
   success: boolean;
+  authUpdateAction: { type: 'login/UPDATE_AUTH_CONTEXT'; payload: User } | { type: 'login/LOGOUT' } | null;
 }
 
 export interface LoginError {
@@ -47,4 +49,5 @@ export type LoginAction =
   | { type: 'login/LOGIN_SUCCESS'; payload: LoginResponse }
   | { type: 'login/LOGIN_FAILURE'; payload: string }
   | { type: 'login/LOGIN_RESET' }
-  | { type: 'login/LOGOUT' }; 
+  | { type: 'login/LOGOUT' }
+  | { type: 'login/UPDATE_AUTH_CONTEXT'; payload: User }; 

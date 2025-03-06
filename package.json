@@ -15,6 +15,7 @@
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
     "@reduxjs/toolkit": "^2.1.0",
+    "@testing-library/user-event": "^14.6.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.4.10",
     "graphql": "^16.8.1",
@@ -44,6 +45,7 @@
     "postcss": "^8.4.35",
     "redux-mock-store": "^1.5.4",
     "tailwindcss": "^3.4.1",
+    "ts-jest": "^29.2.6",
     "typescript": "^5.2.2",
     "vite": "^5.0.8"
   }

@@ -1,10 +1,11 @@
-import { LoginFormData, LoginResponse } from './loginConstants';
+import { LoginFormData, LoginResponse, User } from './loginConstants';
 import {
   LOGIN_REQUEST,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
   LOGIN_RESET,
   LOGOUT,
+  UPDATE_AUTH_CONTEXT,
 } from '@/containers/Login/loginConstants';
 
 export const loginRequest = (formData: LoginFormData) => ({
@@ -28,4 +29,9 @@ export const loginReset = () => ({
 
 export const logout = () => ({
   type: LOGOUT,
+});
+
+export const updateAuthContext = (user: User) => ({
+  type: UPDATE_AUTH_CONTEXT,
+  payload: user,
 });

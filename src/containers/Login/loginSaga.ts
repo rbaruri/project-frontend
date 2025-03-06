@@ -2,8 +2,8 @@ import { takeLatest, call, put, delay } from 'redux-saga/effects';
 import { api } from '@/api/axios';
 import { get } from 'lodash';
 import { LOGIN_REQUEST, LOGOUT } from '@/containers/Login/loginConstants';
-import { loginSuccess, loginFailure } from '@/containers/Login/loginActions';
-import { LoginFormData, LoginResponse } from './loginConstants';
+import { loginSuccess, loginFailure, updateAuthContext } from '@/containers/Login/loginActions';
+import { LoginFormData, LoginResponse, User } from './loginConstants';
 import { AxiosResponse } from 'axios';
 
 function* loginSaga(action: { type: string; payload: LoginFormData }) {
@@ -45,8 +45,8 @@ function* loginSaga(action: { type: string; payload: LoginFormData }) {
       throw new Error('Missing required user data');
     }
 
-    // Transform the user data
-    const user = {
+    // Transform the user data for Redux state
+    const userForRedux = {
       id: rawUser.id,
       firstName: rawUser.first_name,
       lastName: rawUser.last_name,
@@ -56,7 +56,16 @@ function* loginSaga(action: { type: string; payload: LoginFormData }) {
 
     const responseData: LoginResponse = {
       token: response.data.token,
-      user
+      user: userForRedux
+    };
+
+    // Transform the user data for AuthContext
+    const userForAuth: User = {
+      id: rawUser.id,
+      userId: rawUser.id, // Using the same ID since they represent the same user
+      email: rawUser.email,
+      first_name: rawUser.first_name,
+      last_name: rawUser.last_name
     };
 
     console.log('Transformed response data:', responseData);
@@ -66,6 +75,8 @@ function* loginSaga(action: { type: string; payload: LoginFormData }) {
       localStorage.setItem('token', response.data.token);
     }
 
+    // Update AuthContext through Redux
+    yield put(updateAuthContext(userForAuth));
     yield put(loginSuccess(responseData));
     
   } catch (error: any) {
@@ -91,13 +102,24 @@ function* loginSaga(action: { type: string; payload: LoginFormData }) {
 
 function* logoutSaga() {
   try {
+    // Call logout API
     yield call(api.post, '/api/auth/logout');
-    localStorage.removeItem('token');
     
-    // Navigation will be handled by the component
+    // Clear local storage
+    localStorage.clear(); // Clear all storage to ensure clean state
+    
+    // Dispatch logout action
     yield put({ type: 'LOGOUT_SUCCESS' });
+    
+    // Small delay to ensure all state updates are processed
+    yield delay(100);
+    
+    // Force refresh the page
+    window.location.href = '/authentication/login';
   } catch (error) {
     console.error('Error during logout:', error);
+    // Even if there's an error, force refresh to ensure clean state
+    window.location.href = '/authentication/login';
   }
 }
 
