@@ -1,4 +1,4 @@
-import { QuizSummaryReport, SummaryAnalysisResponse } from '../types';
+import { QuizSummaryReport, SummaryAnalysisResponse } from '../summaryConstants';
 
 class SummaryService {
   private static instance: SummaryService;
