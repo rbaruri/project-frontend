@@ -6,21 +6,18 @@ export interface QuizQuestion {
 }
 
 export interface QuizData {
-  quizzes_by_pk: {
+  id: string;
+  title: string;
+  module: {
     id: string;
-    module: {
-      id: string;
-      title: string;
-      course_id: string;
-    };
-    quiz_questions: {
-      id: string;
-      question: string;
-      options: string[];
-      correct_option: string;
-    }[];
-    cutoff_score: number;
+    course_id: string;
   };
+  questions: Array<{
+    id: string;
+    question: string;
+    options: string[];
+    correct_option: string;
+  }>;
 }
 
 export interface QuizState {

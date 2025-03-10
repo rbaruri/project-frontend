@@ -9,19 +9,6 @@ interface UserAnswers {
   [questionId: string]: string;
 }
 
-interface QuizState {
-  userAnswers: UserAnswers;
-  isSubmitted: boolean;
-  score: number;
-  timeLeft: number;
-  currentQuestionIndex: number;
-  showResults: boolean;
-  attempts: number;
-  isReviewMode: boolean;
-  timeTaken: number;
-  allModuleReports: ModuleQuizReports;
-}
-
 interface QuizAttemptSummary {
   attemptNumber: number;
   score: number;

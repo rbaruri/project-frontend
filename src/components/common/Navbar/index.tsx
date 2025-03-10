@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext'
+import { useDispatch } from 'react-redux';
+import { resetSyllabusState } from '@/containers/SyllabusUpload/syllabusActions';
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { logout, user, isAuthenticated } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -42,15 +45,19 @@ const Navbar = () => {
 
   const handleSyllabusUploadClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    console.log('Syllabus upload clicked');
+    
     if (isMobileMenuOpen) {
       toggleMobileMenu();
     }
-    // Always force refresh when coming from courses page
-    if (location.pathname.includes('/courses')) {
-      window.location.href = '/syllabus-upload';
-    } else {
-      navigate('/syllabus-upload');
-    }
+    
+    // Reset the syllabus state in Redux before navigating
+    dispatch(resetSyllabusState());
+    
+    // Then navigate
+    navigate('/syllabus-upload', { 
+      replace: true 
+    });
   };
 
   const toggleMobileMenu = () => {

@@ -1,6 +1,6 @@
 import React from "react";
-import { CardProps } from "./types";
-import { getCardClasses } from "./helper";
+import { CardProps } from "@/components/common/Card/types/index";
+import { getCardClasses } from "@/components/common/Card/helper/index";
 
 const Card: React.FC<CardProps> = ({ children, className = "", onClick }) => {
   return (

@@ -2,8 +2,8 @@ import React from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { ClockIcon } from '@heroicons/react/24/outline';
-import { TimeoutModalProps } from './types';
-import { getModalClasses } from './helper';
+import { TimeoutModalProps } from '@/components/quiz/TimeoutModal/types/index';
+import { getModalClasses } from '@/components/quiz/TimeoutModal/helper/index';
 
 const TimeoutModal: React.FC<TimeoutModalProps> = ({ isOpen, onRetake }) => {
   const classes = getModalClasses();

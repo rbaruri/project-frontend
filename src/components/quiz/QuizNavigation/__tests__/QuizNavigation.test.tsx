@@ -1,6 +1,6 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import QuizNavigation from '..';
+import '@testing-library/jest-dom';
+import QuizNavigation from '@/components/quiz/QuizNavigation/index';
 
 describe('QuizNavigation', () => {
   const defaultProps = {

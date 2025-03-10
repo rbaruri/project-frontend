@@ -3,9 +3,9 @@ import {
   GENERATE_SUMMARY_SUCCESS,
   GENERATE_SUMMARY_FAILURE,
   CLEAR_SUMMARY
-} from './summaryConstants';
-import { SummaryActionTypes, UUID } from './summaryActions';
-import { StructuredAnalysis } from '@/summary/types';
+} from '@/containers/SummaryReport/summaryConstants';
+import { SummaryActionTypes, UUID } from '@/containers/SummaryReport/summaryActions';
+import { StructuredAnalysis } from '@/components/quiz/SummaryReport/types';
 
 export interface SummaryState {
   loading: { [moduleId: UUID]: boolean };

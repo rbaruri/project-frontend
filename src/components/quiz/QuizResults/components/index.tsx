@@ -1,6 +1,6 @@
 import React from 'react';
-import { QuizQuestion } from '../types';
-import { getAnswerStatus, getOptionClassName } from '../helper';
+import { QuizQuestion } from '@/components/quiz/types';
+import { getAnswerStatus, getOptionClassName } from '@/components/quiz/QuizResults/helper';
 
 interface TimeExpiredProps {
   onRetake: () => void;

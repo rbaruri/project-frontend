@@ -9,7 +9,7 @@ import { getModuleRoute } from './helper';
 // Sub-components
 const LoadingState: React.FC = () => (
   <div className="p-4">
-    <div className="animate-pulse">
+    <div className="animate-pulse" data-testid="loading-skeleton">
       <div className="h-32 bg-gray-200 rounded-xl mb-8"></div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[1, 2, 3].map(i => (

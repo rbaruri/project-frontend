@@ -2,9 +2,9 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useQuery } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
-import { QuizResultsProps } from './types';
-import { calculateResults } from './helper';
-import { TimeExpired, QuestionResult } from './components';
+import { QuizResultsProps } from '@/components/quiz/QuizResults/types';
+import { calculateResults } from '@/components/quiz/QuizResults/helper';
+import { TimeExpired, QuestionResult } from '@/components/quiz/QuizResults/components';
 import {
   generateSummary,
   SummaryActionTypes
@@ -23,7 +23,6 @@ const QuizResults: React.FC<QuizResultsProps> = ({
   onNextModule,
   hasNextModule,
   timeExpired = false,
-  onReview,
   timeTaken,
   moduleId,
   moduleReports,

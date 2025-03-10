@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import QuizQuestion from '..';
-import { QuizQuestion as QuizQuestionType } from '../types';
+import QuizQuestion from '@/components/quiz/QuizQuestion/index';
+import { QuizQuestion as QuizQuestionType } from '@/components/quiz/types';
+import '@testing-library/jest-dom';
 
 describe('QuizQuestion', () => {
   const mockQuestion: QuizQuestionType = {
@@ -13,7 +14,7 @@ describe('QuizQuestion', () => {
   const mockProps = {
     question: mockQuestion,
     questionNumber: 1,
-    selectedAnswer: undefined,
+    selectedAnswer: '',
     onAnswerSelect: jest.fn()
   };
 

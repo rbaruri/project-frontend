@@ -1,6 +1,6 @@
 import React from "react";
-import { CalendarProps } from "./types";
-import { getTodayDate } from "./helper";
+import { CalendarProps } from "@/components/common/Calendar/types/index";
+import { getTodayDate } from "@/components/common/Calendar/helper/index";
 
 const Calendar: React.FC<CalendarProps> = ({ 
   label, 

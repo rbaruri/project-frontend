@@ -4,14 +4,12 @@ import { router } from '@/routes/AppRoutes';
 import { AuthProvider } from '@/context/AuthContext';
 import { Provider } from 'react-redux';
 import { store } from '@/redux/store';
-import AuthContextUpdater from '@/components/auth/AuthContextUpdater';
 import './App.css';
 
 const App: React.FC = () => {
   return (
     <Provider store={store}>
       <AuthProvider>
-        <AuthContextUpdater />
         <RouterProvider router={router} />
       </AuthProvider>
     </Provider>

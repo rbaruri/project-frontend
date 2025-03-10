@@ -1,6 +1,6 @@
 import React from 'react';
-import { QuizQuestionProps } from './types';
-import { getOptionClassName } from './helper';
+import { QuizQuestionProps } from '@/components/quiz/QuizQuestion/types';
+import { getOptionClassName } from '@/components/quiz/QuizQuestion/helper';
 
 const QuizQuestion: React.FC<QuizQuestionProps> = ({
   question,

@@ -17,7 +17,8 @@ const initialState: QuizState = {
   loading: false,
   error: null,
   data: null,
-  nextModule: null,
+  nextModule: undefined,
+  currentQuestion: 0,
   currentQuestionIndex: 0,
   userAnswers: {},
   timeLeft: 3600, // 1 hour in seconds

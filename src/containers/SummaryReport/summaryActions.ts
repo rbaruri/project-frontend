@@ -1,10 +1,10 @@
-import { QuizSummaryReport, StructuredAnalysis } from '@/summary/types';
+import { QuizSummaryReport, StructuredAnalysis } from '@/components/quiz/SummaryReport/types';
 import {
   GENERATE_SUMMARY,
   GENERATE_SUMMARY_SUCCESS,
   GENERATE_SUMMARY_FAILURE,
   CLEAR_SUMMARY
-} from './summaryConstants';
+} from '@/containers/SummaryReport/summaryConstants';
 
 // Define UUID type for clarity
 export type UUID = string;

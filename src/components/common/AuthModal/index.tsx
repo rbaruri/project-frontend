@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthModalProps } from './types';
-import { getModalClasses, getOverlayClasses, getModalPanelClasses } from './helper';
+import { AuthModalProps } from '@/components/common/AuthModal/types/index';
+import { getModalClasses, getOverlayClasses, getModalPanelClasses } from '@/components/common/AuthModal/helper/index';
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();

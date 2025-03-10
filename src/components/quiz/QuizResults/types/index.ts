@@ -1,4 +1,4 @@
-import { QuizSummaryReport } from '@/summary/types';
+import { QuizSummaryReport } from '@/components/quiz/SummaryReport/types';
 
 export interface QuizQuestion {
   id: string;

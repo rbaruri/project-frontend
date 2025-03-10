@@ -1,10 +1,13 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MockedProvider } from '@apollo/client/testing';
 import { BrowserRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import configureStore from 'redux-mock-store';
 import ModuleList from '..';
 import { GET_MODULES_BY_COURSE, UPDATE_MODULE_STATUS } from '@/graphql/queries/modules';
+import '@testing-library/jest-dom';
 
+const mockStore = configureStore([]);
 const mockNavigate = jest.fn();
 
 jest.mock('react-router-dom', () => ({
@@ -75,19 +78,34 @@ describe('ModuleList', () => {
     },
   ];
 
+  const mockReduxStore = mockStore({
+    summary: {
+      analyses: {},
+      loading: false,
+      error: null
+    }
+  });
+
   const renderComponent = () => {
     return render(
-      <MockedProvider mocks={mocks} addTypename={false}>
-        <BrowserRouter>
-          <ModuleList courseId="course1" />
-        </BrowserRouter>
-      </MockedProvider>
+      <Provider store={mockReduxStore}>
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <BrowserRouter>
+            <ModuleList courseId="course1" />
+          </BrowserRouter>
+        </MockedProvider>
+      </Provider>
     );
   };
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockReduxStore.clearActions();
+  });
+
   it('shows loading state initially', () => {
     renderComponent();
-    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(screen.getByTestId('module-list-loading')).toBeInTheDocument();
   });
 
   it('renders modules after loading', async () => {

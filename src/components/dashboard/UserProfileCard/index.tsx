@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { UserProfileCardProps } from './types';
-import { getInitial, getSkeletonClasses } from './helper';
+import { getInitial } from './helper';
 
 const UserProfileCard: React.FC<UserProfileCardProps> = ({ firstName = '', email = '', onLogout }) => {
   if (!firstName || !email) {

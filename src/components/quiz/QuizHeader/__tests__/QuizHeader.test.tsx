@@ -1,6 +1,6 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
-import QuizHeader from '..';
+import '@testing-library/jest-dom';
+import QuizHeader from '@/components/quiz/QuizHeader/index';
 
 describe('QuizHeader', () => {
   const defaultProps = {

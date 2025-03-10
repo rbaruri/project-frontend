@@ -1,5 +1,5 @@
 import { RootState } from '@/redux/store';
-import { StructuredAnalysis } from '@/summary/types';
+import { StructuredAnalysis } from '@/components/quiz/SummaryReport/types';
 
 export const selectSummaryAnalysis = (state: RootState, moduleId: string): StructuredAnalysis | null =>
   state.summary.analyses[moduleId] || null;

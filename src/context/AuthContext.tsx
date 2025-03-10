@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { api } from '@/api/axios';
 import { User } from '@/containers/Login/loginConstants';
+import { RootState } from '@/redux/store';
 
 interface AuthContextType {
   user: User | null;
@@ -16,6 +18,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Get auth update action from Redux store
+  const authUpdateAction = useSelector((state: RootState) => state.login.authUpdateAction);
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -40,6 +45,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     initializeAuth();
   }, []);
+
+  // Handle Redux auth updates
+  useEffect(() => {
+    if (authUpdateAction?.type === 'login/UPDATE_AUTH_CONTEXT') {
+      login(authUpdateAction.payload);
+    } else if (authUpdateAction?.type === 'login/LOGOUT') {
+      logout();
+    }
+  }, [authUpdateAction]);
 
   const login = (userData: User) => {
     setUser(userData);

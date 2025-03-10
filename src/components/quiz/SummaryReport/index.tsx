@@ -1,6 +1,6 @@
 import React from 'react';
-import { downloadPDFReport } from './helper';
-import { StructuredAnalysis } from '@/summary/types';
+import { downloadPDFReport } from '@/components/quiz/SummaryReport/helper/index';
+import { StructuredAnalysis } from '@/components/quiz/SummaryReport/types';
 
 export interface SummaryDisplayProps {
   analysis: StructuredAnalysis | null;

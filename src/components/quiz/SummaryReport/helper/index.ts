@@ -1,4 +1,4 @@
-import { QuizSummaryReport, StructuredAnalysis } from '@/summary/types';
+import { QuizSummaryReport, StructuredAnalysis } from '../types';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 

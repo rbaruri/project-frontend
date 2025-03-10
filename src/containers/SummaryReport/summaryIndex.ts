@@ -1,15 +1,15 @@
-export { default as summaryReducer } from './summaryReducer';
-export { watchSummary } from './summarySaga';
+export { default as summaryReducer } from '@/containers/SummaryReport/summaryReducer';
+export { watchSummary } from '@/containers/SummaryReport/summarySaga';
 export {
   generateSummary,
   generateSummarySuccess,
   generateSummaryFailure,
   clearSummary,
   type SummaryActionTypes
-} from './summaryActions';
+} from '@/containers/SummaryReport/summaryActions';
 export {
   selectSummaryLoading,
   selectSummaryAnalysis,
   selectSummaryError
-} from './summarySelectors';
-export * from './summaryConstants';
+} from '@/containers/SummaryReport/summarySelectors';
+export * from '@/containers/SummaryReport/summaryConstants';
