@@ -65,6 +65,17 @@ export const calculateProgressStatus = (course: Course): ProgressStatus => {
   const today = new Date();
   const startDate = new Date(course.start_date);
   const endDate = new Date(course.end_date);
+  
+  // If the course hasn't started yet, return on track
+  if (today < startDate) {
+    return {
+      status: 'on_track',
+      daysOffset: 0,
+      completedModules: 0,
+      expectedModules: 0
+    };
+  }
+
   const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
   const daysPassed = Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 
@@ -79,29 +90,51 @@ export const calculateProgressStatus = (course: Course): ProgressStatus => {
     (module: Module) => module.status === 'completed'
   ).length;
 
-  // Expected days to complete current progress
-  const expectedDays = daysPerModule * completedModules;
+  // Calculate when the current number of completed modules should have been done
+  const expectedCompletionDay = daysPerModule * completedModules;
   
-  // If you took less days than expected, you're ahead
-  // If you took more days than expected, you're behind
-  const daysOffset = Math.ceil(expectedDays - daysPassed);
-
   // Calculate expected modules at this point in time
-  const expectedModules = Math.ceil((daysPassed / totalDays) * course.modules.length);
+  const expectedModules = Math.floor((daysPassed / totalDays) * course.modules.length);
 
-  // Determine status based on completed vs expected
+  // For courses that just started (less than a week)
+  if (daysPassed <= 7) {
+    // If we have any completed modules, we're ahead
+    if (completedModules > 0) {
+      return {
+        status: 'ahead',
+        daysOffset: Math.ceil(daysPassed),
+        completedModules,
+        expectedModules: 0
+      };
+    }
+    // Otherwise we're on track since it just started
+    return {
+      status: 'on_track',
+      daysOffset: 0,
+      completedModules: 0,
+      expectedModules: 0
+    };
+  }
+
+  // For courses running longer than a week
   let status: 'ahead' | 'on_track' | 'behind';
+  
+  // If we've completed more than expected, we're ahead
   if (completedModules > expectedModules) {
     status = 'ahead';
-  } else if (completedModules < expectedModules) {
+  }
+  // If we're behind the expected completion day for our current progress, we're behind
+  else if (daysPassed > expectedCompletionDay) {
     status = 'behind';
-  } else {
+  }
+  // Otherwise we're on track
+  else {
     status = 'on_track';
   }
 
   return {
     status,
-    daysOffset: Math.abs(daysOffset),
+    daysOffset: Math.abs(Math.ceil(expectedCompletionDay - daysPassed)),
     completedModules,
     expectedModules
   };
