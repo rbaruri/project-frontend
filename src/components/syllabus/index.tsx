@@ -32,7 +32,7 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
 
   useEffect(() => {
     if (uploadedData) {
-      navigate('/courses');
+      navigate('/courses?success=true');
     }
   }, [uploadedData, navigate]);
 
@@ -176,7 +176,13 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
               className={`mt-1 flex justify-center px-6 pt-8 pb-8 border-2 ${
                 isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 border-dashed'
               } rounded-lg hover:border-blue-500 transition-colors ${!file ? 'cursor-pointer' : ''}`}
-              onClick={() => !file && fileInputRef.current?.click()}
+              onClick={(e) => {
+                if (file || loading) {
+                  e.preventDefault();
+                  return;
+                }
+                fileInputRef.current?.click();
+              }}
               onDragEnter={handleDragEnter}
               onDragLeave={handleDragLeave}
               onDragOver={handleDragOver}
@@ -200,7 +206,15 @@ const SyllabusUploadForm: React.FC<SyllabusUploadFormProps> = ({
                       />
                     </svg>
                     <div className="flex text-sm text-gray-600 justify-center">
-                      <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
+                      <label 
+                        className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!file && !loading) {
+                            fileInputRef.current?.click();
+                          }
+                        }}
+                      >
                         <span>Upload a file</span>
                         <input
                           type="file"

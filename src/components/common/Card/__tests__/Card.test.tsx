@@ -1,6 +1,6 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Card from '../index';
+import '@testing-library/jest-dom'
+import Card from '@/components/common/Card/index';
 
 describe('Card', () => {
   it('renders children correctly', () => {

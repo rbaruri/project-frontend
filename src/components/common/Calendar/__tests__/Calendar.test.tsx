@@ -1,6 +1,6 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Calendar from '../index';
+import '@testing-library/jest-dom'
+import Calendar from '@/components/common/Calendar/index';
 
 describe('Calendar', () => {
   const mockProps = {

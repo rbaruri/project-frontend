@@ -1,13 +1,10 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom';
-import SyllabusUploadForm from '../index';
+import SyllabusUploadForm from '@/components/syllabus/index';
 
 const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
-}));
+
 
 describe('SyllabusUploadForm', () => {
   const mockOnSubmit = jest.fn();

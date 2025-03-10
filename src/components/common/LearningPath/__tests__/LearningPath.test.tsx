@@ -1,7 +1,7 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import LearningPath from '../index';
-import { Module } from '../types';
+import '@testing-library/jest-dom'
+import LearningPath from '@/components/common/LearningPath/index';
+import { Module } from '@/components/common/LearningPath/types/index';
 
 const mockModules: Module[] = [
   {

@@ -1,7 +1,8 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import AuthModal from '../index';
+import AuthModal from '@/components/common/AuthModal/index';
+import '@testing-library/jest-dom'
+
 
 // Mock useNavigate
 const mockNavigate = jest.fn();

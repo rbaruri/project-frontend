@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import toast from 'react-hot-toast';
+import { useAuth } from '@/context/AuthContext'
 
 const Navbar = () => {
   const location = useLocation();
@@ -23,15 +22,35 @@ const Navbar = () => {
   };
 
   const handleLogout = async () => {
-    setShowLogoutModal(false);
-    await logout();
-    toast.success('Successfully signed out');
-    navigate('/authentication/login');
+    try {
+      setShowLogoutModal(false);
+      // Force refresh immediately before any state updates
+      window.location.href = '/authentication/login';
+      // The following will run but the page will already be refreshing
+      await logout();
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // Ensure we still redirect even on error
+      window.location.href = '/authentication/login';
+    }
   };
 
   const handleUnauthenticatedClick = (e: React.MouseEvent) => {
     e.preventDefault();
     navigate('/authentication/login');
+  };
+
+  const handleSyllabusUploadClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isMobileMenuOpen) {
+      toggleMobileMenu();
+    }
+    // Always force refresh when coming from courses page
+    if (location.pathname.includes('/courses')) {
+      window.location.href = '/syllabus-upload';
+    } else {
+      navigate('/syllabus-upload');
+    }
   };
 
   const toggleMobileMenu = () => {
@@ -72,7 +91,8 @@ const Navbar = () => {
                   Courses
                 </Link>
                 <Link
-                  to="/syllabus-upload"
+                  to="#"
+                  onClick={handleSyllabusUploadClick}
                   className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 hover:shadow-lg ${isActiveLink('/syllabus-upload')}`}
                 >
                   Syllabus Upload
@@ -159,8 +179,8 @@ const Navbar = () => {
               Courses
             </Link>
             <Link
-              to="/syllabus-upload"
-              onClick={toggleMobileMenu}
+              to="#"
+              onClick={handleSyllabusUploadClick}
               className={`block px-3 py-2 rounded-md text-base font-medium hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 ease-in-out ${isActiveLink('/syllabus-upload')}`}
             >
               Syllabus Upload

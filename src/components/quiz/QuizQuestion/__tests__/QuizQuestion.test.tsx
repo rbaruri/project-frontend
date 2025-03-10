@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import QuizQuestion from '..';
 import { QuizQuestion as QuizQuestionType } from '../types';

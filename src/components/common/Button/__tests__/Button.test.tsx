@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import "@testing-library/jest-dom";
 import userEvent from '@testing-library/user-event';
-import Button from '../index';
+import Button from '@/components/common/Button/index';
 
 describe('Button Component', () => {
   it('renders with children correctly', () => {
