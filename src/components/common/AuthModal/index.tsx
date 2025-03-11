@@ -2,9 +2,18 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthModalProps } from '@/components/common/AuthModal/types/index';
 import { getModalClasses, getOverlayClasses, getModalPanelClasses } from '@/components/common/AuthModal/helper/index';
+import { useAuth } from '@/context/AuthContext';
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
+const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess }) => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  // Effect to handle successful authentication
+  React.useEffect(() => {
+    if (isAuthenticated && onAuthSuccess) {
+      onAuthSuccess();
+    }
+  }, [isAuthenticated, onAuthSuccess]);
 
   return (
     <div 
@@ -55,26 +64,26 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               </div>
             </div>
           </div>
-          <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-            <button
-              type="button"
-              onClick={() => {
-                onClose();
-                navigate('/authentication/signup');
-              }}
-              className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm transform transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-0.5"
-            >
-              Sign Up
-            </button>
+          <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3">
             <button
               type="button"
               onClick={() => {
                 onClose();
                 navigate('/authentication/login');
               }}
-              className="mt-3 sm:mt-0 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-1 sm:text-sm transform transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-0.5"
+              className="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm transform transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-0.5"
             >
               Sign In
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                navigate('/authentication/signup');
+              }}
+              className="mt-3 sm:mt-0 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm transform transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-0.5"
+            >
+              Sign Up
             </button>
           </div>
         </div>

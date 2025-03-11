@@ -18,18 +18,24 @@ interface FormData {
 
 const SyllabusUploadPage: React.FC = () => {
   const dispatch = useDispatch();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const loading = useSelector(selectSyllabusLoading);
   const error = useSelector(selectSyllabusError) || undefined;
   const uploadedData = useSelector(selectSyllabusData);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [pendingUpload, setPendingUpload] = useState<{formData: FormData, file: File} | null>(null);
 
   const handleSubmit = (formData: FormData, file: File) => {
     if (!isAuthenticated) {
+      setPendingUpload({ formData, file });
       setShowAuthModal(true);
       return;
     }
 
+    processUpload(formData, file);
+  };
+
+  const processUpload = (formData: FormData, file: File) => {
     const form = new FormData();
     form.append('file', file);
     form.append('courseName', formData.courseName);
@@ -38,8 +44,22 @@ const SyllabusUploadPage: React.FC = () => {
     
     dispatch(uploadSyllabusRequest({ 
       formData: form,
-      courseId: formData.courseName
+      courseId: formData.courseName,
+      userId: user?.userId || ''
     }));
+  };
+
+  const handleAuthModalClose = () => {
+    setShowAuthModal(false);
+    setPendingUpload(null);
+  };
+
+  const handleAuthSuccess = () => {
+    if (pendingUpload && user?.userId) {
+      processUpload(pendingUpload.formData, pendingUpload.file);
+    }
+    setShowAuthModal(false);
+    setPendingUpload(null);
   };
 
   const handleReset = () => {
@@ -62,7 +82,8 @@ const SyllabusUploadPage: React.FC = () => {
 
       <AuthModal 
         isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
+        onClose={handleAuthModalClose}
+        onAuthSuccess={handleAuthSuccess}
       />
     </div>
   );

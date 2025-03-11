@@ -104,6 +104,14 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
       },
+      {
+        path: "syllabus-upload",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <SyllabusUploadPage />
+          </Suspense>
+        ),
+      },
     ],
   },
 
@@ -114,14 +122,6 @@ export const router = createBrowserRouter([
       {
         element: <ProtectedRoute />,
         children: [
-          {
-            path: "syllabus-upload",
-            element: (
-              <Suspense fallback={<LoadingSpinner />}>
-                <SyllabusUploadPage />
-              </Suspense>
-            ),
-          },
           {
             path: "dashboard",
             element: (

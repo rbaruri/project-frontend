@@ -44,7 +44,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, userId, onClick, onView
     try {
       await updateCourseName({
         variables: {
-          courseId: course.id,
+          id: course.id,
           name: newName,
         },
       });
