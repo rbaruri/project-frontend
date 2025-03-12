@@ -64,8 +64,8 @@ const Quiz: React.FC = () => {
   }, [data?.quizzes_by_pk?.module?.course_id, navigate]);
 
   const handleNextModule = useCallback(() => {
-    // Only clear local storage if the quiz was passed
-    if (quizId && state.score >= (data?.quizzes_by_pk?.cutoff_score || 0)) {
+    // Clear local storage regardless of quiz score
+    if (quizId) {
       // Clear timer data
       localStorage.removeItem(`quiz_${quizId}_time`);
       localStorage.removeItem(`quiz_${quizId}_timestamp`);
@@ -106,7 +106,7 @@ const Quiz: React.FC = () => {
     } else {
       handleBackToModule();
     }
-  }, [nextModuleData?.modules, data?.quizzes_by_pk, navigate, handleBackToModule, quizId, state.score]);
+  }, [nextModuleData?.modules, data?.quizzes_by_pk, navigate, handleBackToModule, quizId]);
 
   const handleSubmitClick = useCallback(() => {
     setShowSubmitConfirm(true);

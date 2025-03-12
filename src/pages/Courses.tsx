@@ -8,7 +8,7 @@ const CoursesPage: React.FC = () => {
         {/* Header Section */}
         <div className="bg-gradient-to-r from-purple-600 to-purple-800 rounded-lg shadow-lg p-6 text-white">
           <h1 className="text-3xl font-bold mb-2">My Courses</h1>
-          <p className="text-purple-100">Explore your enrolled courses and track your progress</p>
+          <p className="text-purple-100">Explore your courses and track your progress</p>
         </div>
 
         {/* Courses Content */}
