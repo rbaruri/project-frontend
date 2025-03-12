@@ -1,5 +1,5 @@
 import { get } from 'lodash';
-import { SyllabusState } from '@/components/syllabus/types';
+import { SyllabusState } from '@/containers/SyllabusUpload/types';
 
 interface RootState {
   syllabus: SyllabusState;
