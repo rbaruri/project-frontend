@@ -17,8 +17,11 @@ const Quiz: React.FC = () => {
   const { quizId } = useParams<{ quizId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const isReviewMode = new URLSearchParams(location.search).get('mode') === 'review';
-  const shouldShowResults = new URLSearchParams(location.search).get('showResults') === 'true';
+  const searchParams = new URLSearchParams(location.search);
+  const mode = searchParams.get('mode');
+  const isReviewMode = mode === 'review';
+  const isResultsMode = mode === 'results';
+  const shouldShowResults = searchParams.get('showResults') === 'true';
 
   const { loading, error, data, refetch } = useQuery<QuizData>(GET_QUIZ_WITH_QUESTIONS, {
     variables: { quizId },
@@ -32,7 +35,7 @@ const Quiz: React.FC = () => {
     quizId: quizId || '',
     refetch,
     initialReviewMode: isReviewMode,
-    initialShowResults: shouldShowResults
+    initialShowResults: shouldShowResults || isResultsMode
   });
 
   const storage = useQuizStorage(quizId);
@@ -117,22 +120,23 @@ const Quiz: React.FC = () => {
     actions.handleSubmit(data?.quizzes_by_pk.quiz_questions, data?.quizzes_by_pk.module.id, data?.quizzes_by_pk.cutoff_score);
   }, [actions, data]);
 
-  // Load saved answers only once when component mounts
   useEffect(() => {
-    if (!state.isSubmitted && !state.showResults) {
-      const savedAnswers = storage.loadAnswersFromLocalStorage();
+    // When returning to results mode, ensure we show the complete results page
+    if (isResultsMode) {
+      actions.setShowResults(true);
+      actions.setIsSubmitted(true);
+      // Load saved answers if they exist
+      const savedAnswers = localStorage.getItem(`quiz_${quizId}_answers`);
       if (savedAnswers) {
-        actions.setUserAnswers(savedAnswers);
+        try {
+          const parsedAnswers = JSON.parse(savedAnswers);
+          actions.setUserAnswers(parsedAnswers);
+        } catch (e) {
+          console.error('Error parsing saved answers:', e);
+        }
       }
     }
-  }, []);  // Empty dependency array since we only want this to run once
-
-  // Clear saved answers when quiz is submitted or retaken
-  useEffect(() => {
-    if (state.isSubmitted || state.showResults) {
-      storage.clearLocalStorage();
-    }
-  }, [state.isSubmitted, state.showResults, storage]);
+  }, [isResultsMode, quizId, actions]);
 
   if (!quizId) return <div className="p-4">Quiz ID not provided</div>;
   if (loading) return <div className="flex justify-center items-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>;
