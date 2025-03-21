@@ -19,6 +19,9 @@ export const GET_MODULES_BY_COURSE = gql`
       title
       status
       created_at
+      start_date
+      end_date
+      hours_allocated
       resources {
         id
         title
@@ -108,6 +111,9 @@ export interface Module {
   title: string;
   status: ModuleStatusType;
   created_at: string;
+  start_date: string;
+  end_date: string;
+  hours_allocated: number;
   resources: Resource[];
   quizzes: Quiz[];
   similar_questions: SimilarQuestion[];

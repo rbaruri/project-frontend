@@ -1,8 +1,20 @@
 import { combineReducers } from "redux";
-import { syllabusReducer } from "../containers/SyllabusUpload/syllabusReducer";
+import { syllabusReducer } from "@/containers/SyllabusUpload/syllabusReducer";
+import { signupReducer } from "@/containers/SignUp/signupIndex";
+import { loginReducer } from "@/containers/Login/loginIndex";
+import { learningPathReducer } from "@/containers/LearningPath/learningPathReducer";
+import moduleReducer from "@/containers/Modules/moduleReducer";
+import quizReducer from "@/containers/Quiz/quizReducer";
+import { summaryReducer } from "@/containers/SummaryReport/summaryIndex";
 
 const rootReducer = combineReducers({
   syllabus: syllabusReducer,
+  signup: signupReducer,
+  login: loginReducer,
+  learningPath: learningPathReducer,
+  modules: moduleReducer,
+  quiz: quizReducer,
+  summary: summaryReducer,
   // Add more reducers here as needed
 });
 

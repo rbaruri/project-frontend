@@ -1,23 +1,18 @@
-import { BrowserRouter as Router } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import AppRoutes from './routes/AppRoutes';
-import Navbar from './components/Navbar';
-import { FC } from 'react';
+import React from 'react';
+import { RouterProvider } from 'react-router-dom';
+import { router } from '@/routes/AppRoutes';
+import { AuthProvider } from '@/context/AuthContext';
+import { Provider } from 'react-redux';
+import { store } from '@/redux/store';
+import './App.css';
 
-const App: FC = () => {
+const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-gray-50">
-          <Navbar />
-          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-4">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <AppRoutes />
-            </div>
-          </main>
-        </div>
-      </Router>
-    </AuthProvider>
+    <Provider store={store}>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </Provider>
   );
 };
 

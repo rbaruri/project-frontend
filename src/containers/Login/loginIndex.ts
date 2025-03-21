@@ -1,6 +1,7 @@
-export * from './loginActions';
+export * from '@/containers/Login/loginActions';
 export * from './loginConstants';
-export * from './loginTypes';
-export * from './loginSelectors';
-export { default as loginReducer } from './loginReducer';
-export { watchLoginSaga } from './loginSaga';
+export * from '@/containers/Login/loginSelectors';
+export { default as loginReducer } from '@/containers/Login/loginReducer';
+export { watchLoginSaga } from '@/containers/Login/loginSaga';
+
+

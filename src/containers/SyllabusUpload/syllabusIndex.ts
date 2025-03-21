@@ -1,7 +1,14 @@
-export { syllabusReducer } from './syllabusReducer';
-export { syllabusSaga } from './syllabusSaga';
+export * from '@/containers/SyllabusUpload/syllabusActions';
+export * from '@/containers/SyllabusUpload/syllabusConstants';
+export * from '@/containers/SyllabusUpload/syllabusSelectors';
+export { syllabusReducer } from '@/containers/SyllabusUpload/syllabusReducer';
+export { uploadSyllabusSaga, watchSyllabusSaga } from '@/containers/SyllabusUpload/syllabusSaga';
 export {
   uploadSyllabusRequest,
   uploadSyllabusSuccess,
   uploadSyllabusFailure,
-} from './syllabusActions';
+  updateUploadProgress,
+  resetSyllabusState,
+  type SyllabusActionTypes
+} from '@/containers/SyllabusUpload/syllabusActions';
+export * from './types';

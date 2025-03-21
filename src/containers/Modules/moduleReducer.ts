@@ -4,12 +4,13 @@ import {
     FETCH_MODULES_FAILURE,
     ModuleState,
     ModuleActionTypes,
-  } from "./moduleTypes";
+  } from "./modulesConstants";
   
   const initialState: ModuleState = {
     modules: [],
     loading: false,
     error: null,
+    currentModuleIndex: 0
   };
   
   const moduleReducer = (state = initialState, action: ModuleActionTypes): ModuleState => {

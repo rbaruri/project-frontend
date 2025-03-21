@@ -1,15 +1,28 @@
 import React from 'react';
-import { useAuth } from '../context/AuthContext';
-import { Navigate } from 'react-router-dom';
-import DashboardContainer from '../containers/Dashboard/Dashboard';
+import { useAuth } from '@/context/AuthContext';
+import { Navigate, useNavigate } from 'react-router-dom';
+import Dashboard from '@/components/dashboard';
 
 const DashboardPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   // Redirect to login if user is not authenticated
   if (!user) return <Navigate to="/login" />;
 
-  return <DashboardContainer />;
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  return (
+    <Dashboard 
+      firstName={user.first_name || ''} 
+      email={user.email || ''} 
+      userId={user.id || ''} 
+      onLogout={handleLogout} 
+    />
+  );
 };
 
 export default DashboardPage;

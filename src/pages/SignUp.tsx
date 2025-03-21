@@ -1,15 +1,16 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import SignUpForm from '../components/SignUpForm';
+import SignUpForm from '@/components/auth/SignUpForm';
 import {
   signupRequest,
   signupReset,
   selectSignupLoading,
   selectSignupError,
   selectSignupSuccess
-} from '../containers/SignUp/signupIndex';
-import { SignUpFormData } from '../containers/SignUp/signupTypes';
+} from '@/containers/SignUp/signupIndex';
+import { SignUpFormData } from '@/containers/SignUp/signupConstants';
+import LoadingOverlay from '@/components/common/LoadingOverlay';
 
 const SignUpPage: React.FC = () => {
   const dispatch = useDispatch();
@@ -28,7 +29,13 @@ const SignUpPage: React.FC = () => {
 
   useEffect(() => {
     if (success) {
-      navigate('/login');
+      const timer = setTimeout(() => {
+        navigate('/authentication/login', { 
+          state: { message: 'Account created successfully! Please log in.' }
+        });
+      }, 800); // Smooth 800ms transition
+
+      return () => clearTimeout(timer);
     }
   }, [success, navigate]);
 
@@ -36,7 +43,14 @@ const SignUpPage: React.FC = () => {
     dispatch(signupRequest(formData));
   };
 
-  return <SignUpForm onSubmit={handleSignup} loading={loading} error={error} />;
+  return (
+    <>
+      {(loading || success) && <LoadingOverlay />}
+      <div className="fixed inset-0 top-16 flex items-center justify-center bg-white">
+        <SignUpForm onSubmit={handleSignup} loading={loading} error={error} />
+      </div>
+    </>
+  );
 };
 
 export default SignUpPage; 

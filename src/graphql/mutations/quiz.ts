@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 export const UPDATE_QUIZ_STATUS = gql`
-  mutation UpdateQuizStatus($quizId: String!, $status: String!, $score: Int!) {
+  mutation UpdateQuizStatus($quizId: uuid!, $status: String!, $score: Int!) {
     update_quizzes_by_pk(
       pk_columns: { id: $quizId },
       _set: { 
@@ -17,7 +17,7 @@ export const UPDATE_QUIZ_STATUS = gql`
 `;
 
 export const UPDATE_MODULE_STATUS = gql`
-  mutation UpdateModuleStatus($moduleId: String!, $status: String!) {
+  mutation UpdateModuleStatus($moduleId: uuid!, $status: String!) {
     update_modules_by_pk(
       pk_columns: { id: $moduleId },
       _set: { status: $status }

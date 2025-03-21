@@ -1,11 +1,11 @@
 import { produce } from 'immer';
-import { SignUpState } from './signupTypes';
+import { SignUpState } from './signupConstants';
 import {
   SIGNUP_REQUEST,
   SIGNUP_SUCCESS,
   SIGNUP_FAILURE,
   SIGNUP_RESET,
-} from './signupConstants';
+} from '@/containers/SignUp/signupConstants';
 
 const initialState: SignUpState = {
   loading: false,
@@ -23,7 +23,7 @@ const signupReducer = (state = initialState, action: any) =>
         break;
 
       case SIGNUP_SUCCESS:
-        draft.loading = false;
+        draft.loading = true;
         draft.error = null;
         draft.success = true;
         break;

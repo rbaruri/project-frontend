@@ -12,13 +12,12 @@ import {
   SET_QUIZ_SCORE,
   UPDATE_TIME_LEFT,
   RESET_QUIZ,
-} from './quizConstants';
+} from '@/containers/Quiz/quizConstants';
 
 import { 
   QuizData, 
-  UpdateQuizStatusPayload, 
-  UpdateModuleStatusPayload 
-} from './quizTypes';
+  UpdateQuizStatusPayload
+} from '@/components/quiz/types';
 
 // Quiz Data Loading Actions
 export const fetchQuizRequest = (quizId: string) => ({

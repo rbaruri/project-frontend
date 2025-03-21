@@ -1,5 +1,5 @@
 import { get } from 'lodash';
-import { QuizState } from './quizTypes';
+import { QuizState } from '@/components/quiz/types';
 
 interface RootState {
   quiz: QuizState;

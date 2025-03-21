@@ -3,17 +3,17 @@ import { get } from 'lodash';
 import { 
   FETCH_QUIZ_REQUEST,
   UPDATE_QUIZ_STATUS_REQUEST,
-} from './quizConstants';
+} from '@/containers/Quiz/quizConstants';
 import {
   fetchQuizSuccess,
   fetchQuizFailure,
   updateQuizStatusSuccess,
   updateQuizStatusFailure,
-} from './quizActions';
-import { QuizData, UpdateQuizStatusPayload } from './quizTypes';
-import { GET_QUIZ_WITH_QUESTIONS, GET_NEXT_MODULE } from '../../graphql/queries/quiz';
-import { UPDATE_QUIZ_STATUS, UPDATE_MODULE_STATUS } from '../../graphql/mutations/quiz';
-import { client } from '../../graphql/client';
+} from '@/containers/Quiz/quizActions';
+import { QuizData, UpdateQuizStatusPayload } from '@/components/quiz/types';
+import { GET_QUIZ_WITH_QUESTIONS, GET_NEXT_MODULE } from '@/graphql/queries/quiz';
+import { UPDATE_QUIZ_STATUS, UPDATE_MODULE_STATUS } from '@/graphql/mutations/quiz';
+import { client } from '@/api/apolloClient';
 
 function* fetchQuizSaga(action: { type: string; payload: string }) {
   try {

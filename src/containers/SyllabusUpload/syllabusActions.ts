@@ -1,14 +1,15 @@
-// Action Types
-export const UPLOAD_SYLLABUS_REQUEST = 'UPLOAD_SYLLABUS_REQUEST';
-export const UPLOAD_SYLLABUS_SUCCESS = 'UPLOAD_SYLLABUS_SUCCESS';
-export const UPLOAD_SYLLABUS_FAILURE = 'UPLOAD_SYLLABUS_FAILURE';
+import {
+  UPLOAD_SYLLABUS_REQUEST,
+  UPLOAD_SYLLABUS_SUCCESS,
+  UPLOAD_SYLLABUS_FAILURE,
+  UPDATE_UPLOAD_PROGRESS,
+  RESET_SYLLABUS_STATE,
+} from '@/containers/SyllabusUpload/syllabusConstants';
 
-// State Type
-export interface SyllabusState {
-  status: 'idle' | 'uploading' | 'success' | 'error';
-  message: string | null;
-  syllabusId: string | null;
-}
+import {
+  SyllabusResponse,
+  UploadSyllabusPayload,
+} from './types';
 
 // Action Interfaces
 interface UploadSyllabusRequestAction {

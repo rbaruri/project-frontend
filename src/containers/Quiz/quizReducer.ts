@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { QuizState } from './quizTypes';
+import { QuizState } from '@/components/quiz/types';
 import {
   FETCH_QUIZ_REQUEST,
   FETCH_QUIZ_SUCCESS,
@@ -11,13 +11,14 @@ import {
   SET_QUIZ_SCORE,
   UPDATE_TIME_LEFT,
   RESET_QUIZ,
-} from './quizConstants';
+} from '@/containers/Quiz/quizConstants';
 
 const initialState: QuizState = {
   loading: false,
   error: null,
   data: null,
-  nextModule: null,
+  nextModule: undefined,
+  currentQuestion: 0,
   currentQuestionIndex: 0,
   userAnswers: {},
   timeLeft: 3600, // 1 hour in seconds

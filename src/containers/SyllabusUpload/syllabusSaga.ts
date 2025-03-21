@@ -1,26 +1,43 @@
 import { takeLatest, call, put } from 'redux-saga/effects';
-import { api } from '../../api/axios';
+import axios, { AxiosResponse, AxiosProgressEvent } from 'axios';
+import { get } from 'lodash';
+import { UPLOAD_SYLLABUS_REQUEST } from '@/containers/SyllabusUpload/syllabusConstants';
 import {
   UPLOAD_SYLLABUS_REQUEST,
   uploadSyllabusSuccess,
   uploadSyllabusFailure,
-  SyllabusActionTypes
-} from './syllabusActions';
+  updateUploadProgress,
+} from '@/containers/SyllabusUpload/syllabusActions';
+import { UploadSyllabusPayload, SyllabusResponse } from './types';
 
 // API call function
 const uploadSyllabusAPI = async (formData: FormData) => {
   try {
-    // First, extract text from the syllabus
-    const textExtractionResponse = await api.post('/ocr/extract-text', formData);
-    const { extractedText } = textExtractionResponse.data;
+    const { formData } = action.payload;
 
-    // Then, generate learning path with the extracted text
-    const learningPathResponse = await api.post('/api/learning-path', {
-      extractedText,
-      courseName: formData.get('courseName'),
-      startDate: formData.get('startDate'),
-      endDate: formData.get('endDate')
-    });
+    function* onUploadProgress(progressEvent: AxiosProgressEvent) {
+      const percentCompleted = progressEvent.total
+        ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
+        : 0;
+      yield put(updateUploadProgress(percentCompleted));
+    }
+
+    const response: AxiosResponse<SyllabusResponse> = yield call(() => 
+      axios.post(
+        `${import.meta.env.VITE_API_URL}/api/syllabus/process`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          withCredentials: true,
+          onUploadProgress: function(progressEvent: AxiosProgressEvent) {
+            const saga = onUploadProgress(progressEvent);
+            saga.next();
+          },
+        }
+      )
+    );
 
     if (!learningPathResponse.data.learningPath) {
       throw new Error('No learning path generated');

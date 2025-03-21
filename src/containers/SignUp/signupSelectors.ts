@@ -1,17 +1,20 @@
-import { get } from 'lodash';
-import { SignUpState } from './signupTypes';
+import { RootState } from '@/redux/rootReducer';
+import { SignUpState } from './signupConstants';
 
-interface RootState {
-  signup: SignUpState;
-}
+const initialState: SignUpState = {
+  loading: false,
+  error: null,
+  success: false,
+};
 
-export const selectSignupState = (state: RootState) => get(state, 'signup', {});
+const selectSignupState = (state: RootState): SignUpState => 
+  state.signup || initialState;
 
-export const selectSignupLoading = (state: RootState) =>
-  get(state, 'signup.loading', false);
+export const selectSignupLoading = (state: RootState): boolean => 
+  selectSignupState(state).loading;
 
-export const selectSignupError = (state: RootState) =>
-  get(state, 'signup.error', null);
+export const selectSignupError = (state: RootState): string | null => 
+  selectSignupState(state).error;
 
-export const selectSignupSuccess = (state: RootState) =>
-  get(state, 'signup.success', false);
+export const selectSignupSuccess = (state: RootState): boolean => 
+  selectSignupState(state).success;

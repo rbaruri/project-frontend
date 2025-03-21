@@ -1,42 +1,40 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import LoginForm from '../components/LoginForm';
-import {
-  loginRequest,
-  loginReset,
-  selectLoginLoading,
-  selectLoginError,
-  selectLoginSuccess,
-} from '../containers/Login/loginIndex';
-import { LoginFormData } from '../containers/Login/loginTypes';
+import { useNavigate } from 'react-router-dom';
+import LoginForm from '@/components/auth/LoginForm';
+import { selectLoginLoading, selectLoginError, selectLoginSuccess } from '@/containers/Login/loginSelectors';
+import { loginRequest } from '@/containers/Login/loginActions';
+import { LoginFormData } from '@/containers/Login/loginConstants';
 
 const LoginPage: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
   const loading = useSelector(selectLoginLoading);
   const error = useSelector(selectLoginError);
   const success = useSelector(selectLoginSuccess);
 
   useEffect(() => {
-    // Reset login state when component unmounts
-    return () => {
-      dispatch(loginReset());
-    };
-  }, [dispatch]);
-
-  useEffect(() => {
     if (success) {
-      navigate('/dashboard');
+      const timer = setTimeout(() => {
+        navigate('/dashboard');
+      }, 800); // Keep the same delay for smooth transition
+      return () => clearTimeout(timer);
     }
   }, [success, navigate]);
 
-  const handleLogin = (formData: LoginFormData) => {
+  const handleSubmit = (formData: LoginFormData) => {
     dispatch(loginRequest(formData));
   };
 
-  return <LoginForm onSubmit={handleLogin} loading={loading} error={error} />;
+  return (
+    <div className="fixed inset-0 top-16 flex items-center justify-center bg-white">
+      <LoginForm 
+        onSubmit={handleSubmit}
+        loading={loading}
+        error={error}
+      />
+    </div>
+  );
 };
 
-export default LoginPage; 
+export default LoginPage;

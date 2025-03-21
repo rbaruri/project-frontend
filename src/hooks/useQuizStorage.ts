@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { QUIZ_TIME_LIMIT } from '../helper/quizHelper';
+import { QUIZ_TIME_LIMIT } from '@/components/quiz/helper';
 
 interface UserAnswers {
   [questionId: string]: string;
