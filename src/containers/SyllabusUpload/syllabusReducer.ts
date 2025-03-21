@@ -4,9 +4,14 @@ import {
   UPLOAD_SYLLABUS_REQUEST,
   UPLOAD_SYLLABUS_SUCCESS,
   UPLOAD_SYLLABUS_FAILURE,
-  UPDATE_UPLOAD_PROGRESS,
-  RESET_SYLLABUS_STATE,
-} from './syllabusConstants';
+  SyllabusActionTypes,
+} from './syllabusActions';
+
+export interface SyllabusState {
+  status: 'idle' | 'uploading' | 'success' | 'error';
+  syllabusId: string | null;
+  message: string | null;
+}
 
 const initialState: SyllabusState = {
   loading: false,

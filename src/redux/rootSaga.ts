@@ -10,7 +10,7 @@ import { watchSummary } from "@/containers/SummaryReport/summaryIndex";
 export default function* rootSaga() {
   yield all([
     watchLearningPathSaga(),
-    watchSyllabusSaga(),
+    syllabusSaga(),
     moduleSaga(),
     watchQuizSaga(),
     watchLoginSaga(),
