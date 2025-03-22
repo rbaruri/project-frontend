@@ -19,7 +19,7 @@ const QuizSummaryPage: React.FC = () => {
     const quizId = searchParams.get('quizId');
     
     if (quizId) {
-      navigate(`/quiz/${quizId}?showResults=true&mode=results`);
+      navigate(`/quiz/${quizId}?showResults=true`);
     } else {
       navigate(-1);
     }

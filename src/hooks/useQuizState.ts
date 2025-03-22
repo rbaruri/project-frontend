@@ -77,13 +77,7 @@ const useQuizState = ({ quizId, refetch, initialReviewMode = false, initialShowR
       const savedAnswers = localStorage.getItem(`quiz_${quizId}_answers`);
       if (savedAnswers) {
         try {
-          const parsedAnswers = JSON.parse(savedAnswers);
-          // Always use saved answers in review mode or when showing results
-          if (initialReviewMode || initialShowResults || localStorage.getItem(`quiz_${quizId}_submitted`) === 'true') {
-            return parsedAnswers;
-          }
-          // For non-review mode, only use saved answers if quiz is not submitted
-          return parsedAnswers;
+          return JSON.parse(savedAnswers);
         } catch (e) {
           console.error('Error parsing saved answers:', e);
         }
@@ -92,12 +86,11 @@ const useQuizState = ({ quizId, refetch, initialReviewMode = false, initialShowR
     return {};
   });
 
-  // Initialize state based on whether we're showing results
   const [isSubmitted, setIsSubmitted] = useState(() => {
     if (quizId) {
-      return initialShowResults || localStorage.getItem(`quiz_${quizId}_submitted`) === 'true';
+      return localStorage.getItem(`quiz_${quizId}_submitted`) === 'true';
     }
-    return initialReviewMode || initialShowResults;
+    return initialReviewMode;
   });
 
   const [score, setScore] = useState<number>(() => {
@@ -153,7 +146,7 @@ const useQuizState = ({ quizId, refetch, initialReviewMode = false, initialShowR
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showResults, setShowResults] = useState(() => {
     if (quizId) {
-      return initialShowResults || localStorage.getItem(`quiz_${quizId}_show_results`) === 'true';
+      return localStorage.getItem(`quiz_${quizId}_show_results`) === 'true' || initialShowResults;
     }
     return initialShowResults;
   });
@@ -411,21 +404,7 @@ const useQuizState = ({ quizId, refetch, initialReviewMode = false, initialShowR
       setShowResults(false);
       setIsSubmitted(true);
       setTimeLeft(0);
-      
-      // Load saved answers from localStorage for review mode
-      const savedAnswers = localStorage.getItem(`quiz_${quizId}_answers`);
-      if (savedAnswers) {
-        try {
-          const parsedAnswers = JSON.parse(savedAnswers);
-          setUserAnswers(parsedAnswers);
-          // Also ensure we persist these answers
-          localStorage.setItem(`quiz_${quizId}_answers`, JSON.stringify(parsedAnswers));
-        } catch (e) {
-          console.error('Error parsing saved answers:', e);
-        }
-      }
-      
-      // Only remove timer-related data
+      // Do not clear userAnswers in review mode
       if (quizId) {
         localStorage.removeItem(`quiz_${quizId}_time`);
         localStorage.removeItem(`quiz_${quizId}_timestamp`);
@@ -598,17 +577,6 @@ const useQuizState = ({ quizId, refetch, initialReviewMode = false, initialShowR
       localStorage.setItem(`quiz_${quizId}_show_results`, showResults.toString());
     }
   }, [quizId, userAnswers, isSubmitted, score, timeTaken, showResults]);
-
-  // Add console log to check if saved answers are being loaded
-  useEffect(() => {
-    if (!isSubmitted && !showResults) {
-      const savedAnswers = localStorage.getItem(`quiz_${quizId}_answers`);
-      console.log('Loaded saved answers:', savedAnswers); // Debugging log
-      if (savedAnswers) {
-        setUserAnswers(JSON.parse(savedAnswers));
-      }
-    }
-  }, [isSubmitted, showResults, quizId]);
 
   return {
     state: {

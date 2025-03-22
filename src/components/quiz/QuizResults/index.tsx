@@ -131,7 +131,6 @@ const QuizResults: React.FC<QuizResultsProps> = ({
             question={question}
             userAnswer={userAnswers[question.id]}
             questionNumber={index + 1}
-            showCorrectAnswer={true}
           />
         ))}
       </div>
