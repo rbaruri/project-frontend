@@ -97,7 +97,6 @@ project_backend/
 │       └── constants/            # Global constants
 │
 ├── logs/                    # Application logs
-├── prisma/                  # Database schema and migrations
 └── project-hasura/          # Hasura configuration
     ├── metadata/                # Hasura metadata
     ├── migrations/              # Database migrations
