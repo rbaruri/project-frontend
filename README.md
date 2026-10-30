@@ -1,171 +1,99 @@
-# Full Stack Project
+NerdNest – Frontend
 
-## Project Overview
-A modern web application built with React and Node.js, featuring a microservices architecture with Hasura for GraphQL API management. The project implements a robust authentication system, real-time data updates, and a responsive user interface built with Tailwind CSS.
+The frontend application for NerdNest, an AI-powered Learning Management System designed to help students organize their learning journey through syllabus-based study resources, timeline-based quizzes, and performance tracking.
 
-## Tech Stack & Architecture
+Tech Stack
 
-### Frontend (React Application)
-- **Core Framework & Build Tools**
-  - React 18 with TypeScript - Main UI framework
-  - Vite - Development server and build optimization
-  - ESLint & TypeScript - Code quality and type safety
+* Framework: React
+* Language: TypeScript
+* State Management: Redux-Saga
+* API Communication: GraphQL
+* Backend Integration: Hasura
+* Database: PostgreSQL (through the backend)
 
-- **State Management & Data Flow**
-  - Redux + Redux Saga - Global state and side effects
-  - Apollo Client - GraphQL data fetching and caching
-  - React Context - Component-level state sharing
+Core Features
 
-- **UI & Styling**
-  - TailwindCSS - Utility-first styling
-  - Framer Motion - UI animations
-  - Headless UI - Accessible UI components
-  - Heroicons - SVG icon system
+1. Syllabus Upload
 
-- **Testing & Quality**
-  - Jest - Unit testing framework
-  - React Testing Library - Component testing
-  - TypeScript - Static type checking
+* Provide an interface for students to upload academic syllabi.
+* Integrate with backend document-processing workflows.
+* Display processed syllabus information.
 
-### Backend (Node.js Server)
-- **Core Framework & Runtime**
-  - Node.js with Express - Server framework
-  - TypeScript - Type safety and developer experience
-  - Nodemon - Development hot-reload
+2. AI-Powered Study Resources
 
-- **Authentication & Security**
-  - JWT - Token-based authentication
-  - bcrypt - Password hashing
-  - Cookie-parser - Session management
+* Display curated study links generated from syllabus content.
+* Organize learning resources to help students follow their academic curriculum.
 
-- **File Handling & Processing**
-  - Multer - File upload handling
-  - OCR Service - Document text extraction
-  - Token Tracker - Rate limiting
+3. Timeline-Based Quizzes
 
-- **Database & ORM**
-  - Prisma - Database ORM
-  - PostgreSQL - Primary database
-  - Hasura - GraphQL API layer
+* Present quizzes based on the learning timeline.
+* Provide an interface for students to attempt assessments.
+* Display assessment results.
 
-### Infrastructure & APIs
-- **Database Layer**
-  - PostgreSQL - Primary data store
-  - Hasura - GraphQL API gateway and authorization
-  - Database migrations - Version control for schema
+4. Performance Tracking
 
-- **External Services**
-  - OCR API Integration
-  - AI Path Generation
-  - Summary Generation
+* Display student learning progress.
+* Track quiz and assessment performance.
+* Present automatically generated performance reports.
 
-## Project Structure
+Architecture
 
-### Backend Structure (Detailed)
-```
-project_backend/
-├── src/
-│   ├── controllers/           # Request handlers
-│   │   ├── auth.controller.ts    # Authentication logic
-│   │   ├── syllabusController.ts # Syllabus management
-│   │   ├── quizController.ts     # Quiz functionality
-│   │   ├── ocrController.ts      # OCR processing
-│   │   ├── aiPathController.ts   # AI path generation
-│   │   └── tokenController.ts    # Token management
-│   │
-│   ├── services/             # Business logic layer
-│   │   ├── graphqlService.ts     # Hasura/GraphQL operations
-│   │   ├── summaryService.ts     # Text summarization
-│   │   ├── aiPathService.ts      # AI path generation
-│   │   ├── ocrService.ts         # OCR processing
-│   │   ├── quizService.ts        # Quiz generation
-│   │   └── tokenTracker.ts       # Rate limiting
-│   │
-│   ├── middleware/           # Express middleware
-│   │   ├── auth/                 # Authentication middleware
-│   │   ├── validation/           # Request validation
-│   │   └── error/                # Error handling
-│   │
-│   ├── routes/              # API route definitions
-│   │   ├── auth.routes.ts        # Authentication routes
-│   │   ├── syllabus.routes.ts    # Syllabus endpoints
-│   │   └── quiz.routes.ts        # Quiz endpoints
-│   │
-│   └── utils/               # Helper functions
-│       ├── validation/           # Data validation
-│       ├── transformers/         # Data transformers
-│       └── constants/            # Global constants
-│
-├── logs/                    # Application logs
-└── project-hasura/          # Hasura configuration
-    ├── metadata/                # Hasura metadata
-    ├── migrations/              # Database migrations
-    └── seeds/                   # Seed data
-```
+             React Application
+                    |
+                    v
+              TypeScript
+                    |
+                    v
+               Redux-Saga
+                    |
+                    v
+             GraphQL Client
+                    |
+                    v
+                Hasura
+                    |
+                    v
+              PostgreSQL
 
-### Frontend Structure
-```
-src/
-├── api/          # API integration layer
-├── assets/       # Static assets
-├── components/   # Reusable UI components
-├── containers/   # Complex components with business logic
-├── context/      # React context providers
-├── graphql/      # GraphQL queries and mutations
-├── hooks/        # Custom React hooks
-├── pages/        # Route components
-├── redux/        # State management
-├── routes/       # Routing configuration
-├── types/        # TypeScript type definitions
-└── utils/        # Helper functions
-```
+State Management
 
-## Key Features
-- 🔐 Secure Authentication System
-- 📱 Responsive Design
-- 🔄 Real-time Data Updates
-- 🎯 Type Safety with TypeScript
-- 📊 GraphQL API Integration
-- 🚀 Optimized Performance
-- 🧪 Comprehensive Testing
-- 🎨 Modern UI/UX with Tailwind
-- 📁 File Upload Capabilities
-- 🔍 Advanced Search Functionality
+Redux-Saga manages asynchronous application workflows, including API interactions and other side effects.
 
-## Getting Started
-1. Clone both frontend and backend repositories
-2. Install dependencies:
-   ```bash
-   # Frontend
-   cd project-frontend
-   npm install
+Backend Integration
 
-   # Backend
-   cd project_backend
-   npm install
-   ```
-3. Set up environment variables (check .env.example)
-4. Start development servers:
-   ```bash
-   # Frontend
-   npm run dev
+The frontend communicates with the backend through Hasura’s GraphQL APIs.
 
-   # Backend
-   npm run dev
-   ```
+These APIs support:
 
-## Environment Setup
-Ensure you have the following environment variables set up:
+* Application data retrieval.
+* Syllabus-related workflows.
+* Learning resource data.
+* Quiz and assessment data.
+* Student performance information.
 
-Frontend (.env):
-```
-VITE_API_URL=your_api_url
-VITE_HASURA_URL=your_hasura_url
-```
+Getting Started
 
-Backend (.env):
-```
-PORT=3000
-JWT_SECRET=your_secret
-DATABASE_URL=your_database_url
-```
+Clone the repository:
+
+git clone <FRONTEND_REPOSITORY_URL>
+cd <FRONTEND_DIRECTORY>
+
+Install dependencies:
+
+npm install
+
+Configure the GraphQL endpoint and other required environment variables.
+
+Start the development server:
+
+npm start
+
+Update the development command and environment variable names according to the actual project configuration.
+
+Project Goals
+
+* Provide an intuitive learning experience.
+* Make syllabus-based learning easier to manage.
+* Help students access relevant study resources.
+* Encourage continuous assessment.
+* Make learning progress measurable and accessible.
